@@ -1,0 +1,15 @@
+{
+  "name": "harness-direct-api",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Direct-API harness — covers the three non-binary providers (OpenAI-compatible, Gemini, Anthropic API). Single register entry exposes `.stream` (OpenAI-compat) plus sibling `.streamGemini` and `.streamAnthropic` so the dispatcher in chat.ts can pick the right variant by model family. Implementation stays at bridge/tools/stream.ts because the streamers share the tool-loop infrastructure (handleHashTool, btw drainage, image-block handling) with non-harness consumers. Disabling this module makes /v1/stream/ throw for any external/direct-anthropic-routed request.",
+  "provides": {
+    "bridgeRegisters": [
+      "harnesses"
+    ]
+  },
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "harness"
+}

@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": false,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "allowJs": false,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true
+  },
+  "include": [
+    "*.ts",
+    "core/**/*.ts",
+    "observability/**/*.ts",
+    "modules/**/*.ts",
+    "chat/**/*.ts",
+    "context/**/*.ts",
+    "features/**/*.ts",
+    "files/**/*.ts",
+    "config/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "mcp"
+  ]
+}

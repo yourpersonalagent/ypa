@@ -1,0 +1,171 @@
+/* ── Recent working directories ─────────────────────────────────────────────── */
+/* Recents render as ordinary .fp-item rows (with the .fp-recent-row modifier)
+   inside the same .fp-list as files+folders. The label below acts as an
+   inline section divider before the first recent row. */
+.fp-recent-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+  padding: 8px 10px 3px;
+  margin-top: 4px;
+  border-top: 1px solid var(--stroke);
+}
+/* Recent rows lean on .fp-item for layout/hover; the modifier just dims the
+   leaf-name colour to match how the original .fp-recent-name read, and lets
+   the parent prefix sit inline without competing with file styling. */
+.fp-item.fp-recent-row .fp-name {
+  color: var(--fg-dim);
+  font-weight: 400;
+}
+.fp-recent-parent {
+  font-size: 10.5px;
+  opacity: 0.55;
+  margin-right: 1px;
+}
+
+.fp-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--stroke);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+.fp-footer-spacer {
+  flex: 1;
+}
+.fp-btn {
+  background: var(--bg-2);
+  border: 1px solid var(--stroke-2);
+  color: var(--fg-dim);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  font-size: 12.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+.fp-btn:hover:not(:disabled) {
+  background: var(--hl);
+  color: var(--fg);
+}
+.fp-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.fp-btn-primary {
+  background: rgba(0, 224, 138, 0.15);
+  border-color: rgba(0, 224, 138, 0.3);
+  color: var(--accent);
+  font-weight: 600;
+}
+.fp-btn-primary:hover:not(:disabled) {
+  background: rgba(0, 224, 138, 0.25);
+}
+
+/* ── File view / edit button on file items ────────────────────────────────── */
+.fp-view-btn {
+  display: none;
+  font-size: 10.5px;
+  padding: 2px 7px;
+  background: rgba(0, 180, 220, 0.1);
+  border: 1px solid rgba(0, 180, 220, 0.2);
+  color: var(--fg-dim);
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+.fp-item:hover .fp-view-btn {
+  display: inline-block;
+}
+.fp-view-btn:hover {
+  background: rgba(0, 180, 220, 0.22);
+  color: var(--fg);
+}
+
+/* ── Working-dir display injected into #chat-file trigger button ───────────── */
+.fp-wd-display {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 5px;
+  line-height: 1.15;
+  max-width: 96px;
+  overflow: hidden;
+}
+.fp-wd-parent {
+  font-size: 8.5px;
+  opacity: 0.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.fp-wd-name {
+  font-size: 10.5px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* ── File editor modal ────────────────────────────────────────────────────── */
+.fe-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.fe-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 50vw;
+}
+
+.fe-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.fe-ext-flag {
+  color: var(--accent);
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+/* ── Shiki token theme — dark default, bright override via [data-theme] ─────── */
+/* Dark is the default color (defaultColor: 'dark' in codeToHtml options).       */
+/* Bright theme: swap to --shiki-light values defined inline on each token span. */
+html[data-variant='bright'] .shiki-highlighted,
+html[data-variant='bright'] .shiki-highlighted span {
+  color: var(--shiki-light) !important;
+  background-color: var(--shiki-light-bg) !important;
+}
+/* Strip the background Shiki inlines on the <pre> wrapper when embedded in chat */
+.msg-bubble .shiki-highlighted {
+  background: transparent !important;
+}
+/* Shiki token spans don't need pointer events. With 27-48K DOM nodes from
+   syntax highlighting, Chrome hit-tests through every span on each pointermove
+   to decide which element is hovered. Removing pointer events from the spans
+   lets the hit test stop at the <pre>/<code> element instead — same visual
+   result (pre:hover still fires for the copy button) but O(1) instead of
+   O(n_spans) per mouse event. Text selection still works: browsers use a
+   separate text-layout hit path for drag-select that ignores pointer-events. */
+.shiki-highlighted span {
+  pointer-events: none;
+}
+

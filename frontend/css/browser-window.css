@@ -1,0 +1,195 @@
+/* BrowserWindow — KasmVNC-specific bits only. Drag/resize/header/btn/resize
+   live in moveable-window.css; this file owns the iframe surface, status
+   states, lock overlay, quality picker, and the YHA-header trigger button. */
+
+.browser-window-body {
+  background: #000;
+}
+
+.browser-window-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.browser-window-phase {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  color: var(--text-2, #a8a8a8);
+}
+.browser-window-phase.phase-starting { color: #f0c560; border-color: rgba(240, 197, 96, 0.4); }
+.browser-window-phase.phase-ready    { color: #6fd47f; border-color: rgba(111, 212, 127, 0.4); }
+.browser-window-phase.phase-error    { color: #f06f6f; border-color: rgba(240, 111, 111, 0.4); }
+.browser-window-phase.phase-idle     { display: none; }
+
+.browser-window-status {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-2, #a8a8a8);
+}
+.browser-window-status p { margin: 0; }
+.browser-window-hint  { font-size: 12px; opacity: 0.7; max-width: 360px; }
+.browser-window-error { color: #f06f6f; }
+.browser-window-errmsg {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  font-size: 11px;
+  max-width: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  text-align: left;
+}
+.browser-window-retry {
+  margin-top: 4px;
+  background: var(--accent, #5b8cff);
+  color: #fff;
+  border: 0;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.browser-window-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--stroke);
+  border-top-color: var(--accent, #5b8cff);
+  border-radius: 50%;
+  animation: browser-window-spin 0.9s linear infinite;
+}
+@keyframes browser-window-spin { to { transform: rotate(360deg); } }
+
+/* Lock overlay — covers the iframe when the window is locked. Catches all
+   pointer events so nothing reaches the page, and acts as a drag handle for
+   the whole window. Subtle visual hint that interactions are blocked. */
+.browser-window-lock-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: grab;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 14px,
+    rgba(255, 255, 255, 0.018) 14px,
+    rgba(255, 255, 255, 0.018) 28px
+  );
+}
+.mw-card.dragging .browser-window-lock-overlay { cursor: grabbing; }
+
+/* 5-step stream-quality picker — five dots, filled up to the current level.
+   Sits in the header between the phase pill and the lock button. */
+.browser-window-quality {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.bw-q-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--stroke-2);
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.bw-q-dot:hover { transform: scale(1.25); }
+.bw-q-dot.on {
+  background: var(--text-2, #a8a8a8);
+  border-color: var(--text-2, #a8a8a8);
+}
+.bw-q-dot.current {
+  background: var(--accent, #5b8cff);
+  border-color: var(--accent, #5b8cff);
+  box-shadow: 0 0 0 1px rgba(91, 140, 255, 0.25);
+}
+
+/* CDP screencast path — browser chrome (toolbar) stacked above the canvas.
+   Windows-native only; the Linux KasmVNC iframe carries its own chrome inside
+   the streamed desktop. The view box flexes to fill the rest of the body. */
+.browser-window-cdp {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.browser-window-cdp-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+.browser-window-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.02);
+}
+.bw-nav-btn {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-2, #a8a8a8);
+  background: transparent;
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.bw-nav-btn:hover {
+  color: var(--text-1, #e8e8e8);
+  border-color: var(--stroke-2);
+}
+.bw-nav-btn:active { transform: translateY(0.5px); }
+.bw-address-form {
+  flex: 1 1 auto;
+  display: flex;
+  min-width: 0;
+}
+.bw-address-bar {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
+  color: var(--text-1, #e8e8e8);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  outline: none;
+}
+.bw-address-bar:focus {
+  border-color: var(--accent, #5b8cff);
+  box-shadow: 0 0 0 2px rgba(91, 140, 255, 0.2);
+}
+.bw-address-bar::placeholder { color: var(--text-2, #a8a8a8); opacity: 0.7; }
+
+/* Header button — sits next to theme + prefs in the YHA header.
+   Matches the existing .hm-item icon-button styling. */
+#btn-remote-browser[data-state="starting"] .hm-icon { animation: browser-window-spin 1.4s linear infinite; }
+#btn-remote-browser[data-state="ready"] {
+  color: var(--accent, #5b8cff);
+}

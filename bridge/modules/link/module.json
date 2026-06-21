@@ -1,0 +1,20 @@
+{
+  "name": "link",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "LINK / Obsidian Sync — owns /v1/config/link/* routes (status, run-now, secrets, test-ping, import-vault-folder) AND the LINK watchdog worker (final leg of the ContextGenerator pipeline). The vault sync engine library lives at ./vault/sync.ts; the context-generator module's sorter chains into it via cross-module require. Worker lifecycle is registered with ctx.workers.add() so disable / reload clears the 5-min interval cleanly.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/config/link/status",
+      "/v1/config/link/run-now",
+      "/v1/config/link/secrets",
+      "/v1/config/link/test-ping",
+      "/v1/config/link/import-vault-folder"
+    ]
+  },
+  "lifecycle": {
+    "reload": "never"
+  },
+  "category": "integrations"
+}

@@ -1,0 +1,106 @@
+/* ── Confirm modal ────────────────────────────────────────────────────────── */
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10100; /* above toast stack (10000), below shutdown overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity var(--dur-med) var(--ease);
+}
+.confirm-backdrop[data-visible='true'] {
+  opacity: 1;
+}
+
+.confirm-modal {
+  min-width: 280px;
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 16px 18px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-md, 10px);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  color: var(--fg);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(6px) scale(0.97);
+  transition:
+    opacity var(--dur-med) var(--ease),
+    transform var(--dur-med) var(--ease);
+}
+.confirm-modal--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.confirm-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+.confirm-msg {
+  color: var(--fg-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 14px;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.confirm-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--stroke-2);
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.confirm-btn:hover {
+  background: var(--hl);
+}
+.confirm-btn:focus-visible {
+  outline: 2px solid var(--accent-3);
+  outline-offset: 2px;
+}
+
+.confirm-btn--cancel {
+  color: var(--fg-dim);
+}
+
+.confirm-btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg, #111);
+}
+.confirm-btn--primary:hover {
+  filter: brightness(1.08);
+  background: var(--accent);
+}
+
+.confirm-btn--danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.confirm-btn--danger:hover {
+  filter: brightness(1.08);
+  background: var(--danger);
+}

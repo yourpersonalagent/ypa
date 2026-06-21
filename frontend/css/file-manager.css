@@ -1,0 +1,460 @@
+/* FileManager — server-side file management surface.
+   Lives inside a MoveableWindow (.mw-card / .mw-body), so generic frame
+   styles come from moveable-window.css. This file owns the toolbar,
+   listing, footer, drag-overlay, upload queue, and confirm dialogs.
+
+   All colours route through themed CSS variables (--surface, --surface-2,
+   --fg, --fg-dim, --fg-mute, --stroke, --stroke-2, --accent, --danger,
+   --hl). Avoid --surface-1 / --text-* / --border / --bg-soft — those
+   tokens are only defined on the variant base (dark/bright) and don't
+   re-tint per theme family (kawaii, ocean, sunset, …). */
+
+/* The mw-body wraps fm-root which fills it. */
+.mw-body.fm-body { padding: 0; }
+
+.fm-root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 13px;
+  overflow: hidden;
+}
+
+/* Title path next to "File Manager" — dimmed so the modal title stays readable */
+.fm-title-path {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--fg-dim);
+  margin-left: 8px;
+  max-width: 36vw;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────── */
+
+.fm-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--stroke);
+  background: var(--hl);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.fm-toolbar-spacer { flex: 1; }
+
+.fm-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+.fm-crumb-wrap { display: inline-flex; align-items: center; }
+.fm-crumb {
+  background: transparent;
+  border: 0;
+  color: var(--fg-dim);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.fm-crumb:hover { background: var(--hl); color: var(--fg); }
+.fm-crumb-sep { color: var(--fg-mute); margin: 0 1px; }
+
+.fm-hidden-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  cursor: pointer;
+  user-select: none;
+}
+.fm-hidden-toggle input { margin: 0; }
+
+.fm-btn {
+  background: var(--hl);
+  border: 1px solid var(--stroke);
+  color: var(--fg);
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.4;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.fm-btn:hover { background: var(--surface-2); border-color: var(--stroke-2); }
+.fm-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.fm-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-2);
+}
+.fm-btn-primary:hover {
+  background: var(--accent);
+  filter: brightness(1.1);
+}
+.fm-btn-danger {
+  background: color-mix(in srgb, var(--danger) 18%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 50%, transparent);
+  color: var(--danger);
+}
+.fm-btn-danger:hover {
+  background: color-mix(in srgb, var(--danger) 30%, transparent);
+}
+.fm-btn-accent {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent);
+}
+
+/* ── Inline mkdir input ──────────────────────────────────────────────────── */
+
+.fm-inline-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--hl);
+  border-bottom: 1px solid var(--stroke);
+}
+.fm-inline-label { font-size: 12px; color: var(--fg-dim); }
+.fm-inline-input input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke);
+  color: var(--fg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+/* ── Listing ─────────────────────────────────────────────────────────────── */
+
+.fm-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+.fm-empty {
+  padding: 30px 14px;
+  text-align: center;
+  color: var(--fg-mute);
+  font-size: 12px;
+}
+.fm-error { color: var(--danger); }
+
+.fm-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+}
+.fm-row:hover { background: var(--hl); }
+.fm-row.fm-selected {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.fm-row.fm-parent {
+  font-style: italic;
+  color: var(--fg-dim);
+}
+.fm-icon {
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.fm-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fm-size {
+  font-size: 11px;
+  color: var(--fg-mute);
+  flex-shrink: 0;
+}
+.fm-rename-input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  color: var(--fg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.fm-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--stroke);
+  background: var(--hl);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.fm-sel-info {
+  flex: 1;
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+
+/* ── Drag overlay ───────────────────────────────────────────────────────── */
+
+.fm-drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fm-drop-overlay-inner {
+  pointer-events: none;
+  text-align: center;
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  border: 2px dashed var(--accent);
+  border-radius: 14px;
+  padding: 28px 38px;
+  max-width: 80%;
+}
+.fm-drop-icon {
+  font-size: 36px;
+  color: var(--accent);
+}
+.fm-drop-title {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.fm-drop-hint {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+/* ── Upload queue ────────────────────────────────────────────────────────── */
+
+.fm-queue {
+  position: absolute;
+  right: 12px;
+  bottom: 56px; /* sits above the footer */
+  width: min(440px, calc(100% - 24px));
+  max-height: 60%;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: 10px;
+  box-shadow: var(--shadow-2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 8;
+}
+.fm-queue-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--stroke);
+  background: var(--hl);
+}
+.fm-queue-summary {
+  font-size: 11px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fm-queue-spacer { flex: 1; }
+.fm-queue-progress {
+  position: relative;
+  height: 4px;
+  background: var(--stroke);
+}
+.fm-queue-bar {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+.fm-queue-pct {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  font-size: 10px;
+  color: var(--fg);
+  background: var(--surface);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+.fm-queue-list {
+  overflow-y: auto;
+  padding: 4px 0;
+  max-height: 280px;
+}
+.fm-queue-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+.fm-queue-row.fm-queue-uploading { background: var(--hl); }
+.fm-queue-row.fm-queue-done { color: var(--fg-dim); }
+.fm-queue-row.fm-queue-error { color: var(--danger); }
+.fm-queue-row.fm-queue-skipped { color: var(--fg-mute); }
+.fm-queue-status {
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.fm-queue-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fm-queue-size {
+  font-size: 11px;
+  color: var(--fg-mute);
+}
+.fm-queue-rowpct {
+  font-size: 11px;
+  color: var(--accent);
+}
+.fm-queue-err {
+  font-size: 11px;
+  color: var(--danger);
+}
+.fm-queue-rm {
+  background: transparent;
+  border: 0;
+  color: var(--fg-mute);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 12px;
+}
+.fm-queue-rm:hover { color: var(--danger); }
+.fm-queue-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--stroke);
+}
+
+/* ── Modal overlays (conflict, delete, move) ─────────────────────────────── */
+
+.fm-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  backdrop-filter: blur(4px);
+}
+.fm-modal {
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: 10px;
+  padding: 20px 22px;
+  max-width: 540px;
+  width: 80%;
+  box-shadow: var(--shadow-2);
+}
+.fm-modal h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.fm-modal p {
+  margin: 6px 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+.fm-modal code {
+  background: var(--hl);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+.fm-modal-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  color: var(--fg);
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-family: inherit;
+  margin: 6px 0;
+}
+.fm-modal-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+.fm-conflict-actions {
+  flex-wrap: wrap;
+}
+.fm-conflict-apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-top: 8px;
+}
+.fm-modal-danger { border-color: color-mix(in srgb, var(--danger) 50%, transparent); }
+.fm-delete-list {
+  margin: 8px 0;
+  padding-left: 20px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  max-height: 160px;
+  overflow-y: auto;
+}
+.fm-delete-list li { margin: 2px 0; }
+.fm-hint {
+  font-size: 11px !important;
+  color: var(--fg-mute) !important;
+  font-style: italic;
+}
+
+/* ── Header trigger button ───────────────────────────────────────────────── */
+
+
+/* No bright-mode override block needed: every colour now routes through
+   themed CSS variables (--surface, --surface-2, --fg, --fg-dim, --fg-mute,
+   --stroke, --stroke-2, --accent, --danger, --hl), which carry the right
+   light/dark/family-tinted values in every theme. */

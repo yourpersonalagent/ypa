@@ -1,0 +1,228 @@
+/* shutdown.css — analog-TV switch-off effect when the YHA backend is unreachable.
+ *
+ * Driven by ShutdownOverlay.tsx via `body.tv-off` and `.shutdown-overlay` classes.
+ * The bg.ts-rendered #bg-canvas is left untouched so the ambient WebGL animation
+ * keeps running in the background while the rest of the UI collapses.
+ *
+ * Selector strategy: every direct child of #root *except* the bg-canvas and the
+ * overlay itself collapses. That covers <Shell> (header/main/nav), all portals,
+ * status indicator, etc. — without enumerating individual IDs.
+ */
+
+/* Smooth, bidirectional transition. Removing `tv-off` reverses automatically. */
+#root > *:not(#bg-canvas):not(.shutdown-overlay) {
+  transition:
+    transform 320ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)),
+    opacity 320ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)),
+    filter 320ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1));
+  transform-origin: 50% 50%;
+}
+
+/* TV switch-off: vertical squash, bleach to a bright line, then fade. */
+body.tv-off #root > *:not(#bg-canvas):not(.shutdown-overlay) {
+  transform: scaleY(0.018);
+  filter: brightness(2.6) saturate(0.15) contrast(1.3);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Overlay ────────────────────────────────────────────────────────────── */
+
+.shutdown-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Sit above the collapsing UI but below dev tools. The bg-canvas is below us. */
+}
+
+/* The bright horizontal "scanline" that pinches to a dot, then fades.
+ * Phase 1 (0–260ms):  fade in as a full-width thin bright bar
+ * Phase 2 (260–520ms): scaleX → 0  (pinches to a center dot)
+ * Phase 3 (520–760ms): opacity → 0 with a glow afterimage
+ */
+.shutdown-line {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background: #fff;
+  box-shadow:
+    0 0 4px 1px rgba(255, 255, 255, 0.9),
+    0 0 18px 4px rgba(255, 255, 255, 0.45);
+  transform-origin: 50% 50%;
+  transform: translate(-50%, -50%) scaleX(1);
+  opacity: 0;
+}
+
+.shutdown-lost .shutdown-line {
+  animation: tv-off-line 760ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) forwards;
+}
+
+.shutdown-restored .shutdown-line,
+.shutdown-booted .shutdown-line {
+  animation: tv-on-line 700ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) forwards;
+}
+
+.shutdown-unauthorized .shutdown-line {
+  animation: tv-off-line 400ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) forwards;
+}
+
+/* Boot reveal owns no message — just the scanline + the body un-collapse. */
+.shutdown-booted .shutdown-msg {
+  display: none;
+}
+
+@keyframes tv-off-line {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scaleX(1)   scaleY(0.6); }
+  35%  { opacity: 1;   transform: translate(-50%, -50%) scaleX(1)   scaleY(1); }
+  70%  { opacity: 1;   transform: translate(-50%, -50%) scaleX(0.004) scaleY(1.2); }
+  85%  { opacity: 1;   transform: translate(-50%, -50%) scaleX(0.004) scaleY(1.2); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scaleX(0.004) scaleY(0.6); }
+}
+
+@keyframes tv-on-line {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scaleX(0.004) scaleY(0.6); }
+  20%  { opacity: 1;   transform: translate(-50%, -50%) scaleX(0.004) scaleY(1.2); }
+  60%  { opacity: 1;   transform: translate(-50%, -50%) scaleX(1)    scaleY(1); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scaleX(1)    scaleY(0.6); }
+}
+
+/* Status text — sits below the line, fades in after the line collapses. */
+.shutdown-msg {
+  position: relative;
+  margin-top: 56px; /* below the line */
+  color: var(--fg, #e6eef7);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  animation: shutdown-msg-in 500ms 600ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) forwards,
+             shutdown-msg-pulse 2.4s 1.1s ease-in-out infinite;
+}
+
+.shutdown-restored .shutdown-msg {
+  /* Restored: text already visible (lingering from 'lost'), no fade-in needed */
+  animation: none;
+  opacity: 0.85;
+  color: var(--accent, #00e08a);
+}
+
+.shutdown-unauthorized .shutdown-msg {
+  animation: shutdown-msg-in 280ms 200ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) forwards;
+  color: var(--accent-2, #ff9a3d);
+}
+
+@keyframes shutdown-msg-in {
+  from { opacity: 0;   transform: translateY(4px); }
+  to   { opacity: 0.85; transform: translateY(0); }
+}
+
+@keyframes shutdown-msg-pulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 0.45; }
+}
+
+/* ── Boot progress ───────────────────────────────────────────────────────
+ * Tiny bottom-center counter shown during the 'booting' phase (after auth,
+ * before the first paint reveal). Fades in after a short delay so very fast
+ * boots don't flash anything; otherwise the user sees elapsed time + bytes
+ * received so the wait doesn't feel frozen. Lives inside .shutdown-overlay
+ * so the body.tv-off collapse leaves it untouched.
+ */
+.shutdown-booting .boot-progress {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg, #e6eef7);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  animation: boot-progress-in 380ms 350ms var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) forwards;
+}
+
+.boot-progress-text {
+  opacity: 0.7;
+  min-width: 14ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.boot-progress-bar {
+  position: relative;
+  width: 200px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.boot-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.35);
+  transition: width 120ms linear;
+}
+
+.boot-progress-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.85),
+    transparent
+  );
+  animation: boot-shimmer 1.4s linear infinite;
+}
+
+@keyframes boot-progress-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes boot-shimmer {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(350%); }
+}
+
+/* Respect reduced-motion: skip transforms and animations, just fade. */
+@media (prefers-reduced-motion: reduce) {
+  #root > *:not(#bg-canvas):not(.shutdown-overlay) {
+    transition: opacity 200ms linear;
+    transform: none !important;
+  }
+  body.tv-off #root > *:not(#bg-canvas):not(.shutdown-overlay) {
+    transform: none;
+    filter: none;
+  }
+  .shutdown-line { display: none; }
+  .shutdown-msg {
+    margin-top: 0;
+    animation: shutdown-msg-in 200ms linear forwards;
+  }
+  .boot-progress-shimmer {
+    animation: none;
+    width: 100%;
+    opacity: 0.5;
+  }
+}

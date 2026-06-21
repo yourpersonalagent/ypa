@@ -1,0 +1,24 @@
+# YPA README screenshots — drop PNGs here with these exact names.
+# They are linked from README.md by relative path and ride along into
+# the public snapshot automatically: publish-org.ps1 builds from the
+# committed HEAD tree and strips only the private pets + itself.
+# COMMIT the images before publishing — the publisher ignores the
+# working tree, so anything uncommitted will not ship.
+#
+#   hero.png             chat + node editor, mid-record   (~900px wide)
+#   full.png             Full layout
+#   code.png             Code view (VSCode-style workspace)
+#   workflow.png         Workflow node editor
+#   split.png            Split view (graph + chat)
+#   messenger.png        Messenger layout
+#   zen.png              Zen layout
+#   theme-atelier.png    Atelier design
+#   theme-console.png    Console design
+#   theme-patchbay.png   Patchbay design
+#   color-smoke-{bright,dark}.png    grayscale pair
+#   color-prism-{bright,dark}.png    colorful pair
+#   color-minimal-{bright,dark}.png  minimal pair
+#   color-void-{bright,dark}.png     stark / very-dark pair
+#   color-ocean-{bright,dark}.png    cool pair
+#   color-sunset-{bright,dark}.png   warm pair
+#   pet.png              the pet companion (~230px wide is plenty)

@@ -1,0 +1,11 @@
+{
+  "name": "remote-browser",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Moveable, resizable, fullscreen-toggleable iframe view onto the desktop-browser MCP's KasmVNC surface. Lets the user occasionally see + take over (logins, captchas) while the model drives Chromium via CDP. Adds a primary-row header icon, the BrowserWindow modal, and the Alt+B hotkey that opens it. Reaches the Chromium surface via the bridge's reverse proxy at /proxy/browser/ (KasmVNC running on 127.0.0.1:3001). Disabling this module hides the icon, unbinds the hotkey, and unmounts the modal.",
+  "needs": [],
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "integrations"
+}

@@ -1,0 +1,351 @@
+/* Atelier — editorial / boutique design.
+ *
+ * Bone paper, deep ink, verdigris accent. Newsreader serif headings,
+ * Geist body, JetBrains Mono captions in uppercase.
+ *
+ * SPECIFICITY STRATEGY
+ *   tokens.css sets the default base palette at `html[data-variant='Y']`
+ *   (specificity 11) and per-family palettes at
+ *   `html[data-theme='X'][data-variant='Y']` (specificity 21).
+ *
+ *   Atelier's variant blocks below use `[data-design='atelier'][data-variant='Y']`
+ *   *without* the leading `html` — specificity 20. That deliberate ranking
+ *   gives us:
+ *      default base (11) < atelier variant (20) < colour theme (21)
+ *   so atelier replaces the default look, but any non-default colour family
+ *   (ocean / sunset / minimal / kawaii / etc.) wins back on bg / fg /
+ *   surface / accent / shadow — same behaviour console has. The "default"
+ *   colour family has no spec-21 block, so atelier's paper/walnut palette
+ *   shows through there.
+ *
+ *   Design-specific tokens that no colour family touches (typography,
+ *   `--design-decor`, structural radii) stay in the spec-11
+ *   `html[data-design='atelier']` block.
+ *
+ * VARIANTS
+ *   Bright variant = paper (the original design source).
+ *   Dark variant   = dark parchment / leather — same chrome, inverted base.
+ */
+
+/* ─── Atelier-native palette references ───────────────────────────────── */
+html[data-design='atelier'] {
+  --atelier-paper:        #efe7d8;
+  --atelier-paper-deep:   #e6dcc8;
+  --atelier-paper-edge:   #dccfb6;
+  --atelier-ink:          #19140d;
+  --atelier-ink-2:        #5a4f3f;
+  --atelier-ink-3:        #8d8273;
+  --atelier-accent:       #1f5a4c; /* verdigris */
+  --atelier-accent-soft:  rgba(31, 90, 76, 0.10);
+  --atelier-ember:        #a4451c;
+
+  /* Dark-variant palette (warm walnut + paper inverted). */
+  --atelier-walnut:       #1a160f;
+  --atelier-walnut-deep:  #221c14;
+  --atelier-walnut-edge:  #2c241a;
+  --atelier-paper-dim:    #b8a98e;
+  --atelier-paper-mute:   #8d8273;
+  --atelier-verdigris-up: #3a8f7c;
+  --atelier-ember-up:     #c95c2a;
+
+  /* Design-role tokens (consumed by design-aware components only — design
+     concepts that the colour-theme axis has no opinion about: fonts,
+     chrome decoration, structural radii). */
+  --design-display-font: 'Newsreader', 'Instrument Serif', Georgia, serif;
+  --design-body-font:    'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --design-mono-font:    'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --design-radius:        2px;
+  --design-radius-sharp:  0;
+  --design-radius-pill:   999px;
+  --design-accent-native: var(--atelier-accent);
+
+  /* Override the universal --font / --font-mono tokens so EVERY component
+     that uses var(--font) / var(--font-mono) — chat, prefs, header,
+     moveable-windows, pickers, modals, etc. — picks up Atelier's
+     typographic concept without each needing its own design selector.
+     Atelier's body is a slightly tighter Geist (vs. the default
+     looser default) and mono stays JetBrains Mono. The display token is
+     new and the title selectors below opt into it. */
+  --font:         var(--design-body-font);
+  --font-mono:    var(--design-mono-font);
+  --font-display: var(--design-display-font);
+  --mono:         var(--design-mono-font);
+  --font-sans:    var(--design-body-font);
+
+  /* Default-family accents. Colour themes win at spec 21 in tokens.css;
+     atelier's variant blocks below (spec 20) override these only for the
+     default family. */
+  --accent:       var(--atelier-accent);
+  --accent-2:     var(--atelier-ember);
+  --accent-3:     #3f7f6f;
+  --danger:       var(--atelier-ember);
+  --hl:           var(--atelier-accent-soft);
+
+  font-family: var(--design-body-font);
+}
+
+/* ─── BRIGHT variant — the original paper design ──────────────────────── */
+[data-design='atelier'][data-variant='bright'] {
+  --bg:            var(--atelier-paper);
+  --bg-2:          var(--atelier-paper-deep);
+  --bg-3:          var(--atelier-paper-edge);
+  --surface:       rgb(230, 220, 200);
+  --surface-1:     rgb(220, 207, 182);
+  --surface-2:     rgb(239, 231, 216);
+  --stroke:        rgba(25, 20, 13, 0.16);
+  --stroke-2:      rgba(25, 20, 13, 0.42);
+  --border:        rgba(25, 20, 13, 0.42);
+  --bg-soft:       var(--atelier-paper-deep);
+  --bg-elevated:   var(--atelier-paper-deep);
+  --fg:            var(--atelier-ink);
+  --fg-dim:        var(--atelier-ink-2);
+  --fg-mute:       var(--atelier-ink-3);
+  --text-1:        var(--atelier-ink);
+  --text-2:        var(--atelier-ink-2);
+  --text-3:        var(--atelier-ink-3);
+
+  --shadow-1:      0 1px 2px rgba(25, 20, 13, 0.08);
+  --shadow-2:      0 8px 28px rgba(25, 20, 13, 0.12);
+  --shadow-glow:   0 0 0 0.5px rgba(25, 20, 13, 0.42), 0 4px 16px rgba(31, 90, 76, 0.12);
+
+  /* Paper grain — two diagonal radial vignettes. Mirrors the masthead
+     treatment from the design source. */
+  --design-decor:
+    radial-gradient(ellipse 60% 40% at 80% 8%, rgba(31, 90, 76, 0.05), transparent 60%),
+    radial-gradient(ellipse 50% 35% at 12% 90%, rgba(164, 69, 28, 0.04), transparent 60%);
+}
+
+/* ─── DARK variant — walnut + leather ─────────────────────────────────── */
+[data-design='atelier'][data-variant='dark'] {
+  --bg:            var(--atelier-walnut);
+  --bg-2:          var(--atelier-walnut-deep);
+  --bg-3:          var(--atelier-walnut-edge);
+  --surface:       rgb(34, 28, 20);
+  --surface-1:     rgb(44, 36, 26);
+  --surface-2:     rgb(54, 44, 32);
+  --stroke:        rgba(239, 231, 216, 0.10);
+  --stroke-2:      rgba(239, 231, 216, 0.28);
+  --border:        rgba(239, 231, 216, 0.28);
+  --bg-soft:       var(--atelier-walnut-deep);
+  --bg-elevated:   var(--atelier-walnut-edge);
+  --fg:            var(--atelier-paper);
+  --fg-dim:        var(--atelier-paper-dim);
+  --fg-mute:       var(--atelier-paper-mute);
+  --text-1:        var(--atelier-paper);
+  --text-2:        var(--atelier-paper-dim);
+  --text-3:        var(--atelier-paper-mute);
+
+  /* Brightened accents for legibility on the walnut ground. Spec 20 — beats
+     atelier's spec-11 default-family accents, but loses to colour themes at
+     spec 21 in tokens.css, so ocean/sunset/etc. still cycle through. */
+  --accent:        var(--atelier-verdigris-up);
+  --accent-2:      var(--atelier-ember-up);
+  --hl:            rgba(58, 143, 124, 0.12);
+
+  --shadow-1:      0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-2:      0 10px 30px rgba(0, 0, 0, 0.55);
+  --shadow-glow:   0 0 0 0.5px rgba(239, 231, 216, 0.28), 0 6px 20px rgba(58, 143, 124, 0.18);
+
+  --design-decor:
+    radial-gradient(ellipse 60% 40% at 80% 8%, rgba(58, 143, 124, 0.08), transparent 60%),
+    radial-gradient(ellipse 50% 35% at 12% 90%, rgba(201, 92, 42, 0.06), transparent 60%);
+}
+
+/* ── Display typography — serif h1…h3 with tight tracking ─────────────── */
+html[data-design='atelier'] h1,
+html[data-design='atelier'] h2,
+html[data-design='atelier'] h3,
+html[data-design='atelier'] .mw-title,
+html[data-design='atelier'] .brand,
+html[data-design='atelier'] .brand-name,
+html[data-design='atelier'] .hero-h,
+html[data-design='atelier'] .panel-title,
+html[data-design='atelier'] .drawer-title,
+html[data-design='atelier'] .pers-tile h3,
+html[data-design='atelier'] .pers-tile-name {
+  font-family: var(--design-display-font);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-transform: none; /* defeat existing uppercase rules on .mw-title etc.
+                           so the serif reads as an editorial wordmark */
+}
+
+html[data-design='atelier'] h1 small {
+  font-family: var(--design-mono-font);
+  font-size: clamp(9px, 1vw, 11px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+  font-weight: 500;
+}
+
+/* ── Paper-grain decoration — painted under everything ───────────────── */
+html[data-design='atelier'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--design-decor);
+  z-index: 0;
+}
+/* Critical: do NOT create a stacking context on body > * — that can
+   break absolute-positioned overlays + dropdowns. The decoration sits
+   at z-index 0 fixed; everything painted on top in normal flow renders
+   above it because of natural source order. */
+
+/* ── Buttons — pills with thin ink hairline borders ─────────────────── */
+html[data-design='atelier'] .prefs-btn,
+html[data-design='atelier'] button.btn,
+html[data-design='atelier'] .btn-secondary,
+html[data-design='atelier'] .btn-ghost,
+html[data-design='atelier'] .mw-btn,
+html[data-design='atelier'] .pers-btn {
+  border-radius: var(--design-radius-pill);
+  border-color: var(--stroke-2);
+  font-family: var(--design-mono-font);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-design='atelier'] .pers-btn-primary,
+html[data-design='atelier'] .btn-primary,
+html[data-design='atelier'] button[data-primary] {
+  background: var(--fg);
+  color: var(--bg);
+  border-radius: var(--design-radius-pill);
+}
+
+/* ── Surfaces — squared edges, hairline rules instead of rounded panels ── */
+html[data-design='atelier'] .mw-card,
+html[data-design='atelier'] .panel,
+html[data-design='atelier'] .pers-tile,
+html[data-design='atelier'] .hs-body,
+html[data-design='atelier'] .picker,
+html[data-design='atelier'] .perm-modal-card,
+html[data-design='atelier'] .trigger-modal-card,
+html[data-design='atelier'] .prefs-section {
+  border-radius: var(--design-radius);
+  border: 0.5px solid var(--stroke);
+}
+
+/* ── Inputs / selects — flat paper rectangles ─────────────────────────── */
+html[data-design='atelier'] .prefs-input,
+html[data-design='atelier'] .prefs-select,
+html[data-design='atelier'] .prefs-prompt-ta,
+html[data-design='atelier'] input[type='text'],
+html[data-design='atelier'] input[type='number'],
+html[data-design='atelier'] select,
+html[data-design='atelier'] textarea {
+  border-radius: var(--design-radius);
+  border: 0.5px solid var(--stroke-2);
+  background: var(--bg-2);
+  font-family: var(--design-body-font);
+}
+
+/* ── Section headings inside prefs / panels — small caps verdigris ─── */
+html[data-design='atelier'] .prefs-sec,
+html[data-design='atelier'] .prefs-col-lbl,
+html[data-design='atelier'] .debug-modal-tab {
+  font-family: var(--design-mono-font);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+/* ── Full layout: paint the chat view with --bg (walnut, the darker tone)
+       instead of core's default --bg-2 (walnut-deep, slightly lighter), and
+       — critically — keep it OPAQUE so the body::before decor radials don't
+       leak through and tint the chat area warmer/lighter. This matches what
+       zen's .layout-zen does: opaque --bg over the viewport, decor hidden
+       inside the chat surface. Transparent gives the wrong result here
+       because .view-chat sits later in tree order than body::before, so a
+       transparent view exposes the decor instead of body. Scoped to
+       atelier's default color family. ─────────────────────────────────── */
+html[data-design='atelier'][data-theme='default'][data-layout='full'] .view-chat {
+  background: var(--bg);
+}
+
+/* ── Chat input bar — pill-ish but flatter, mono labels ──────────────── */
+html[data-design='atelier'] .chat-input-bar {
+  border-radius: var(--design-radius);
+}
+html[data-design='atelier'] .chat-bar-btn {
+  border-radius: var(--design-radius);
+  font-family: var(--design-mono-font);
+}
+
+/* ── Chat messages — actual selectors: `.msg`, `.msg-bubble` etc. ────── */
+html[data-design='atelier'] .msg-bubble {
+  border-radius: var(--design-radius);
+}
+html[data-design='atelier'] .msg.user .msg-bubble {
+  background: var(--bg-2);
+  border: 0.5px solid var(--stroke);
+  /* Override the giant 2em user font with a more editorial scale. */
+  font-size: 1.05em;
+}
+html[data-design='atelier'] .msg.agent .msg-bubble {
+  background: transparent;
+  border-radius: 0;
+}
+html[data-design='atelier'] .msg-role-label {
+  font-family: var(--design-mono-font);
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  font-size: 11px;
+  background: transparent;
+}
+html[data-design='atelier'] .msg.user .msg-role-label {
+  color: var(--accent);
+}
+html[data-design='atelier'] .msg.agent .msg-role-label {
+  color: var(--accent);
+}
+
+/* ── Header brand — verdigris dot after the wordmark ─────────────────── */
+html[data-design='atelier'] .header-block,
+html[data-design='atelier'] .header-bar h1 .header-block,
+html[data-design='atelier'] .brand {
+  color: var(--accent);
+}
+
+/* ── Landing-page hero typography — opt-in via class names that already
+       exist in index.html. ────────────────────────────────────────────── */
+html[data-design='atelier'] .landing-hero h1,
+html[data-design='atelier'] .landing-title,
+html[data-design='atelier'] .hero h1 {
+  font-family: var(--design-display-font);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  font-size: clamp(48px, 9vw, 112px);
+  line-height: 0.95;
+}
+html[data-design='atelier'] .landing-hero em,
+html[data-design='atelier'] .hero em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+/* ── Mobile / small-screen adjustments ─────────────────────────────── */
+@media (max-width: 720px) {
+  html[data-design='atelier'] .prefs-btn,
+  html[data-design='atelier'] button.btn {
+    font-size: 10px;
+    padding: 8px 12px;
+  }
+}
+@media (max-width: 480px) {
+  html[data-design='atelier'] h1,
+  html[data-design='atelier'] h2,
+  html[data-design='atelier'] h3 {
+    letter-spacing: -0.015em;
+  }
+  html[data-design='atelier'] .landing-hero h1,
+  html[data-design='atelier'] .landing-title,
+  html[data-design='atelier'] .hero h1 {
+    font-size: clamp(38px, 11vw, 64px);
+  }
+  /* Soften the paper grain on mobile — too busy at small sizes. */
+  html[data-design='atelier'] body::before { opacity: 0.5; }
+}

@@ -1,0 +1,178 @@
+/* ── Participant chips (above chat input) ─────────────────────────────────── */
+.chat-participants {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 10px 2px;
+}
+.chat-participant-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg-2));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--stroke));
+  border-radius: 12px;
+  padding: 2px 8px 2px 10px;
+  font-size: 11.5px;
+  color: var(--accent);
+  font-weight: 500;
+}
+.chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-mute);
+  font-size: 10px;
+  padding: 0 1px;
+  line-height: 1;
+}
+.chip-remove:hover {
+  color: var(--red, #e05);
+}
+.chat-participant-add {
+  background: none;
+  border: 1px dashed var(--stroke);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: var(--fg-mute);
+  cursor: pointer;
+}
+.chat-participant-add:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Mode toggle button */
+.chat-mode-toggle {
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--stroke));
+  border-radius: 12px;
+  padding: 2px 9px;
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: background 0.15s;
+}
+.chat-mode-toggle:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* Moderator first-chip highlight */
+.chat-participant-chip.chip-moderator {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--stroke));
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg-2));
+}
+.chip-mod-badge {
+  font-size: 9px;
+  color: var(--accent);
+  opacity: 0.8;
+  line-height: 1;
+  margin-right: 1px;
+}
+
+/* Drag handle */
+.chip-drag {
+  font-size: 11px;
+  color: var(--fg-mute);
+  cursor: grab;
+  opacity: 0.4;
+  user-select: none;
+  padding-right: 2px;
+}
+.chip-drag:active {
+  cursor: grabbing;
+}
+.chip-name {
+  cursor: pointer;
+}
+.chip-name:hover {
+  text-decoration: underline;
+}
+.chat-participant-chip.chip-dragging {
+  opacity: 0.4;
+}
+.chat-participant-chip.chip-drag-over {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ── @ / personnel autocomplete popup ────────────────────────────────────── */
+.at-picker {
+  position: fixed;
+  z-index: 9999;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22);
+  overflow-y: auto;
+  max-height: 280px;
+  padding: 4px 0;
+}
+.at-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.at-picker-item:hover,
+.at-picker-item.at-picker-active {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-2));
+}
+.at-picker-av {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg-2));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--stroke));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.at-picker-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.at-picker-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+}
+.at-picker-role {
+  font-size: 10.5px;
+  color: var(--fg-mute);
+}
+.at-picker-action {
+  font-size: 10.5px;
+  color: var(--accent);
+  opacity: 0.7;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.at-picker-empty {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--fg-mute);
+}
+
+/* ── Author label on streamed messages ────────────────────────────────────── */
+.msg-author-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+

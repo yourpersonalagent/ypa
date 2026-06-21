@@ -1,0 +1,20 @@
+{
+  "name": "context",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Read + sensitivity surface for the ContextGenerator pipeline. Owns /v1/context/items, /v1/context/file, /v1/context/items/:id/sensitivity, /v1/context/sensitivity/{confirm,whitelist}. Backs the QuickContextPicker (input popover) and the ContextHub (header modal). The pipeline workers (auto-title, categorizer, sorter, LINK) live in modules/context-generator; the global+cwd context helpers live in bridge/context/{global,cwd}.ts. Disabling the module 404s the picker fetches and locks the Hub modal in 'no items' state.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/context/items",
+      "/v1/context/file",
+      "/v1/context/items/:id/sensitivity",
+      "/v1/context/sensitivity/confirm",
+      "/v1/context/sensitivity/whitelist"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "context"
+}

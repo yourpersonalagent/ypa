@@ -1,0 +1,721 @@
+/* ── Editor HUD: workflow controls rows ──────────────────────────────────── */
+.editor-hud {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  z-index: 5;
+  align-items: flex-end;
+}
+.hud-row {
+  display: flex;
+  gap: 2px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.hud-btn {
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  color: var(--fg);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  opacity: 0.55;
+  transition:
+    opacity var(--dur-fast),
+    background var(--dur-fast);
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+}
+.hud-btn:hover {
+  opacity: 1;
+}
+.hud-run {
+  color: var(--accent);
+  border-color: rgba(0, 224, 138, 0.3);
+  background: rgba(0, 224, 138, 0.07);
+}
+.hud-run:hover {
+  background: rgba(0, 224, 138, 0.18);
+  opacity: 1;
+}
+.hud-del:hover {
+  color: var(--danger, #ff5060);
+  opacity: 1;
+}
+.hud-rec-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  height: 28px;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  overflow: hidden;
+  opacity: 0.7;
+  transition:
+    opacity var(--dur-fast),
+    border-color var(--dur-fast),
+    background var(--dur-fast);
+}
+.hud-rec-toggle:hover {
+  opacity: 1;
+}
+.hud-rec-toggle:focus-within {
+  opacity: 1;
+  border-color: rgba(0, 180, 220, 0.3);
+  background: rgba(0, 180, 220, 0.05);
+}
+.hud-rec-toggle-btn {
+  appearance: none;
+  border: 0;
+  border-right: 1px solid var(--stroke);
+  background: transparent;
+  color: var(--fg);
+  min-width: 26px;
+  height: 100%;
+  padding: 0 7px;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  opacity: 0.6;
+  transition:
+    opacity var(--dur-fast),
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+.hud-rec-toggle-btn:last-child {
+  border-right: 0;
+}
+.hud-rec-toggle-btn:hover {
+  opacity: 1;
+}
+.hud-rec-toggle-btn.hud-rec-active {
+  background: rgba(0, 180, 220, 0.15);
+  color: var(--accent);
+  opacity: 1;
+}
+.hud-bound {
+  color: var(--accent-2, #b06aff);
+  border-color: rgba(176, 106, 255, 0.35);
+  background: rgba(176, 106, 255, 0.1);
+  opacity: 1;
+}
+.hud-wf {
+  width: auto;
+  max-width: 140px;
+  padding: 0 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hud-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--stroke);
+  opacity: 0.5;
+  align-self: center;
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+/* popover list */
+.popover-list {
+  max-height: 50vh;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+}
+.popover-list::-webkit-scrollbar {
+  width: 6px;
+}
+.popover-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.popover-list::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+.popover-list::-webkit-scrollbar-thumb:hover {
+  background: var(--stroke);
+}
+.popover-item {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.popover-item:hover,
+.popover-item.selected {
+  background: var(--hl);
+}
+.popover-item .dim {
+  color: var(--fg-dim);
+  font-size: 12px;
+}
+.popover-group,
+.popover-group-header {
+  padding: 8px 10px 3px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-mute);
+}
+/* Command group badges */
+.cmd-badge {
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.cmd-badge.cc {
+  background: #1a3a1a;
+  color: #4caf50;
+}
+.cmd-badge.ct {
+  background: #1a2a3a;
+  color: #4a9eff;
+}
+.cmd-badge.oc {
+  background: #3a2412;
+  color: #ff9a3d;
+}
+.cmd-badge.mcp {
+  background: #2a1a3a;
+  color: #b47eff;
+}
+.cmd-badge.loc {
+  background: #2a2a1a;
+  color: #c8a040;
+}
+.cmd-badge-dim {
+  font-size: 9px;
+  color: var(--fg-mute);
+  margin-left: 6px;
+}
+/* Subgroup hint chip — flat (search) mode in the `#` picker. Tells the
+   user which subgroup an item belongs to (MCP server name or skill
+   category) once the hierarchy view is gone. Sits between the type
+   badge and the description. */
+.cmd-subgroup-hint {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: var(--fg-mute);
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+  border-radius: 3px;
+  padding: 1px 5px;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  max-width: 18ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cmd-item-dim {
+  opacity: 0.45;
+}
+.cmd-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 12.5px;
+}
+
+/* Inline mode (GlobalAppCommandPalette): the modal wrapper provides the visual
+   frame, so strip the duplicate border/background from the .popover class. */
+.app-cmd-palette.app-cmd-palette--inline {
+  position: static;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  min-width: 0;
+  z-index: auto;
+}
+
+/* ── Hierarchical "rest view" styles, shared by both pickers ──────────────
+   At rest (no filter typed) the `/` App Command Palette and the `#`
+   Chat Command Picker both render one row per group with a chevron and
+   a count badge. Clicking expands a group in place; only one group is
+   expanded at a time. Once the user types anything past the trigger,
+   each picker switches to flat ranked mode (see .is-flat below) and
+   these styles no longer apply. */
+.app-cmd-palette.is-hierarchical .app-cmd-group-row,
+.chat-cmd-picker.is-hierarchical .app-cmd-group-row {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.app-cmd-palette.is-hierarchical .app-cmd-group-row.is-expanded,
+.chat-cmd-picker.is-hierarchical .app-cmd-group-row.is-expanded {
+  background: color-mix(in srgb, var(--hl) 55%, transparent);
+}
+.app-cmd-chevron {
+  display: inline-block;
+  width: 2ch;
+  margin-right: 8px;
+  color: var(--fg-mute);
+  font-size: 20px;
+  line-height: 1;
+  vertical-align: -2px;
+  transition: color 120ms ease;
+}
+.app-cmd-palette.is-hierarchical .app-cmd-group-row.is-expanded .app-cmd-chevron,
+.chat-cmd-picker.is-hierarchical .app-cmd-group-row.is-expanded .app-cmd-chevron {
+  color: var(--accent, var(--fg));
+}
+.app-cmd-palette.is-hierarchical .app-cmd-nested,
+.chat-cmd-picker.is-hierarchical .app-cmd-nested {
+  padding-left: 28px;
+}
+/* Second-level nest for items inside an expanded subgroup (e.g. MCP Tools →
+   agent-multichat → emit_plan). Picker-only — the `/` palette has no
+   sub-categorization. */
+.chat-cmd-picker.is-hierarchical .app-cmd-nested.app-cmd-nested-2 {
+  padding-left: 48px;
+}
+/* Subgroup row sits between the top-level group row and its items. Slightly
+   lighter weight than the parent group row, indented one level so the tier
+   reads as a child of the expanded group above it. */
+.chat-cmd-picker.is-hierarchical .app-cmd-subgroup-row {
+  font-weight: 500;
+  padding-left: 28px;
+  font-size: 11.5px;
+  color: var(--fg-mute);
+}
+.chat-cmd-picker.is-hierarchical .app-cmd-subgroup-row .cmd-label {
+  font-family: var(--font-mono, monospace);
+}
+.chat-cmd-picker.is-hierarchical .app-cmd-subgroup-row.is-expanded {
+  background: color-mix(in srgb, var(--hl) 35%, transparent);
+  color: var(--fg);
+}
+/* `/` palette only — the "Recently used" group at the top gets a slight
+   accent so it reads as a special quick-access row distinct from the
+   categorical groups below. The `#` picker has no MRU section. */
+.app-cmd-palette.is-hierarchical .app-cmd-group-row[aria-expanded='true']:first-child {
+  border-bottom: 1px solid color-mix(in srgb, var(--accent, var(--fg)) 18%, transparent);
+}
+.app-cmd-palette.is-hierarchical .app-cmd-nested .cmd-label::before,
+.chat-cmd-picker.is-hierarchical .app-cmd-nested .cmd-label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-left: 1px solid var(--stroke, rgba(255,255,255,0.12));
+  border-bottom: 1px solid var(--stroke, rgba(255,255,255,0.12));
+  margin: 0 8px 3px -10px;
+  vertical-align: middle;
+}
+
+/* add-node popover */
+#add-node {
+  width: 360px;
+  padding: 6px;
+}
+#add-node-input {
+  width: 100%;
+  background: var(--bg-2);
+  color: var(--fg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 4px;
+}
+#add-node-input:focus {
+  border-color: var(--accent);
+}
+
+/* model picker — display toggled by JS only; auto-sizes to content, capped at 70vh */
+#model-overlay {
+  width: min(560px, 94vw);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+.ms-scroll {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 8px 10px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 6px;
+  align-content: start;
+}
+.ms-scroll > .popover-group,
+.ms-scroll > .ms-grid {
+  grid-column: 1 / -1;
+}
+.ms-scroll > .ms-provider-section[data-collapsed='false'] {
+  grid-column: 1 / -1;
+}
+.ms-scroll > .ms-provider-section[data-collapsed='true'] {
+  grid-column: span 1;
+}
+.ms-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.ms-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ms-scroll::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+.ms-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--stroke);
+}
+.ms-active-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 6px;
+  padding: 10px;
+  border-bottom: 1px solid var(--stroke);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  backdrop-filter: blur(12px);
+}
+.ms-search-wrap {
+  padding: 7px 10px 5px;
+  border-bottom: 1px solid var(--stroke);
+}
+.ms-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  font-size: 13px;
+  padding: 5px 10px;
+  outline: none;
+}
+.ms-search-input:focus {
+  border-color: var(--accent);
+}
+.ms-search-input::placeholder {
+  color: var(--fg-mute);
+}
+.ms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px;
+  padding: 4px 4px 8px;
+}
+.ms-grid .popover-item {
+  padding: 8px 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2px;
+  min-height: 44px;
+}
+.ms-grid .popover-item .ms-name {
+  font-size: 12.5px;
+  word-break: break-word;
+  line-height: 1.4;
+  display: block;
+  min-width: 0;
+}
+.ms-prov-chip {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--stroke));
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  vertical-align: 1px;
+  text-transform: uppercase;
+}
+/* Harness picker buttons in locked mode (instance is derived from the model
+   provider, e.g. picker shows SUB2 when model.provider = "Anthropic-SUB2"). */
+#chat-instance-btn.locked,
+#chat-codex-inst-btn.locked {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.ms-grid .popover-item .dim {
+  font-size: 10px;
+  white-space: normal;
+  overflow: hidden;
+  word-break: break-word;
+}
+.ms-active-card {
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  text-align: left;
+  cursor: default;
+}
+button.ms-active-card.ms-active-filter {
+  cursor: pointer;
+  color: var(--fg);
+  transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+button.ms-active-card.ms-active-filter:hover {
+  background: var(--bg-3);
+}
+button.ms-active-card.ms-active-filter.active {
+  background: rgba(74, 222, 128, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.ms-active-card .ms-active-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--fg-mute);
+  flex-shrink: 0;
+}
+button.ms-active-card.ms-active-filter:hover .ms-active-icon,
+button.ms-active-card.ms-active-filter.active .ms-active-icon {
+  color: inherit;
+}
+.ms-active-card .ms-active-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.ms-active-card .ms-name {
+  color: var(--fg);
+  font-weight: 600;
+  font-size: 12px;
+  word-break: break-all;
+  line-height: 1.2;
+}
+button.ms-active-card.ms-active-filter.active .ms-name {
+  color: var(--accent);
+}
+.ms-active-card .dim {
+  font-size: 10px;
+  line-height: 1.2;
+}
+.ms-active-card.llm {
+  border-color: rgba(0, 224, 138, 0.4);
+}
+.ms-active-card.img {
+  border-color: rgba(255, 154, 61, 0.4);
+}
+.ms-active-card.vid {
+  border-color: rgba(92, 200, 255, 0.4);
+}
+.ms-active-card.aud {
+  border-color: rgba(180, 100, 255, 0.4);
+}
+
+.ms-chip-badge {
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--stroke-2);
+  color: var(--fg-dim);
+  margin-right: 6px;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.ms-chip-badge.img {
+  background: rgba(255, 154, 61, 0.2);
+  color: var(--accent-2);
+}
+.ms-chip-badge.vid {
+  background: rgba(92, 200, 255, 0.2);
+  color: var(--accent-3);
+}
+.ms-chip-badge.aud {
+  background: rgba(180, 100, 255, 0.2);
+  color: #b464ff;
+}
+.ms-chip-badge.util {
+  background: var(--stroke-2);
+  color: var(--fg-dim);
+}
+.ms-chip-badge.unk {
+  background: rgba(255, 200, 80, 0.15);
+  color: #d4a04a;
+}
+
+.popover-item.current {
+  background: var(--hl);
+}
+.popover-item.current::after {
+  content: '●';
+  color: var(--accent);
+  margin-left: auto;
+}
+
+.ms-cap {
+  font-size: 10px;
+  margin-left: 2px;
+  opacity: 0.75;
+}
+.ms-cap.ms-cap-off {
+  opacity: 0.15;
+  filter: grayscale(1);
+}
+
+/* Favorites header */
+.ms-fav-header {
+  color: #f5c518 !important;
+}
+
+/* Collapsible "All Models" button */
+.ms-collapse-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 10px 3px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-mute);
+  font-family: inherit;
+}
+.ms-collapse-btn:hover {
+  color: var(--fg);
+}
+.ms-collapse-arrow {
+  font-size: 9px;
+  margin-right: 4px;
+}
+
+/* Model card top row with star */
+.ms-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+}
+.ms-card-top .ms-name {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Grouped model card — header/body are inert; only badges + star are clickable */
+.ms-grid .popover-item.ms-group-card {
+  cursor: default;
+}
+.ms-grid .popover-item.ms-group-card:hover {
+  background: transparent;
+}
+.ms-grid .popover-item.ms-group-card.current {
+  background: var(--hl);
+}
+/* Suppress the ::after dot — active badge already signals the current variant */
+.ms-grid .popover-item.ms-group-card.current::after {
+  content: none;
+}
+/* Single-variant groups behave like classic cards: whole body is the button */
+.ms-grid .popover-item.ms-group-card.ms-group-single {
+  cursor: pointer;
+}
+.ms-grid .popover-item.ms-group-card.ms-group-single:hover {
+  background: var(--hl);
+}
+.ms-grid .popover-item.ms-group-card.ms-group-single.current::after {
+  content: '●';
+}
+
+/* Subscription / API instance badges inside a grouped card */
+.ms-variant-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 4px;
+  width: 100%;
+}
+.ms-variant-btn {
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--stroke));
+  background: transparent;
+  color: var(--fg-mute);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+.ms-variant-btn:hover {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  color: var(--fg);
+}
+.ms-variant-btn.active {
+  background: color-mix(in srgb, var(--accent) 25%, var(--bg));
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.ms-single-variant-chip {
+  flex: none;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--stroke));
+  color: var(--fg-mute);
+}
+
+/* Star/favorite button */
+.ms-fav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 1px;
+  color: var(--fg-mute);
+  flex-shrink: 0;
+  opacity: 0.25;
+  transition:
+    opacity 0.12s,
+    color 0.12s;
+  font-family: inherit;
+}
+.ms-fav-btn:hover {
+  opacity: 0.8;
+  color: #f5c518;
+}
+.ms-fav-btn.active {
+  opacity: 1;
+  color: #f5c518;
+}

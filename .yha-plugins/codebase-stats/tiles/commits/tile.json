@@ -1,0 +1,20 @@
+{
+  "id": "commits",
+  "label": "Recent commits",
+  "template": "list",
+  "data": "data.ts",
+  "refresh": "manual",
+  "size": { "w": 380, "h": 320 },
+  "props": {
+    "dataPath": "commits",
+    "itemTemplate": {
+      "leading": "{{author}}",
+      "primary": "{{subject}}",
+      "secondary": "{{author}} · {{relDate}}",
+      "trailing": "{{shortHash}}"
+    },
+    "emptyText": "No commits (not a git repo?)"
+  },
+  "headline": { "label": "latest", "from": "commits.0.subject" },
+  "command": { "keywords": ["git", "commits", "log", "history"] }
+}

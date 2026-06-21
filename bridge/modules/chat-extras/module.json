@@ -1,0 +1,18 @@
+{
+  "name": "chat-extras",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Slimmed leftover-bag of chat-side helpers — drafts (server-side input autosave) + input-history (the up-arrow recall stack). Welcome-messages, todos, and pet-console moved to their own modules per registers-doc §4. User-state files stay outside the module dir so a disable-then-enable cycle preserves them; input-history is stored per active user under bridge/users/<email>/input-history.json.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/drafts/current",
+      "/v1/input-history",
+      "/v1/input-history/merge"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "chat"
+}

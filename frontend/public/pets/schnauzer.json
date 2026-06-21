@@ -1,0 +1,340 @@
+{
+  "name": "schnauzer",
+  "label": "Schnauzer",
+  "description": "A compact hand-drawn Schnauzer Codex pet.",
+  "homeSpot": {
+    "x": null,
+    "y": 420
+  },
+  "spriteFormat": "codex-imported",
+  "spriteSize": 192,
+  "poses": {
+    "idle": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/idle_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/idle_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/idle_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/idle_f04.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/idle_f05.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/idle_f06.png",
+          "duration": 140
+        }
+      ]
+    },
+    "running": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/running_f01.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/schnauzer/running_f02.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/schnauzer/running_f03.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/schnauzer/running_f04.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/schnauzer/running_f05.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/schnauzer/running_f06.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/schnauzer/running_f07.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/schnauzer/running_f08.png",
+          "duration": 125
+        }
+      ]
+    },
+    "streaming": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/streaming_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/streaming_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/streaming_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/streaming_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/streaming_f05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/streaming_f06.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/streaming_f07.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/streaming_f08.png",
+          "duration": 90
+        }
+      ]
+    },
+    "happy": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/happy_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/happy_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/happy_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/happy_f04.png",
+          "duration": 140
+        }
+      ]
+    },
+    "error": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/error_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/error_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/error_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/error_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/error_f05.png",
+          "duration": 90
+        }
+      ]
+    },
+    "thinking": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/thinking_f01.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/schnauzer/thinking_f02.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/schnauzer/thinking_f03.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/schnauzer/thinking_f04.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/schnauzer/thinking_f05.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/schnauzer/thinking_f06.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/schnauzer/thinking_f07.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/schnauzer/thinking_f08.png",
+          "duration": 110
+        }
+      ]
+    },
+    "jumping": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/jumping_f01.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/schnauzer/jumping_f02.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/schnauzer/jumping_f03.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/schnauzer/jumping_f04.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/schnauzer/jumping_f05.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/schnauzer/jumping_f06.png",
+          "duration": 105
+        }
+      ]
+    },
+    "powermove": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/powermove_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/powermove_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/powermove_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/powermove_f04.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/powermove_f05.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/schnauzer/powermove_f06.png",
+          "duration": 140
+        }
+      ]
+    },
+    "xpeffect": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/schnauzer/xpeffect_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/xpeffect_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/xpeffect_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/xpeffect_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/xpeffect_f05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/schnauzer/xpeffect_f06.png",
+          "duration": 90
+        }
+      ]
+    }
+  }
+}

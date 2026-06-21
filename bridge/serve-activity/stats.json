@@ -1,0 +1,359 @@
+{
+  "updatedAt": 1781821369444,
+  "entries": {
+    "d8b5d9a4-4e53-4ffb-94bb-a3074d4dcbd6": {
+      "cwd": "/Users/michael/ypa-landing-pages",
+      "profile": "static",
+      "stats": {
+        "hits": 48,
+        "pageViews": 3,
+        "lastViewedAt": 1781821369444,
+        "byIp": {
+          "127.0.0.1": {
+            "hits": 48,
+            "pageViews": 3,
+            "lastViewedAt": 1781821369444
+          }
+        },
+        "recent": [
+          {
+            "at": 1781821287380,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821287422,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/shared/css/designs/atelier.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821287423,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/shared/css/designs/console.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821287425,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/shared/css/designs/patchbay.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821302200,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821302239,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/shared/css/designs/console.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821302241,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/shared/css/designs/atelier.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821302249,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/shared/css/designs/patchbay.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821302384,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/shared/favicon.svg",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305680,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/index.html",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305772,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/content.html",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305869,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/designs/console.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305871,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/designs/atelier.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305871,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/designs/patchbay.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305876,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/landing/bg-audio.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305877,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/landing/topology.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305877,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/landing/landing.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305877,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/js/bg-cards.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305877,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/landing/pet-demo.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305878,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/js/lead-form.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305878,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/js/landing.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305878,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/js/bg-audio.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305878,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/js/bg-videos.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305879,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/js/mesh-tier.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305879,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/music/playlist.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305879,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/landing/testimonials.css",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305879,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/js/pet-demo.js",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821305949,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/css/landing/public/ypa-background.png",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821306015,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/background-video1.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821306016,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/background-video3.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821325515,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video3.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821333143,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/favicon.svg",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821349585,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video9.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821350376,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video4.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821351337,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video1.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821356905,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video5.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821357511,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video8.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821358825,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video2.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821359986,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video7.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821360112,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video6.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821365381,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video3.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821365892,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video9.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821367049,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video4.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821367153,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video4.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821367602,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video1.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821367695,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video1.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821368199,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video5.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          },
+          {
+            "at": 1781821369444,
+            "ip": "127.0.0.1",
+            "method": "GET",
+            "path": "/dist/ypa.dev/buildV002Alpha/public/branding-videos/video8.mp4",
+            "shareToken": "qeUt6IiLbKTqpa2b"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,82 @@
+/* panels-drawer.css — floating panel overlay for messenger/zen layouts.
+   Used by PanelsDrawer.tsx when a header.section.* command fires outside
+   of the full layout (which embeds the panels in its own header sidebar). */
+
+.panels-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
+.panels-drawer {
+  width: min(380px, 94vw);
+  max-height: 100%;
+  background: var(--surface);
+  border-left: 0.5px solid var(--stroke);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+}
+
+.panels-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 0.5px solid var(--stroke);
+  flex-shrink: 0;
+  min-height: 40px;
+}
+
+.panels-drawer-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg-mute);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.panels-drawer-close {
+  background: none;
+  border: none;
+  color: var(--fg-mute);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.panels-drawer-close:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.panels-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Suppress the hs-toggle button (CwdPanel, GlobalContextPanel render one
+   as their section title — the drawer header already labels the panel). */
+.panels-drawer .hs-toggle {
+  display: none;
+}
+
+/* hs-body max-height animation is for the in-header accordion; in the
+   drawer the body is always fully expanded. */
+.panels-drawer .hs-body {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Ensure section containers fill the drawer width. */
+.panels-drawer .hs-section {
+  width: 100%;
+}

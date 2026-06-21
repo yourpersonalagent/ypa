@@ -1,0 +1,501 @@
+/* css/layouts/messenger.css
+ * Scoped under [data-layout="messenger"]. Persistent session rail on the
+ * left, chat pane on the right, no top header bar. Bubble styling reuses
+ * tokens.css; nothing layout-specific leaks beyond the
+ * [data-layout="messenger"] selector.
+ */
+
+[data-layout="messenger"] body {
+  margin: 0;
+  background: var(--bg, #0a0a0a);
+  color: var(--fg, #f0f0f0);
+}
+
+[data-layout="messenger"] #header {
+  display: none !important;
+}
+
+/* Anchored to the viewport via inset:0 rather than 100vw/100vh so the small-
+ * screen `html { zoom: 0.9 }` rule in prefs-modal.css doesn't shrink the
+ * layout box to 90% of the visible area (which left empty bg gutters at the
+ * right + bottom). Matches how full's #main is positioned. */
+[data-layout="messenger"] .layout-messenger {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+[data-layout="messenger"] .msg-rail {
+  flex: 0 0 300px;
+  border-right: 1px solid var(--stroke, rgba(255, 255, 255, 0.08));
+  background: var(--bg-2, rgba(255, 255, 255, 0.02));
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+[data-layout="messenger"] .msg-chat {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Session rail ──────────────────────────────────────────────────────── */
+[data-layout="messenger"] .session-rail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+[data-layout="messenger"] .session-rail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--stroke, rgba(255, 255, 255, 0.06));
+}
+[data-layout="messenger"] .session-rail-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+[data-layout="messenger"] .session-rail-new {
+  background: var(--accent, #4ade80);
+  color: var(--bg, #0a0a0a);
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+[data-layout="messenger"] .session-rail-new:hover {
+  filter: brightness(1.15);
+}
+
+[data-layout="messenger"] .session-rail-search {
+  position: relative;
+  padding: 8px 12px;
+}
+[data-layout="messenger"] .session-rail-search input {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--bg, #0a0a0a);
+  color: var(--fg, #f0f0f0);
+  border: 1px solid var(--stroke, rgba(255,255,255,0.08));
+  border-radius: 18px;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+[data-layout="messenger"] .session-rail-search input.has-clear {
+  padding-right: 28px;
+}
+[data-layout="messenger"] .session-rail-search input:focus {
+  border-color: var(--accent, #4ade80);
+}
+[data-layout="messenger"] .session-rail-search-clear {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--fg-muted, rgba(255,255,255,0.4));
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+[data-layout="messenger"] .session-rail-search-clear:hover {
+  color: var(--fg, #f0f0f0);
+}
+
+[data-layout="messenger"] .session-rail-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 12px 6px;
+  border-bottom: 1px solid var(--stroke, rgba(255,255,255,0.06));
+}
+[data-layout="messenger"] .session-rail-tab {
+  background: transparent;
+  color: var(--fg-mute, rgba(255,255,255,0.5));
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+[data-layout="messenger"] .session-rail-tab.is-active {
+  color: var(--accent, #4ade80);
+  border-bottom-color: var(--accent, #4ade80);
+}
+[data-layout="messenger"] .session-rail-tab-count {
+  font-size: 10px;
+  background: var(--accent, #4ade80);
+  color: var(--bg, #0a0a0a);
+  border-radius: 8px;
+  padding: 0 5px;
+  line-height: 1.6;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-layout="messenger"] .session-rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 6px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+[data-layout="messenger"] .session-rail-empty {
+  color: var(--fg-mute, rgba(255,255,255,0.4));
+  font-size: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+[data-layout="messenger"] .session-rail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+[data-layout="messenger"] .session-rail-row:hover {
+  background: var(--hl, rgba(255,255,255,0.04));
+}
+[data-layout="messenger"] .session-rail-row.is-current {
+  background: var(--hl-strong, rgba(74, 222, 128, 0.12));
+}
+[data-layout="messenger"] .session-rail-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+[data-layout="messenger"] .session-rail-row-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+[data-layout="messenger"] .session-rail-row-time {
+  font-size: 10.5px;
+  color: var(--fg-mute, rgba(255,255,255,0.4));
+  flex-shrink: 0;
+}
+[data-layout="messenger"] .session-rail-row-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+[data-layout="messenger"] .session-rail-row-sub {
+  font-size: 11.5px;
+  color: var(--fg-mute, rgba(255,255,255,0.5));
+  font-family: var(--font-mono, monospace);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+[data-layout="messenger"] .session-rail-row-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent, #4ade80);
+  animation: msg-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes msg-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+[data-layout="messenger"] .session-rail-row-pin {
+  font-size: 7px;
+  color: var(--accent, #4ade80);
+  flex-shrink: 0;
+}
+[data-layout="messenger"] .session-rail-row-unread {
+  display: inline-block;
+  margin-right: 5px;
+  color: var(--accent-2, #6cf);
+  font-weight: 700;
+  font-size: 0.88em;
+}
+
+/* ── Section headers (Busy / Pinned / Recent) ──────────────────────────── */
+[data-layout="messenger"] .session-rail-section-header {
+  list-style: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--fg-mute, rgba(255,255,255,0.35));
+  padding: 8px 10px 3px;
+}
+[data-layout="messenger"] .session-rail-section-header.is-busy {
+  color: var(--accent-2, #6cf);
+}
+[data-layout="messenger"] .session-rail-section-header.is-pinned {
+  color: var(--accent, #4ade80);
+}
+[data-layout="messenger"] .session-rail-section-header.is-pinned {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+[data-layout="messenger"] .session-rail-section-label {
+  flex: 0 0 auto;
+}
+[data-layout="messenger"] .session-rail-pinned-toggle {
+  background: none;
+  border: none;
+  color: var(--fg-mute, rgba(255,255,255,0.45));
+  font: inherit;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.85;
+  transition: color 0.1s, background 0.1s, opacity 0.1s;
+}
+[data-layout="messenger"] .session-rail-pinned-toggle:hover {
+  color: var(--accent, #4ade80);
+  background: color-mix(in srgb, var(--accent, #4ade80) 14%, transparent);
+  opacity: 1;
+}
+[data-layout="messenger"] .session-rail-pinned-toggle:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--accent, #4ade80) 60%, transparent);
+  outline-offset: 1px;
+}
+
+/* ── Hover action buttons ───────────────────────────────────────────────── */
+[data-layout="messenger"] .session-rail-row-actions {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+[data-layout="messenger"] .session-rail-row {
+  position: relative;
+}
+[data-layout="messenger"] .session-rail-row:hover .session-rail-row-actions {
+  display: flex;
+}
+/* Shift time badge out of the way while actions are showing */
+[data-layout="messenger"] .session-rail-row:hover .session-rail-row-time {
+  display: none;
+}
+
+[data-layout="messenger"] .srail-action-btn {
+  background: none;
+  border: none;
+  color: var(--fg-mute, rgba(255,255,255,0.4));
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: color 0.1s, opacity 0.1s, background 0.1s;
+}
+[data-layout="messenger"] .srail-action-btn:hover {
+  opacity: 1;
+}
+[data-layout="messenger"] .srail-rename-btn:hover {
+  color: var(--accent, #4ade80);
+  background: rgba(74, 222, 128, 0.1);
+}
+[data-layout="messenger"] .srail-pin-btn {
+  opacity: 0.4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-layout="messenger"] .srail-pin-btn svg {
+  display: block;
+}
+[data-layout="messenger"] .srail-pin-btn.is-pinned {
+  opacity: 0.95;
+  color: var(--accent, #4ade80);
+}
+[data-layout="messenger"] .srail-pin-btn:hover {
+  opacity: 1;
+  background: rgba(74, 222, 128, 0.1);
+}
+[data-layout="messenger"] .srail-delete-btn:hover {
+  color: var(--danger, #f87171);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ── Rename input inside rail row ───────────────────────────────────────── */
+[data-layout="messenger"] .session-rail-name-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg, #0a0a0a);
+  color: var(--fg, #f0f0f0);
+  border: 1px solid var(--accent, #4ade80);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+}
+
+/* ── Busy pulse for rail (shared keyframe already defined above) ────────── */
+[data-layout="messenger"] .session-rail-row.is-busy .session-rail-row-name {
+  color: var(--accent-2, #6cf);
+}
+[data-layout="messenger"] .session-rail-row.is-pinned {
+  border-left: 2px solid color-mix(in srgb, var(--accent, #4ade80) 40%, transparent);
+  padding-left: 8px;
+}
+
+/* ── Chat pane ─────────────────────────────────────────────────────────── */
+/* The ChatView component already owns its scroll wrap + composer. We just
+   need to make sure it stretches to fill the rail-less right side and the
+   bubbles have a touch more breathing room than full. */
+[data-layout="messenger"] .chat-scroll-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+[data-layout="messenger"] .chat-controls-area {
+  border-top: 1px solid var(--stroke, rgba(255,255,255,0.06));
+  background: var(--bg-2, rgba(255,255,255,0.02));
+  padding: 10px 14px 12px;
+}
+[data-layout="messenger"] .chat-empty-hero {
+  display: none; /* No big YHA hero in messenger — the rail already labels the app */
+}
+[data-layout="messenger"] .chat-input-wrapper {
+  background: var(--bg-2, rgba(255,255,255,0.03));
+  border-radius: 14px;
+  padding: 6px 10px;
+  border: 1px solid var(--stroke, rgba(255,255,255,0.06));
+}
+[data-layout="messenger"] #chat-ta {
+  background: transparent;
+  border: none;
+  color: var(--fg);
+  font-size: 14px;
+  padding: 6px 4px;
+}
+
+/* ── Chat-bar visibility rules ─────────────────────────────────────────── */
+/* Messenger keeps only: filepicker (#chat-file) + voice buttons
+   (#chat-mic, #chat-voicemode) on the left; model picker (#chat-model-btn)
+   + send/stop (.cb-right-send) on the right. Capability badges are still
+   reachable through the command palette / model picker. */
+[data-layout="messenger"] #chat-cmd,
+[data-layout="messenger"] .session-group,
+[data-layout="messenger"] #chat-notes-btn,
+[data-layout="messenger"] #chat-sys-btn,
+[data-layout="messenger"] .cap-group,
+[data-layout="messenger"] .ef-inline-wrap {
+  display: none !important;
+}
+
+/* With the reduced button set above, .chat-bar-left + .chat-bar-right fit on
+ * one row down to phone widths — override the generic [data-narrow] rule that
+ * gives .chat-bar-left flex-basis:100% (which forces the right half to wrap
+ * onto a second row). The full layout still relies on that wrap behavior. */
+[data-layout="messenger"] .chat-input-bar[data-narrow] .chat-bar-left {
+  flex: 1 1 auto;
+}
+
+/* ── Lazy-load sentinel for session rail ───────────────────────────────── */
+[data-layout="messenger"] .session-rail-load-more {
+  list-style: none;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Mobile (≤600px): WhatsApp-style single-pane navigation ─────────────
+ * Show either the session list OR the chat pane, never both. The
+ * `msg-mobile-back` button (rendered inside .msg-chat) returns to the list.
+ * Above the breakpoint the rail + chat sit side-by-side as before and the
+ * back button hides. The .msg-mobile-list / .msg-mobile-chat class on the
+ * layout root toggles which pane is visible. */
+[data-layout="messenger"] .msg-mobile-back {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  [data-layout="messenger"] .msg-rail {
+    flex: 1 1 100%;
+    border-right: none;
+  }
+  [data-layout="messenger"] .msg-chat {
+    flex: 1 1 100%;
+  }
+  [data-layout="messenger"] .layout-messenger.msg-mobile-list .msg-chat {
+    display: none;
+  }
+  [data-layout="messenger"] .layout-messenger.msg-mobile-chat .msg-rail {
+    display: none;
+  }
+  [data-layout="messenger"] .msg-mobile-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: var(--fg, #f0f0f0);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 14px 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--stroke, rgba(255, 255, 255, 0.06));
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  [data-layout="messenger"] .msg-mobile-back:hover {
+    color: var(--accent, #4ade80);
+  }
+  [data-layout="messenger"] .msg-mobile-back-arrow {
+    flex: 0 0 auto;
+    font-size: 16px;
+  }
+  [data-layout="messenger"] .msg-mobile-back-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Tight input-area padding on phones — full layout keeps the default. */
+  [data-layout="messenger"] .chat-controls-area {
+    padding: 4px;
+  }
+}

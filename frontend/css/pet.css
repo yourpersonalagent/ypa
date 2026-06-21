@@ -1,0 +1,1060 @@
+/* Bare YHA pet overlay. No window chrome, no background card. Only .pet-hitbox
+   receives pointer events; aura/lightning/XP layers are larger than the pet but
+   stay click-through.
+   Supports two rendering modes:
+     1) SVG fallback (.pet-sprite-fallback) — inline He-Man silhouette
+     2) Image sprite (.pet-sprite-img)      — loaded from /pets/<id>/<pose>.png
+
+   Layered transforms in this file (order matters):
+     .pet-overlay       —— translate to (--pet-x + --pet-patrol-x, --pet-y)
+     .pet-flip-wrap     —— scaleX(--pet-flip-x) so the sprite mirrors but the
+                           hitbox + effects keep their original geometry
+     .pet-overlay.is-shutdown .pet-flip-wrap —— vertical CRT collapse
+     #yha-pet-tint      —— optional SVG filter (defined inline by
+                           FloatingPet) recolours the sprite alpha to the
+                           active accent without bleeding onto transparent
+                           cells. Toggle: petStore.themeTint.
+*/
+
+.pet-overlay {
+  --pet-w: 136px;
+  --pet-h: 168px;
+  --pet-x: 24px;
+  --pet-y: calc(100vh - 310px);
+  --pet-patrol-x: 0px;
+  /* Vertical strip-wander offset — set by the side-strip vertical wander
+     scheduler in FloatingPet. Negative = upward from homePos.y. Reset to
+     0 on drag-return-home and layout changes. */
+  --pet-patrol-y: 0px;
+  /* Vertical offset, used by the button-hop behavior so the pet can land
+     on a target anywhere on the page (patrol/fight only ever offset X).
+     0 by default so the home position stays anchored to the chat input. */
+  --pet-offset-y: 0px;
+  --pet-flip-x: 1;
+  --pet-effect-w: 400px;
+  --pet-effect-h: 400px;
+  --pet-effect-top: -120px;
+  --pet-effect-left: -120px;
+  /* Shadow tuning: -px = pull shadow up toward feet, +px = drop it lower.
+     Override comes from the slider in the pet menu via FloatingPet inline
+     style. Default is intentionally tight so the shadow reads as a planted
+     foot contact instead of a floating drop-shadow. */
+  --pet-shadow-offset: -8px;
+  /* Global pet scale (slider in the pet menu). Multiplies the entire
+     overlay — sprite, aura, ground shadow and effects — at the very
+     outermost transform. Foot-anchored origin keeps the pet planted on
+     the chat input as it grows or shrinks. Defaults to 1 so existing
+     positioning calculations are unaffected when the user hasn't
+     touched the slider. */
+  --pet-global-scale: 1;
+  /* 0..1 multiplier on the soft glow behind the pet. The keyframes that
+     animate .pet-aura still set their own opacity values; we layer this
+     multiplier on top via `filter: opacity()` so streaming/powermove
+     pulses still play but at user-tunable intensity. At exactly 0 the
+     `.is-glow-off` class swaps to display: none so the GPU stops
+     compositing a blurred 240×210 transparent rectangle every frame. */
+  --pet-glow-intensity: 1;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 240px;
+  /* Order matters: scale AFTER translate so the translate isn't itself
+     scaled (would double-shift the pet at scale ≠ 1). transform-origin
+     anchors at the FOOT of the sprite, not the bottom of the 240×240
+     overlay box — the hitbox sits at top: 40px and is var(--pet-h) tall,
+     so the foot line at 93 % down sits at calc(40px + --pet-h * 0.93).
+     Anchoring there keeps the pet's ground line at the same screen Y as
+     it grows or shrinks. (Anchoring to 100 % would drift the foot down
+     as the pet shrinks because the empty space below the sprite would
+     scale into the pet's vertical centre.) */
+  transform-origin: 50% calc(40px + var(--pet-h) * 0.93);
+  transform: translate3d(
+      calc(var(--pet-x) + var(--pet-patrol-x)),
+      calc(var(--pet-y) + var(--pet-offset-y) + var(--pet-patrol-y, 0px)),
+      0
+    )
+    scale(var(--pet-global-scale, 1));
+  z-index: 1120;
+  pointer-events: none;
+  overflow: visible;
+  transition: transform 900ms cubic-bezier(.2, .8, .2, 1);
+  /* Compositor isolation. Without `will-change: transform` Blink may keep
+     the pet on the main paint layer with the rest of the chat input, so a
+     repaint of the chat input (e.g. autoGrow on every keystroke) re-paints
+     the pet's filter chain too — that's the typing-lag tax we want to kill.
+     `contain: layout style paint` walls off layout/paint propagation in
+     both directions. */
+  will-change: transform;
+  contain: layout style paint;
+}
+.pet-overlay.is-dragging {
+  transition: none;
+}
+
+/* Flip wrapper — mirrors the sprite for facing="left" without affecting the
+   hitbox or effect layers (which use their own anchor points). */
+.pet-flip-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Base transform — scaleX flip from --pet-flip-x. State-driven
+     overrides (level-up stage, peek-away, button-press via WAAPI) layer
+     on top via more specific selectors or via the press-bounce
+     animate() call. The transform-origin is centred so left/right flip
+     spins around the sprite's vertical axis without horizontal drift.
+     Set explicitly here (not inline) so the level-stage rules can
+     override without fighting CSS specificity. */
+  transform: scaleX(var(--pet-flip-x));
+  transform-origin: 50% 50%;
+  transition: transform 220ms cubic-bezier(.2, .8, .2, 1);
+}
+
+/* Peek-away — pet shrinks and dims as if wandering off into the background
+   to play. We don't actually re-parent or change z-index (the chat input
+   has no explicit stacking context, so a z swap would force everything
+   onto a global z ladder). Instead we just visually demote the sprite:
+   • shrink to ~38 % so it reads as "far away"
+   • drift slightly down + slightly off-axis for parallax feel
+   • dim + desaturate slightly so it sinks into the chrome
+   • shrink the shadow + fade aura/sparks to match
+   The state only fires while idle/thinking; mood escalation cancels it
+   immediately (see FloatingPet useEffect). */
+.pet-overlay.is-peeking-away .pet-flip-wrap {
+  animation: pet-peek-away 720ms cubic-bezier(.4, 0, .2, 1) forwards;
+}
+.pet-overlay.is-peeking-away .pet-ground-glow {
+  /* Smaller shadow to match the smaller pet. */
+  transform: translateX(-50%) scale(0.42);
+  opacity: 0.34;
+  transition: transform 720ms ease, opacity 720ms ease;
+}
+.pet-overlay.is-peeking-away .pet-aura,
+.pet-overlay.is-peeking-away .pet-tool-sparks {
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+.pet-overlay.is-peeking-away .pet-hitbox {
+  /* Drag would interrupt the wander animation; gate it off until peek ends. */
+  pointer-events: none;
+}
+@keyframes pet-peek-away {
+  0% {
+    transform: scaleX(var(--pet-flip-x)) scale(1);
+    filter: none;
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(var(--pet-flip-x)) scale(0.38) translateY(8%);
+    filter: brightness(0.86) saturate(0.78);
+    opacity: 0.78;
+  }
+}
+/* Vertical CRT collapse — when the connection is lost the pet pinches into
+   a vertical bright line down its centre, mirroring the global TV-off
+   effect but rotated 90° (the global one collapses horizontally; the pet
+   collapses vertically). When connection restores we play the reverse. */
+.pet-overlay.is-shutdown .pet-flip-wrap {
+  animation: pet-tv-off-vertical 720ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.pet-overlay.is-restoring .pet-flip-wrap {
+  animation: pet-tv-on-vertical 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.pet-overlay.is-booting .pet-flip-wrap {
+  /* Stay collapsed during boot — symmetric with body.tv-off elsewhere. */
+  transform: scaleX(calc(var(--pet-flip-x) * 0.018));
+  filter: brightness(2.6) saturate(0.15) contrast(1.3);
+  opacity: 0;
+  animation: none;
+}
+@keyframes pet-tv-off-vertical {
+  0%   {
+    transform: scaleX(var(--pet-flip-x)) scaleY(1);
+    filter: none;
+    opacity: 1;
+  }
+  35%  {
+    transform: scaleX(var(--pet-flip-x)) scaleY(1);
+    filter: brightness(1.3) saturate(0.6);
+    opacity: 1;
+  }
+  72%  {
+    transform: scaleX(calc(var(--pet-flip-x) * 0.04)) scaleY(1.06);
+    filter: brightness(2.6) saturate(0.15) contrast(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(calc(var(--pet-flip-x) * 0.018)) scaleY(0.6);
+    filter: brightness(2.6) saturate(0.15) contrast(1.3);
+    opacity: 0;
+  }
+}
+@keyframes pet-tv-on-vertical {
+  0%   {
+    transform: scaleX(calc(var(--pet-flip-x) * 0.018)) scaleY(0.6);
+    filter: brightness(2.6) saturate(0.15) contrast(1.3);
+    opacity: 0;
+  }
+  20%  {
+    transform: scaleX(calc(var(--pet-flip-x) * 0.04)) scaleY(1.06);
+    filter: brightness(2.2) saturate(0.4) contrast(1.2);
+    opacity: 1;
+  }
+  60%  {
+    transform: scaleX(var(--pet-flip-x)) scaleY(1);
+    filter: brightness(1.1) saturate(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(var(--pet-flip-x)) scaleY(1);
+    filter: none;
+    opacity: 1;
+  }
+}
+
+/* While shutdown is happening the effects/aura should also fade; otherwise
+   we'd see ground glow + sparks lingering with no pet on top. */
+.pet-overlay.is-shutdown .pet-effects,
+.pet-overlay.is-booting .pet-effects {
+  opacity: 0;
+  transition: opacity 320ms ease-out;
+}
+.pet-overlay.is-restoring .pet-effects {
+  opacity: 1;
+  transition: opacity 700ms ease-in;
+}
+
+/* ── Hitbox: only the pet body is interactive ─────────────────────────── */
+
+.pet-hitbox {
+  position: absolute;
+  left: 56px;
+  top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.pet-overlay.is-dragging .pet-hitbox {
+  cursor: grabbing;
+}
+
+/* ── Effect layers (click-through) ────────────────────────────────────── */
+
+.pet-effects,
+.pet-xp-layer {
+  position: absolute;
+  left: calc(56px + var(--pet-effect-left));
+  top: calc(40px + var(--pet-effect-top));
+  width: var(--pet-effect-w);
+  height: var(--pet-effect-h);
+  pointer-events: none;
+  overflow: visible;
+}
+.pet-aura,
+.pet-ground-glow,
+.pet-tool-sparks {
+  position: absolute;
+  pointer-events: none;
+}
+.pet-aura {
+  left: 50%;
+  top: 48%;
+  width: min(58%, 210px);
+  height: min(66%, 240px);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255, 226, 112, .28), transparent 45%),
+    radial-gradient(circle at 50% 70%, rgba(84, 190, 255, .18), transparent 62%);
+  /* opacity is a compositor-only property (cheap). filter:blur() was removed
+     because it forces a GPU filter pass on every compositor frame — the
+     radial-gradient's own falloff already reads as a soft glow without blur. */
+  opacity: calc(.35 * var(--pet-glow-intensity, 1));
+  transform: translate(-50%, -50%) scale(.85);
+}
+/* Hard-cut for glow=0. `display: none` skips the radial-gradient blur
+   compositing entirely — important on lower-end GPUs where blurred
+   pseudo-aura layers eat compositor time even at opacity 0. The user
+   explicitly requested "0 = not even show, not transparency 0". */
+.pet-overlay.is-glow-off .pet-aura,
+.pet-overlay.is-glow-off .pet-tool-sparks {
+  display: none;
+}
+
+/* Behind-UI mode: the pet sits in a background plane, occluded by every
+   chat / text / button / image. The body's <body class="has-pet-behind-ui">
+   promotes #root into its own stacking context at z-index 1 — that's the
+   trick that lets the pet (which renders via a portal as a body sibling
+   of #root) be pushed *under* anything inside #root.
+
+   Implementation note: just dropping the pet to z-index: -1 wouldn't work
+   because <body> has an opaque `background: var(--bg)` (tokens.css), and
+   z-index: -1 on a position: fixed element paints below the body's own
+   background — invisibly. Hence z-index: 0 plus the #root promotion.
+
+   We also disable pointer events on the hitbox in this mode: clicks on
+   UI elements above the pet need to land on the UI, not on a phantom
+   hitbox. Drag is intentionally lost — the user can always toggle the
+   mode off briefly via the menu if they want to drag. */
+body.has-pet-behind-ui #root {
+  position: relative;
+  z-index: 1;
+  /* #root must stretch to cover the full viewport so its background occludes
+     transparent app-shell gutters. Without min-height React's root div is
+     only as tall as its content, leaving the lower portion transparent and
+     allowing #bg-canvas (and the pet) to bleed through. */
+  min-height: 100dvh;
+  background: var(--bg);
+}
+/* Belt-and-suspenders: a fixed-position full-viewport opaque cover at z:-1
+   inside root's stacking context. This sits ABOVE #bg-canvas (z:-2) but
+   BELOW all UI content (z:0+), so the decorative shader can't leak through
+   transparent layout gaps (gutters, pill margins, etc.). */
+body.has-pet-behind-ui #root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--bg);
+  pointer-events: none;
+}
+.pet-overlay.is-behind-ui {
+  z-index: 0;
+}
+.pet-overlay.is-behind-ui .pet-hitbox {
+  pointer-events: none;
+}
+
+/* ── Playground mode ──────────────────────────────────────────────────── */
+/* Suppress the 900ms patrol transition so rAF position updates are instant. */
+.pet-overlay.playground-active {
+  transition: none;
+}
+
+.pet-ground-glow {
+  left: 50%;
+  /* Schatten exakt unter den Füßen, unabhängig von Effect-Zone-Größe.
+     Hitbox-Top = 40px, Hitbox-Höhe = --pet-h (168px) → Füße bei y = 40 + 168.
+     Effect-Zone-Boden ist bei (40 + --pet-effect-top + --pet-effect-h).
+     Wir stapeln also: (effect-top + effect-h - pet-h) liefert die Distanz
+     vom Effect-Boden zum Fuß-Niveau, und --pet-shadow-offset ist die
+     User-Tuning-Korrektur (negativ = höher, positiv = tiefer). Letzter
+     `-2px` rückt die Schatten-Mitte minimal über die Fußlinie, damit der
+     Fuß optisch im Schatten "steht". */
+  bottom: calc(
+    var(--pet-effect-top)
+    + var(--pet-effect-h)
+    - var(--pet-h)
+    + var(--pet-shadow-offset, -8px)
+    - 2px
+  );
+  width: min(46%, 150px);
+  height: 14px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, .42), transparent 70%);
+  opacity: .58;
+  transform: translateX(-50%);
+}
+.pet-tool-sparks {
+  left: 50%;
+  top: 48%;
+  width: min(54%, 190px);
+  height: min(54%, 190px);
+  opacity: 0;
+  background:
+    radial-gradient(circle at 18% 42%, rgba(255,255,255,.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 76% 28%, rgba(255,210,80,.95) 0 2px, transparent 3px),
+    radial-gradient(circle at 66% 72%, rgba(150,215,255,.9) 0 1.5px, transparent 3px);
+  transform: translate(-50%, -50%);
+}
+
+/* ── Level-up animation (data-level-stage="1..4") ──────────────────────────
+   The XP system in petStore drives a 3-part grow + 1-part settle sequence
+   each time the running XP crosses the next level threshold. The store
+   walks data-level-stage from 0 → 1 → 2 → 3 → 4 → 0 over LEVEL_STAGE_MS × 4
+   ms. CSS reads the attribute on .pet-overlay and plays a keyframe per
+   stage that scales the .pet-flip-wrap (so the sprite grows but the
+   hitbox + effect zones stay in their original geometry) and adds a
+   bright halo via a generated drop-shadow.
+
+   The user asked for "growing step by step then going back to original
+   size" — so each grow stage is an additive jump, the settle is a snap
+   back to scale 1. We don't transition between stages: the discrete jumps
+   read as more "leveling up" than a smooth ramp would. */
+
+.pet-overlay[data-level-stage="1"] .pet-flip-wrap {
+  transform: scaleX(var(--pet-flip-x)) scale(1.18);
+  filter: drop-shadow(0 0 12px rgba(255, 240, 160, .55));
+}
+.pet-overlay[data-level-stage="2"] .pet-flip-wrap {
+  transform: scaleX(var(--pet-flip-x)) scale(1.34);
+  filter: drop-shadow(0 0 18px rgba(255, 230, 140, .75));
+}
+.pet-overlay[data-level-stage="3"] .pet-flip-wrap {
+  transform: scaleX(var(--pet-flip-x)) scale(1.52);
+  filter: drop-shadow(0 0 28px rgba(255, 220, 120, .9));
+}
+.pet-overlay[data-level-stage="4"] .pet-flip-wrap {
+  /* Settle stage — snap back to native size. The brief overshoot in the
+     transition smoothing reads as a satisfying "thump" landing. */
+  transform: scaleX(var(--pet-flip-x)) scale(1);
+  filter: drop-shadow(0 0 10px rgba(255, 220, 120, .35));
+  transition: transform 220ms cubic-bezier(.34, 1.56, .64, 1),
+              filter 220ms ease-out;
+}
+/* While leveling up, dim the aura so the bright drop-shadow doesn't fight
+   with the streaming pulse for attention. Also kick a strong gold flash
+   on the ground glow as the pet "lands" each step. */
+.pet-overlay[data-level-stage="1"] .pet-ground-glow,
+.pet-overlay[data-level-stage="2"] .pet-ground-glow,
+.pet-overlay[data-level-stage="3"] .pet-ground-glow {
+  background: radial-gradient(ellipse, rgba(255, 220, 120, .85), transparent 70%);
+  opacity: .9;
+  transform: translateX(-50%) scale(1.3);
+  transition: opacity 120ms ease-in, transform 220ms ease-out, background 220ms ease-out;
+}
+
+/* ── Mood-driven effect animations ─────────────────────────────────────── */
+
+.pet-overlay[data-mood="streaming"] .pet-aura {
+  animation: pet-aura-pulse 1.4s ease-in-out infinite;
+}
+.pet-overlay[data-mood="powermove"] .pet-aura {
+  animation: pet-aura-charge 1.6s ease-out forwards;
+}
+.pet-overlay[data-mood="fighting"] .pet-tool-sparks {
+  animation: pet-tool-sparks 380ms steps(2) infinite;
+}
+
+/* ── Sprite image (external /hetch sprites) ───────────────────────────── */
+
+.pet-sprite-img {
+  image-rendering: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+  object-fit: contain;
+  /* The gold drop-shadow alpha is multiplied by --pet-glow-intensity so
+     turning the slider down also drops the warm halo behind the sprite
+     itself, not just the radial aura. The body shadow stays static. */
+  filter:
+    drop-shadow(0 8px 12px rgba(0, 0, 0, .30))
+    drop-shadow(0 0 7px rgba(255, 216, 92, calc(.20 * var(--pet-glow-intensity, 1))));
+}
+/* Glow=0: drop the gold shadow entirely so the sprite reads as flat with
+   only its body shadow. */
+.pet-overlay.is-glow-off .pet-sprite-img {
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .30));
+}
+/* Theme-tinted variant: same multiplier on the gold drop-shadow, kept
+   in lock-step so toggling tint doesn't accidentally restore full glow. */
+.pet-overlay.is-theme-tinted.is-glow-off .pet-sprite-img {
+  filter:
+    url(#yha-pet-tint)
+    drop-shadow(0 8px 12px rgba(0, 0, 0, .30));
+}
+.pet-sprite-loading {
+  opacity: 0;
+}
+
+/* ── Theme tint (optional, toggled via petStore.themeTint) ────────────────
+   The earlier implementation used a `<div>` overlay with
+   `mix-blend-mode: color` over the .pet-flip-wrap. That blended the entire
+   wrap rectangle, so the empty area around the sprite was getting a faint
+   accent wash that read as "the box glows", not "the pet is themed".
+
+   The current approach instead applies an inline SVG filter
+   (`#yha-pet-tint`, defined inside FloatingPet) directly to the sprite
+   <img>. The filter:
+     1. floods the accent colour as a rectangle,
+     2. composites that flood IN the sprite's own alpha (so the rectangle
+        becomes sprite-shaped),
+     3. blends the sprite onto that mask using `mode="color"` — same
+        hue/saturation transfer the old `mix-blend-mode: color` did,
+     4. arithmetic-mixes the blended output with the original at 62/38 so
+        the recolouring isn't a 100 % repaint.
+
+   Because the alpha gating happens inside the filter, transparent areas
+   of the sprite stay genuinely transparent — no bleed onto the
+   background. */
+
+.pet-overlay.is-theme-tinted .pet-sprite-img {
+  filter:
+    url(#yha-pet-tint)
+    drop-shadow(0 8px 12px rgba(0, 0, 0, .30))
+    drop-shadow(0 0 7px rgba(255, 216, 92, calc(.20 * var(--pet-glow-intensity, 1))));
+}
+
+/* Action moods slightly brighten the drop-shadows; the tint strength
+   itself is animated by SMIL inside the SVG filter (see FloatingPet). */
+.pet-overlay.is-theme-tinted[data-mood="streaming"] .pet-sprite-img,
+.pet-overlay.is-theme-tinted[data-mood="powermove"] .pet-sprite-img,
+.pet-overlay.is-theme-tinted[data-mood="fighting"] .pet-sprite-img {
+  filter:
+    url(#yha-pet-tint)
+    drop-shadow(0 8px 12px rgba(0, 0, 0, .34))
+    drop-shadow(0 0 11px rgba(255, 216, 92, .32));
+}
+
+/* ── SVG fallback (built-in He-Man silhouette) ────────────────────────────
+
+   These selectors target the <svg class="pet-sprite-fallback"> tree rendered
+   by PetSprite when no manifest image is available. All coordinates are in
+   the 100×140 SVG viewBox.                                       */
+
+.pet-sprite-fallback {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .28));
+}
+
+.pet-cape          { fill: #c83c3c; }
+.pet-loincloth     { fill: #5e3517; }
+.pet-body ellipse  { fill: #D2691E; }
+.pet-harness       { fill: none; stroke: #2a1208; stroke-width: 4; stroke-linecap: round; }
+.pet-head          { fill: #f1c79b; }
+.pet-hair          { fill: #8B4513; }
+.pet-sword-blade   { stroke: url(#blade-grad); stroke-width: 3.5; stroke-linecap: round; }
+.pet-sword-grip    { fill: #2a1208; }
+.pet-sword-pommel  { fill: #ffd700; }
+.pet-sword-glow    { mix-blend-mode: screen; opacity: 0; }
+.pet-lightning     { opacity: 0; pointer-events: none; }
+.pet-bolt {
+  fill: none;
+  stroke: #cef;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(180, 220, 255, .85));
+}
+.pet-bolt-1 { stroke: #fff; }
+.pet-bolt-2 { stroke: #cce6ff; }
+.pet-bolt-3 { stroke: #b8dfff; }
+.pet-cloud,
+.pet-flash { opacity: 0; mix-blend-mode: screen; }
+.pet-arm-right { transform-origin: 50px 70px; transform-box: fill-box; }
+.pet-body      { transform-origin: 50% 100%; transform-box: fill-box; }
+
+/* SVG mood animations (mirror old .pet-heman[data-mood="…"] for .pet-sprite-fallback) */
+
+.pet-sprite-fallback[data-mood="idle"] .pet-body {
+  animation: pet-idle-bob 4s ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="idle"] .pet-sword-glow {
+  opacity: .4;
+  animation: pet-glow-breath 4s ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="thinking"] .pet-body {
+  animation: pet-think-tilt 1.8s ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="streaming"] .pet-body {
+  animation: pet-stream-rock 1.4s ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="streaming"] .pet-sword-glow {
+  opacity: .85;
+  animation: pet-glow-pulse 1.4s ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="error"] .pet-body {
+  animation: pet-shake .45s ease-in-out 1;
+}
+.pet-sprite-fallback[data-mood="error"] .pet-sword-glow {
+  fill: #ff6b6b;
+  opacity: .65;
+}
+.pet-sprite-fallback[data-mood="reconnecting"] .pet-body {
+  animation: pet-think-tilt 1.8s ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="fighting"] .pet-body {
+  animation: pet-fight-slash 420ms ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="fighting"] .pet-arm-right {
+  animation: pet-sword-slash 420ms ease-in-out infinite;
+}
+.pet-sprite-fallback[data-mood="fighting"] .pet-sword-glow {
+  opacity: .9;
+}
+
+.pet-sprite-fallback[data-mood="powermove"] .pet-body {
+  animation: pet-power-stance 1.6s ease-out forwards;
+}
+.pet-sprite-fallback[data-mood="powermove"] .pet-cloud {
+  animation: pet-cloud-fade 1s ease-out .3s forwards;
+}
+.pet-sprite-fallback[data-mood="powermove"] .pet-lightning {
+  opacity: 1;
+}
+.pet-sprite-fallback[data-mood="powermove"] .pet-bolt {
+  stroke-dasharray: 90;
+  stroke-dashoffset: 90;
+}
+.pet-sprite-fallback[data-mood="powermove"] .pet-bolt-1 { animation: pet-bolt-strike .5s ease-out .50s forwards; }
+.pet-sprite-fallback[data-mood="powermove"] .pet-bolt-2 { animation: pet-bolt-strike .5s ease-out .65s forwards; }
+.pet-sprite-fallback[data-mood="powermove"] .pet-bolt-3 { animation: pet-bolt-strike .5s ease-out .80s forwards; }
+.pet-sprite-fallback[data-mood="powermove"] .pet-sword-glow {
+  animation: pet-power-charge 1s ease-out .6s forwards;
+}
+.pet-sprite-fallback[data-mood="powermove"] .pet-sword-blade {
+  animation: pet-blade-flare .8s ease-out .7s forwards;
+}
+.pet-sprite-fallback[data-mood="powermove"] .pet-flash {
+  animation: pet-radial-flash .6s ease-out 1s forwards;
+}
+.pet-sprite-fallback[data-mood="happy"] .pet-body,
+.pet-sprite-fallback[data-mood="xpeffect"] .pet-body {
+  animation: pet-happy-jump .6s ease-out 1;
+}
+
+/* ── XP Burst (gold stars ─ MMO-style) ────────────────────────────────── */
+
+.pet-xp-burst {
+  position: absolute;
+  left: calc(50% + 4px);
+  top: 62%;
+  width: 1px;
+  height: 1px;
+}
+.pet-xp-particle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  clip-path: polygon(50% 0, 61% 37%, 100% 50%, 61% 63%, 50% 100%, 39% 63%, 0 50%, 39% 37%);
+  background:
+    radial-gradient(circle, #fff9d6 0 14%, #ffd65c 38%, rgba(210, 142, 22, .78) 68%, transparent 74%);
+  box-shadow:
+    0 0 7px rgba(255, 225, 112, .95),
+    0 0 16px rgba(255, 170, 32, .55);
+  transform: translate(-50%, -50%) scale(var(--xp-scale));
+  animation: pet-xp-float 1.65s ease-out var(--xp-delay) forwards;
+}
+.pet-xp-burst[data-kind="coins"] .pet-xp-particle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  clip-path: none;
+  background: radial-gradient(circle, #fff2a0 0 18%, #e8a92e 42%, #9a5e12 70%, transparent 72%);
+}
+.pet-xp-burst[data-kind="fruit"] .pet-xp-particle {
+  border-radius: 50% 50% 45% 55%;
+  clip-path: none;
+  background: radial-gradient(circle, #fff2a6 0 12%, #70d368 34%, #d44f5f 66%, transparent 72%);
+}
+.pet-xp-burst[data-kind="sparks"] .pet-xp-particle {
+  background: radial-gradient(circle, #fff 0 14%, #9ee7ff 38%, rgba(58, 148, 255, .75) 68%, transparent 74%);
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+
+@keyframes pet-idle-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+@keyframes pet-glow-breath {
+  0%, 100% { opacity: .3; }
+  50%      { opacity: .7; }
+}
+@keyframes pet-think-tilt {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-1.5deg); }
+}
+@keyframes pet-stream-rock {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-3px) rotate(.8deg); }
+}
+@keyframes pet-glow-pulse {
+  0%, 100% { transform: scale(1); opacity: .7; }
+  50%      { transform: scale(1.5); opacity: 1; }
+}
+@keyframes pet-shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-3px) rotate(-2deg); }
+  40%      { transform: translateX(3px) rotate(2deg); }
+  60%      { transform: translateX(-2px) rotate(-1deg); }
+  80%      { transform: translateX(2px) rotate(1deg); }
+}
+@keyframes pet-fight-slash {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  45%      { transform: translateX(-5px) rotate(-4deg); }
+  70%      { transform: translateX(5px) rotate(4deg); }
+}
+@keyframes pet-sword-slash {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-22deg) translate(-3px, -2px); }
+}
+@keyframes pet-power-stance {
+  0%   { transform: translateY(0); }
+  20%  { transform: translateY(-6px); }
+  60%  { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+@keyframes pet-cloud-fade {
+  0%   { opacity: 0; transform: scale(.8); }
+  60%  { opacity: .85; transform: scale(1.05); }
+  100% { opacity: .3; transform: scale(1); }
+}
+@keyframes pet-bolt-strike {
+  0%   { stroke-dashoffset: 90; opacity: .2; }
+  30%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: .9; }
+}
+@keyframes pet-power-charge {
+  0%   { r: 0; opacity: 0; }
+  60%  { r: 22; opacity: 1; }
+  100% { r: 16; opacity: .6; }
+}
+@keyframes pet-blade-flare {
+  0%   { filter: drop-shadow(0 0 4px rgba(255, 220, 100, .8)); }
+  50%  { filter: drop-shadow(0 0 14px rgba(255, 240, 160, 1)); }
+  100% { filter: drop-shadow(0 0 8px rgba(255, 220, 100, .7)); }
+}
+@keyframes pet-radial-flash {
+  0%   { r: 0; opacity: .8; }
+  100% { r: 90; opacity: 0; }
+}
+@keyframes pet-happy-jump {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(-10px); }
+  70%      { transform: translateY(-3px); }
+}
+@keyframes pet-aura-pulse {
+  0%, 100% { opacity: .28; transform: translate(-50%, -50%) scale(.85); }
+  50%      { opacity: .62; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes pet-aura-charge {
+  0%   { opacity: .28; transform: translate(-50%, -50%) scale(.8); }
+  70%  { opacity: .95; transform: translate(-50%, -50%) scale(1.35); }
+  100% { opacity: .45; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes pet-tool-sparks {
+  0%, 100% { opacity: .2; transform: translate(-50%, -50%); }
+  50%      { opacity: 1; transform: translate(calc(-50% - 8px), -50%); }
+}
+@keyframes pet-xp-float {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.2);
+  }
+  14% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--xp-x)), calc(-50% + var(--xp-y)))
+      scale(var(--xp-scale));
+  }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-overlay,
+  .pet-sprite-fallback *,
+  .pet-xp-particle,
+  .pet-aura,
+  .pet-tool-sparks,
+  .pet-flip-wrap {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* Reduced motion also stills the SVG-filter SMIL pulse on the tint by
+     dropping the live filter; the static accent color still applies via
+     the .is-theme-tinted rule above (the SMIL animate elements only
+     modulate strength, they don't gate the filter being applied). */
+  .pet-overlay.is-shutdown .pet-flip-wrap,
+  .pet-overlay.is-restoring .pet-flip-wrap,
+  .pet-overlay.is-booting .pet-flip-wrap {
+    /* Replace the CRT collapse with a plain fade so there's still a
+       visual cue for the connection state. */
+    transform: scaleX(var(--pet-flip-x));
+    filter: none;
+    opacity: 0;
+    transition: opacity 200ms linear !important;
+  }
+  .pet-overlay.is-restoring .pet-flip-wrap {
+    opacity: 1;
+  }
+  .pet-overlay.is-peeking-away .pet-flip-wrap {
+    /* Drop the shrink animation entirely under reduced-motion; just dim. */
+    animation: none !important;
+    opacity: 0.6;
+  }
+}
+
+/* ── Pet console bubble (Phase 1.5 — quick-chat + pet-as-toaster) ─────────
+   Speech-bubble next to the pet that carries BOTH the user-facing
+   quick-chat console AND any toasts routed there while the pet is
+   visible. Positioned as fixed via inline left/top from PetConsoleBubble.tsx
+   — these rules only style the inside.
+*/
+.pet-bubble {
+  background: var(--surface-2, rgba(38, 38, 38, 0.95));
+  color: var(--fg, #e6eef7);
+  border: 1px solid color-mix(in srgb, var(--accent, #00e08a) 35%, transparent);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  padding: 10px 12px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: pet-bubble-in 180ms var(--ease, ease-out);
+}
+@keyframes pet-bubble-in {
+  0%   { opacity: 0; transform: translateY(6px) scale(.96); }
+  100% { opacity: 1; transform: translateY(0)   scale(1);   }
+}
+/* Tail pointing back at the pet — visual only, doesn't change layout. */
+.pet-bubble::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  width: 12px;
+  height: 12px;
+  background: inherit;
+  border: inherit;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+.pet-bubble--right::before { left: -7px;  border-right: 0; border-top: 0; }
+.pet-bubble--left::before  { right: -7px; border-left:  0; border-bottom: 0; }
+
+.pet-bubble-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  color: var(--fg-dim, #88a0b4);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pet-bubble-close:hover {
+  color: var(--fg, #e6eef7);
+  background: color-mix(in srgb, var(--fg, #e6eef7) 12%, transparent);
+}
+
+.pet-bubble-history {
+  /* 3–5 lines visible — the rest scrolls. Each turn is ~1 line for short
+     answers; the cap stops the bubble from swallowing the whole screen
+     on a long monologue. */
+  max-height: 7.2em;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 2px;
+}
+.pet-bubble-empty {
+  color: var(--fg-dim, #88a0b4);
+  font-style: italic;
+}
+.pet-bubble-turn {
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: var(--radius-sm, 8px);
+  padding: 4px 8px;
+}
+.pet-bubble-turn--user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--accent, #00e08a) 22%, transparent);
+  color: var(--fg, #e6eef7);
+  max-width: 85%;
+}
+.pet-bubble-turn--assistant {
+  align-self: flex-start;
+  background: color-mix(in srgb, var(--fg, #e6eef7) 8%, transparent);
+}
+.pet-bubble-turn--error {
+  color: #ff9a8a;
+  background: color-mix(in srgb, #ff5566 18%, transparent);
+}
+.pet-bubble-turn--pending {
+  align-self: flex-start;
+  color: var(--fg-dim, #88a0b4);
+  font-style: italic;
+}
+
+/* ── Tool-usage annotation ────────────────────────────────────────────────
+   Rendered under an assistant turn whenever the bridge tool-loop fired one
+   or more bridge/MCP tools (caps.tools = 'on'/'filter' in the 🐾 Pet Chat
+   popover). Compact one-liner so it doesn't crowd the 5-line bubble. */
+.pet-bubble-tools-used {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--fg-dim, #88a0b4);
+  opacity: 0.85;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pet-bubble-toasts {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed color-mix(in srgb, var(--fg-dim, #88a0b4) 40%, transparent);
+}
+/* Minimal-toast mode — the bubble renders ONLY the toast rows and nothing
+   else (no history, no input). Strip the top-divider + margin so the card
+   doesn't look chopped, and shrink the outer padding for a more "popover"
+   feel. Used when `usePetConsoleStore.consoleOpen === false` and at least
+   one toast bubble is queued (see PetConsoleBubble.tsx). */
+.pet-bubble--minimal {
+  padding: 6px 8px;
+  background: var(--surface-2, rgba(38, 38, 38, 0.92));
+  /* Accent-tinted border keeps the popover visually associated with the pet
+     without competing for attention with the chat input. */
+  border-color: color-mix(in srgb, var(--accent, #00e08a) 22%, transparent);
+}
+.pet-bubble--minimal .pet-bubble-toasts--bare {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.pet-bubble-toast {
+  position: relative;
+  background: color-mix(in srgb, var(--accent, #00e08a) 14%, transparent);
+  border-left: 3px solid var(--accent, #00e08a);
+  border-radius: var(--radius-sm, 8px);
+  padding: 5px 22px 5px 8px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  animation: pet-bubble-toast-in 180ms var(--ease, ease-out);
+}
+@keyframes pet-bubble-toast-in {
+  0%   { opacity: 0; transform: translateX(-6px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.pet-bubble-toast--success { border-left-color: var(--accent, #00e08a); }
+.pet-bubble-toast--info    { border-left-color: var(--accent-3, #5cc8ff); }
+.pet-bubble-toast--warning { border-left-color: var(--accent-2, #ff9a3d); }
+.pet-bubble-toast--error   { border-left-color: #ff5566; background: color-mix(in srgb, #ff5566 16%, transparent); }
+.pet-bubble-toast--running { border-left-color: var(--fg-dim, #88a0b4); }
+.pet-bubble-toast-title {
+  font-weight: 600;
+  margin-bottom: 1px;
+}
+.pet-bubble-toast-msg { word-break: break-word; }
+.pet-bubble-toast-close {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  font-size: 13px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  color: var(--fg-dim, #88a0b4);
+  cursor: pointer;
+  padding: 0;
+}
+.pet-bubble-toast-close:hover { color: var(--fg, #e6eef7); }
+
+.pet-bubble-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  margin-top: 8px;
+}
+.pet-bubble-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface, rgba(28,28,28,0.72));
+  border: 1px solid color-mix(in srgb, var(--fg-dim, #88a0b4) 35%, transparent);
+  border-radius: var(--radius-sm, 8px);
+  color: var(--fg, #e6eef7);
+  padding: 6px 8px;
+  font: inherit;
+  outline: none;
+  transition: border-color var(--dur-fast, 140ms) var(--ease, ease);
+}
+.pet-bubble-input:focus {
+  border-color: var(--accent, #00e08a);
+}
+.pet-bubble-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.pet-bubble-send {
+  background: var(--accent, #00e08a);
+  color: #061015;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  padding: 0 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur-fast, 140ms) var(--ease, ease), opacity var(--dur-fast, 140ms);
+}
+.pet-bubble-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.pet-bubble-send:not(:disabled):hover {
+  background: color-mix(in srgb, var(--accent, #00e08a) 80%, white);
+}
+.pet-bubble-send-icon {
+  /* Inherits font-size 1em from the button; bump to 2.5em so the small
+     ▸ / ⏹ glyph reads as a proper send/stop affordance instead of a tiny
+     triangle. line-height clamps the line box so the button doesn't grow
+     vertically along with the icon. */
+  font-size: 2.5em;
+  line-height: 0.6;
+  display: inline-block;
+  transform: translateY(-1px);
+}
+.pet-bubble-send.is-stop {
+  /* Same destructive-red treatment as the main chat-stop button so the
+     two stop paths read identically. The class flips on whenever the pet
+     ask() promise is in flight; reverts as soon as it resolves/aborts. */
+  background: var(--color-danger, #ff5a5a);
+  color: #fff;
+}
+.pet-bubble-send.is-stop:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-danger, #ff5a5a) 80%, white);
+}
+
+.pet-bubble-status {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--fg-mute, #506576);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pet-bubble-status-error { color: #ff9a8a; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-bubble,
+  .pet-bubble-toast {
+    animation: none !important;
+  }
+}

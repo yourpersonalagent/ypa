@@ -1,0 +1,19 @@
+{
+  "name": "multichat-partners",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "External partner-agent cluster — Hermes (local tui_gateway subprocess) + OpenClaw (per-partner WS clients to remote gateways) + the /v1/partners* REST routes that manage them. Owns the partner record list (loaded from bridge/partners.json — user state, stays at bridge root) and the bridge/partners/<id>.md prompt files. On activate, auto-starts the Hermes subprocess if any enabled partner record names it. Registers a `partner` entry in the `participantKinds` register so the multichat invitee picker sees partners only when this module is active. The Hermes/OpenClaw client modules are still required at request time by bridge/routes/chat.ts and bridge/modules/multichat-broadcast/runner.ts via the new module path.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/partners"
+    ],
+    "bridgeRegisters": [
+      "participantKinds"
+    ]
+  },
+  "lifecycle": {
+    "reload": "never"
+  },
+  "category": "multichat"
+}

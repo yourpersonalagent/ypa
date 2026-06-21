@@ -1,0 +1,340 @@
+{
+  "name": "kuro",
+  "label": "Kuro",
+  "description": "A tiny Codex-style black-and-white fluffy dog with upright ears, blue eyes, a white face blaze, black eye mask markings, black saddle, and fluffy curled tail.",
+  "homeSpot": {
+    "x": null,
+    "y": 420
+  },
+  "spriteFormat": "codex-imported",
+  "spriteSize": 192,
+  "poses": {
+    "idle": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/idle_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/idle_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/idle_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/idle_f04.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/idle_f05.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/idle_f06.png",
+          "duration": 140
+        }
+      ]
+    },
+    "running": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/running_f01.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/kuro/running_f02.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/kuro/running_f03.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/kuro/running_f04.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/kuro/running_f05.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/kuro/running_f06.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/kuro/running_f07.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/kuro/running_f08.png",
+          "duration": 125
+        }
+      ]
+    },
+    "streaming": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/streaming_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/streaming_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/streaming_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/streaming_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/streaming_f05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/streaming_f06.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/streaming_f07.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/streaming_f08.png",
+          "duration": 90
+        }
+      ]
+    },
+    "happy": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/happy_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/happy_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/happy_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/happy_f04.png",
+          "duration": 140
+        }
+      ]
+    },
+    "error": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/error_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/error_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/error_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/error_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/error_f05.png",
+          "duration": 90
+        }
+      ]
+    },
+    "thinking": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/thinking_f01.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/kuro/thinking_f02.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/kuro/thinking_f03.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/kuro/thinking_f04.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/kuro/thinking_f05.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/kuro/thinking_f06.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/kuro/thinking_f07.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/kuro/thinking_f08.png",
+          "duration": 110
+        }
+      ]
+    },
+    "jumping": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/jumping_f01.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/kuro/jumping_f02.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/kuro/jumping_f03.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/kuro/jumping_f04.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/kuro/jumping_f05.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/kuro/jumping_f06.png",
+          "duration": 105
+        }
+      ]
+    },
+    "powermove": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/powermove_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/powermove_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/powermove_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/powermove_f04.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/powermove_f05.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/kuro/powermove_f06.png",
+          "duration": 140
+        }
+      ]
+    },
+    "xpeffect": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/kuro/xpeffect_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/xpeffect_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/xpeffect_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/xpeffect_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/xpeffect_f05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/kuro/xpeffect_f06.png",
+          "duration": 90
+        }
+      ]
+    }
+  }
+}

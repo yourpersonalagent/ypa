@@ -1,0 +1,151 @@
+/* ── rclone panel ─────────────────────────────────────────────────────────────
+   Mounted in #rclone-panel, toggled via .rclone-panel-open by RcloneModal.tsx
+ ─────────────────────────────────────────────────────────────────────────── */
+
+/* Button indicator — green dot when cwd is linked */
+#btn-cwd-rclone[data-linked="true"]::before {
+  content: '●';
+  font-size: 6px;
+  color: #4caf50;
+  margin-right: 4px;
+  vertical-align: middle;
+  opacity: 0.9;
+}
+#btn-cwd-rclone[data-linked="true"] {
+  color: #4caf50;
+  border-color: #4caf50;
+  opacity: 0.9;
+}
+#btn-cwd-rclone[data-linked="true"]:hover { opacity: 1; }
+
+/* ── Panel container ── */
+#rclone-panel { display: none; }
+#rclone-panel.rclone-panel-open {
+  display: block;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  width: min(520px, calc(100vw - 2rem));
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--surface-2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border, rgba(255,255,255,0.18));
+  border-radius: var(--radius-md);
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+}
+#rclone-panel::-webkit-scrollbar,
+#rclone-panel *::-webkit-scrollbar { width: 6px; height: 6px; }
+#rclone-panel::-webkit-scrollbar-track,
+#rclone-panel *::-webkit-scrollbar-track { background: transparent; }
+#rclone-panel::-webkit-scrollbar-thumb,
+#rclone-panel *::-webkit-scrollbar-thumb { background: var(--stroke-2); border-radius: 3px; }
+#rclone-panel::-webkit-scrollbar-thumb:hover,
+#rclone-panel *::-webkit-scrollbar-thumb:hover { background: var(--stroke); }
+#rclone-panel * { scrollbar-width: thin; scrollbar-color: var(--stroke-2) transparent; }
+
+/* ── Top-level tab bar ── */
+.rclone-top-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--stroke);
+  background: var(--surface-1, rgba(0,0,0,0.15));
+}
+.rclone-top-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--fg-mute);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 8px 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: color 0.12s, border-color 0.12s;
+}
+.rclone-top-tab:hover { color: var(--fg); }
+.rclone-top-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ── Sync tab specifics ── */
+.rclone-sync-src {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--fg-mute);
+  padding: 5px 8px;
+  background: var(--surface-1, rgba(0,0,0,0.2));
+  border: 1px solid var(--stroke);
+  border-radius: 4px;
+  word-break: break-all;
+  margin-bottom: 8px;
+}
+.rclone-sync-dest {
+  border: 1px solid var(--stroke);
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: var(--surface-1, rgba(0,0,0,0.1));
+}
+.rclone-sync-dest label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--fg);
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.rclone-sync-dest label:last-child { margin-bottom: 0; }
+
+/* ── Remotes tab ── */
+.rclone-remote-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--stroke);
+}
+.rclone-remote-row:last-child { border-bottom: none; }
+.rclone-remote-type {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  background: var(--surface-1, rgba(255,255,255,0.06));
+  border: 1px solid var(--stroke);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 36px;
+  text-align: center;
+}
+.rclone-remote-name {
+  flex: 1;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--fg);
+}
+.rclone-remote-actions { display: flex; gap: 4px; }
+
+.rclone-add-section {
+  border-top: 1px solid var(--stroke);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+/* ── Browse inline (remotes tab) ── */
+.rclone-browse-wrap {
+  border: 1px solid var(--stroke);
+  border-radius: 4px;
+  margin: 8px 12px;
+  overflow: hidden;
+}

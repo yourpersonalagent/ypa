@@ -1,0 +1,16 @@
+{
+  // Opt-in type-checking for bridge/mcp/*.js (CommonJS MCP servers).
+  // checkJs:false => only files with a `// @ts-check` pragma are checked,
+  // so this config stays green as servers are converted one at a time and
+  // non-mcp .js files pulled in via require() are NOT error-reported.
+  // Run: `bun run typecheck:mcp`. NOT wired into `verify` until all servers
+  // are converted clean (then it can become gating).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true
+  },
+  "include": ["mcp/**/*.js", "mcp/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

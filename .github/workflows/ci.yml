@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go:
+    name: go (build + vet + race)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: go-core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go-core/go.mod
+          cache-dependency-path: go-core/go.sum
+      - run: go build ./...
+      - run: go vet ./...
+      # -race needs CGO + a C toolchain; ubuntu runners ship gcc, so this works
+      # here even though it can't run on the stock Windows dev box.
+      - run: go test -race ./...
+
+  checks:
+    name: typecheck + bridge tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      # ubuntu runners ship zip/unzip, so file-manager.test.ts runs here.
+      - run: bun scripts/run-bridge-tests.mjs
+
+  frontend:
+    name: frontend tests (vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      # vitest runs under Node, not bun: vite-node trips on bun's module URL
+      # handling ("File URL path must be an absolute path"), which also blocks
+      # local Windows runs. Node sidesteps it.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npx --no-install vitest run
+        working-directory: frontend

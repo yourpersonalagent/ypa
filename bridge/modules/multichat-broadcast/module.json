@@ -1,0 +1,12 @@
+{
+  "name": "multichat-broadcast",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Multichat broadcast/forward dispatch — per-employee streaming runner (`runEmployeeInChain`) plus the leading-@-mention forward chain (`runForwardMentionChain`). No Express routes of its own; both helpers are required by `bridge/routes/chat.ts` (the core POST /v1/stream handler) at request time. Disabling this module breaks group chats and @-forwarding but leaves single-employee streaming intact (the chat route only enters these branches when the session has multiple participants or the reply starts with @). Files moved from bridge/routes/chat-{broadcast,forward}.ts.",
+  "needs": [],
+  "provides": {},
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "multichat"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "input-autocomplete",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Inline ghost-text autocomplete for the chat input. Pairs with the bridge `input-autocomplete` module: 250 ms idle → fetch a continuation → render in 50%-opacity overlay → Tab accepts. Registers its own `Autocomplete` prefs tab; disabled by default.",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": ["prefsTabs"]
+  },
+  "lifecycle": {
+    "hot": true,
+    "drainTimeoutMs": 0
+  }
+}

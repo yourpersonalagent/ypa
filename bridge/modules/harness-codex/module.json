@@ -1,0 +1,15 @@
+{
+  "name": "harness-codex",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Codex CLI harness — spawns the `codex` (OpenAI Codex) binary as a subprocess. Registers `codex` into the harnesses register. The implementation stays at bridge/providers/codex.ts because it shares splitAllowedToolsByProvider with the providers barrel. Disabling this module makes /v1/stream/ throw 'No harness codex available' for codex-routed requests; switch the user to a non-codex model to recover.",
+  "provides": {
+    "bridgeRegisters": [
+      "harnesses"
+    ]
+  },
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "harness"
+}

@@ -1,0 +1,41 @@
+/* Console — the original YHA design.
+ *
+ * Acts as the no-op baseline. The tokens already declared in tokens.css
+ * (--bg, --fg, --accent, --font, --font-mono) ARE the Console design;
+ * Atelier and Patchbay override on top.
+ *
+ * This file only re-asserts a small set of "design role" tokens so any
+ * design-aware component can ask for them without first checking which
+ * design is active. These are the defaults; Atelier and Patchbay map
+ * each of them to a design-specific value.
+ *
+ * Scope: every rule below is namespaced under html[data-design='console']
+ * so it cannot bleed into another design.
+ */
+
+html[data-design='console'] {
+  /* Design-role tokens (consumed only inside the design theme itself
+     and by a handful of design-aware components — see DESIGNS.md). */
+  --design-display-font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --design-body-font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --design-mono-font: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  /* Re-assert the universal font tokens so toggling FROM atelier/patchbay
+     back to console reverts cleanly even when stylesheet order would
+     otherwise have those design files paint last (this file loads before
+     them, so absolute fallbacks here keep Console's typography intact
+     when no design overrides apply). */
+  --font:         var(--design-body-font);
+  --font-mono:    var(--design-mono-font);
+  --font-display: var(--design-display-font);
+
+  --design-accent-native: var(--accent);
+  --design-rule: var(--stroke);
+  --design-rule-strong: var(--stroke-2);
+
+  --design-radius: var(--radius-md);
+  --design-radius-sharp: var(--radius-sm);
+  --design-radius-pill: var(--radius-pill);
+
+  --design-decor: none;
+}

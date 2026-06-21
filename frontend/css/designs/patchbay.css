@@ -1,0 +1,364 @@
+/* Patchbay — control-surface design.
+ *
+ * Warm graphite background, ember + acid lime accents, ice as tertiary.
+ * Space Grotesk display, Geist body, JetBrains Mono captions. Sharp
+ * corners (2-4px), 1px borders, dotted-grid background.
+ *
+ * SPECIFICITY STRATEGY (see atelier.css header for the long version)
+ *   Variant blocks use `[data-design='patchbay'][data-variant='Y']`
+ *   *without* the leading `html` — specificity 20. That places them
+ *   above the default base (spec 11 in tokens.css) and below colour-theme
+ *   families (spec 21 in tokens.css), so:
+ *      default base (11) < patchbay variant (20) < colour theme (21)
+ *   Patchbay replaces the default look, but ocean / sunset / minimal /
+ *   kawaii / etc. win back on bg / fg / surface / accent / shadow — same
+ *   behaviour Console has. The "default" colour family has no spec-21
+ *   block, so Patchbay's graphite / cream palette shows through there.
+ *
+ * VARIANTS
+ *   Dark variant   = graphite (the original design source).
+ *   Bright variant = cream concrete — same chrome, inverted base.
+ */
+
+/* ─── Patchbay-native palette references ──────────────────────────────── */
+html[data-design='patchbay'] {
+  --pb-bg:           #13141a;
+  --pb-bg-2:         #1b1c24;
+  --pb-bg-3:         #22232d;
+  --pb-bg-4:         #2a2c39;
+  --pb-fg:           #f0ece3;
+  --pb-fg-2:         #9d9aa1;
+  --pb-fg-3:         #5a5862;
+  --pb-ember:        #ff7a3c;
+  --pb-ember-dim:    rgba(255, 122, 60, 0.25);
+  --pb-lime:         #d4f24a;
+  --pb-lime-dim:     rgba(212, 242, 74, 0.20);
+  --pb-ice:          #a9d8ff;
+  --pb-ice-dim:      rgba(169, 216, 255, 0.20);
+  --pb-red:          #ff5a5a;
+
+  /* Bright-variant palette (cream concrete + dark text). */
+  --pb-cream:        #f0eee6;
+  --pb-cream-2:      #e6e2d6;
+  --pb-cream-3:      #d8d3c4;
+  --pb-ink:          #1b1c24;
+  --pb-ink-2:        #4a4954;
+  --pb-ink-3:        #7a7884;
+  --pb-ember-bright: #c8552a;
+  --pb-lime-bright:  #7a9e1a;
+  --pb-ice-bright:   #4a8cc8;
+
+  /* Design-role tokens (consumed by design-aware components only). */
+  --design-display-font: 'Space Grotesk', system-ui, sans-serif;
+  --design-body-font:    'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --design-mono-font:    'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --design-radius:       2px;
+  --design-radius-sharp: 0;
+  --design-radius-pill:  2px; /* Patchbay rejects pills — sharpens to a tab */
+  --design-accent-native: var(--pb-ember);
+
+  /* Override universal --font / --font-mono so every component using these
+     tokens picks up Patchbay's typography automatically. Body stays
+     Geist (per the Patchbay handoff source — pbBody = Geist) so prose
+     reads cleanly; Space Grotesk is reserved for display text via
+     --font-display, which the heading selectors below opt into. */
+  --font:         var(--design-body-font);
+  --font-mono:    var(--design-mono-font);
+  --font-display: var(--design-display-font);
+  --mono:         var(--design-mono-font);
+  --font-sans:    var(--design-body-font);
+
+  /* Default accent — colour themes override via tokens.css at specificity 21. */
+  --accent:        var(--pb-ember);
+  --accent-2:      var(--pb-lime);
+  --accent-3:      var(--pb-ice);
+  --danger:        var(--pb-red);
+  --hl:            var(--pb-ember-dim);
+
+  font-family: var(--design-body-font);
+}
+
+/* ─── DARK variant — the original graphite design ─────────────────────── */
+[data-design='patchbay'][data-variant='dark'] {
+  --bg:            var(--pb-bg);
+  --bg-2:          var(--pb-bg-2);
+  --bg-3:          var(--pb-bg-3);
+  --surface:       rgb(27, 28, 36);
+  --surface-1:     rgb(34, 35, 45);
+  --surface-2:     rgb(42, 44, 57);
+  --stroke:        rgba(240, 236, 227, 0.08);
+  --stroke-2:      rgba(240, 236, 227, 0.18);
+  --border:        rgba(240, 236, 227, 0.18);
+  --bg-soft:       var(--pb-bg-2);
+  --bg-elevated:   var(--pb-bg-3);
+  --fg:            var(--pb-fg);
+  --fg-dim:        var(--pb-fg-2);
+  --fg-mute:       var(--pb-fg-3);
+  --text-1:        var(--pb-fg);
+  --text-2:        var(--pb-fg-2);
+  --text-3:        var(--pb-fg-3);
+
+  --shadow-1:      0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-2:      0 8px 28px rgba(0, 0, 0, 0.55);
+  --shadow-glow:   0 0 0 1px rgba(255, 122, 60, 0.35), 0 4px 16px rgba(255, 122, 60, 0.12);
+
+  /* Dotted grid backdrop (matches the design source). */
+  --design-decor:
+    linear-gradient(rgba(240, 236, 227, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240, 236, 227, 0.06) 1px, transparent 1px);
+}
+
+/* ─── BRIGHT variant — cream concrete ─────────────────────────────────── */
+[data-design='patchbay'][data-variant='bright'] {
+  --bg:            var(--pb-cream);
+  --bg-2:          var(--pb-cream-2);
+  --bg-3:          var(--pb-cream-3);
+  --surface:       rgb(240, 238, 230);
+  --surface-1:     rgb(230, 226, 214);
+  --surface-2:     rgb(245, 243, 235);
+  --stroke:        rgba(27, 28, 36, 0.10);
+  --stroke-2:      rgba(27, 28, 36, 0.22);
+  --border:        rgba(27, 28, 36, 0.22);
+  --bg-soft:       var(--pb-cream-2);
+  --bg-elevated:   var(--pb-cream-2);
+  --fg:            var(--pb-ink);
+  --fg-dim:        var(--pb-ink-2);
+  --fg-mute:       var(--pb-ink-3);
+  --text-1:        var(--pb-ink);
+  --text-2:        var(--pb-ink-2);
+  --text-3:        var(--pb-ink-3);
+
+  /* Toned-down accents for legibility on cream. */
+  --accent:        var(--pb-ember-bright);
+  --accent-2:      var(--pb-lime-bright);
+  --accent-3:      var(--pb-ice-bright);
+  --hl:            rgba(200, 85, 42, 0.10);
+
+  --shadow-1:      0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-2:      0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-glow:   0 0 0 1px rgba(200, 85, 42, 0.25), 0 4px 14px rgba(200, 85, 42, 0.10);
+
+  --design-decor:
+    linear-gradient(rgba(27, 28, 36, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27, 28, 36, 0.06) 1px, transparent 1px);
+}
+
+/* ── Display typography — Space Grotesk, heavy, tight tracking ─────────── */
+html[data-design='patchbay'] h1,
+html[data-design='patchbay'] h2,
+html[data-design='patchbay'] h3,
+html[data-design='patchbay'] .mw-title,
+html[data-design='patchbay'] .brand,
+html[data-design='patchbay'] .brand-name,
+html[data-design='patchbay'] .hero-h,
+html[data-design='patchbay'] .panel-title,
+html[data-design='patchbay'] .drawer-title,
+html[data-design='patchbay'] .pers-tile h3,
+html[data-design='patchbay'] .pers-tile-name {
+  font-family: var(--design-display-font);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-transform: uppercase; /* Patchbay leans into the rack-label aesthetic */
+}
+
+html[data-design='patchbay'] h1 small {
+  font-family: var(--design-mono-font);
+  font-size: clamp(8.5px, 1vw, 10.5px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+  font-weight: 500;
+}
+
+/* ── Background decoration — dotted grid faded toward edges ────────── */
+html[data-design='patchbay'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--design-decor);
+  background-size: 40px 40px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black, transparent 90%);
+          mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black, transparent 90%);
+  opacity: 0.6;
+  z-index: 0;
+}
+/* Do NOT add `body > * { position: relative; z-index: 1 }` — that creates
+   a stacking context on every immediate body child and breaks
+   absolute-positioned dropdowns / overlays / modals. The decor at z-index
+   0 with normal source-order children renders correctly without it. */
+
+/* ── Buttons — sharp 2px corners, mono caps labels ─────────────────── */
+html[data-design='patchbay'] .prefs-btn,
+html[data-design='patchbay'] button.btn,
+html[data-design='patchbay'] .btn-secondary,
+html[data-design='patchbay'] .btn-ghost,
+html[data-design='patchbay'] .mw-btn,
+html[data-design='patchbay'] .pers-btn {
+  border-radius: var(--design-radius);
+  border: 1px solid var(--stroke-2);
+  font-family: var(--design-mono-font);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+html[data-design='patchbay'] button[data-primary],
+html[data-design='patchbay'] .btn-primary,
+html[data-design='patchbay'] .pers-btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  border-radius: var(--design-radius);
+}
+
+html[data-design='patchbay'] button.btn-success,
+html[data-design='patchbay'] .btn-go {
+  background: var(--accent-2);
+  color: var(--bg);
+  border-color: var(--accent-2);
+}
+
+/* ── Surfaces — sharp panels, hairline borders ──────────────────────── */
+html[data-design='patchbay'] .mw-card,
+html[data-design='patchbay'] .panel,
+html[data-design='patchbay'] .pers-tile,
+html[data-design='patchbay'] .hs-body,
+html[data-design='patchbay'] .picker,
+html[data-design='patchbay'] .perm-modal-card,
+html[data-design='patchbay'] .trigger-modal-card,
+html[data-design='patchbay'] .prefs-section {
+  border-radius: var(--design-radius);
+  border: 1px solid var(--stroke-2);
+}
+
+/* ── Inputs — flat rects with sharp corners + mono font ──────────────── */
+html[data-design='patchbay'] .prefs-input,
+html[data-design='patchbay'] .prefs-select,
+html[data-design='patchbay'] .prefs-prompt-ta,
+html[data-design='patchbay'] input[type='text'],
+html[data-design='patchbay'] input[type='number'],
+html[data-design='patchbay'] select,
+html[data-design='patchbay'] textarea {
+  border-radius: var(--design-radius);
+  border: 1px solid var(--stroke-2);
+  background: var(--bg);
+  font-family: var(--design-mono-font);
+  font-size: 12.5px;
+}
+
+/* ── Section headings — heavy mono caps ─────────────────────────────── */
+html[data-design='patchbay'] .prefs-sec,
+html[data-design='patchbay'] .prefs-col-lbl,
+html[data-design='patchbay'] .debug-modal-tab {
+  font-family: var(--design-mono-font);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fg-mute);
+  font-weight: 600;
+}
+
+/* ── Chat input bar — sharp corners, mono labels ─────────────────────── */
+html[data-design='patchbay'] .chat-input-bar {
+  border-radius: var(--design-radius);
+}
+html[data-design='patchbay'] .chat-bar-btn {
+  border-radius: var(--design-radius);
+  font-family: var(--design-mono-font);
+}
+
+/* ── Chat messages — actual selectors: `.msg`, `.msg-bubble`, etc. ───── */
+html[data-design='patchbay'] .msg-bubble {
+  border-radius: var(--design-radius);
+}
+html[data-design='patchbay'] .msg.user .msg-bubble {
+  background: var(--bg-2);
+  border: 1px solid var(--stroke-2);
+  font-size: 1.05em; /* dial down chat's hardcoded 2em user font */
+}
+html[data-design='patchbay'] .msg.agent .msg-bubble {
+  background: var(--bg-2);
+  border: 1px solid var(--stroke-2);
+  border-left: 2px solid var(--accent);
+}
+html[data-design='patchbay'] .msg-role-label {
+  font-family: var(--design-mono-font);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  font-size: 11px;
+  background: transparent;
+  text-transform: uppercase;
+}
+html[data-design='patchbay'] .msg.user .msg-role-label {
+  color: var(--accent-2);
+}
+html[data-design='patchbay'] .msg.agent .msg-role-label {
+  color: var(--accent);
+}
+
+/* ── Header brand — ember accent ─────────────────────────────────────── */
+html[data-design='patchbay'] .header-block,
+html[data-design='patchbay'] .header-bar h1 .header-block,
+html[data-design='patchbay'] .brand {
+  color: var(--accent);
+}
+
+/* ── Landing-page hero typography ──────────────────────────────────── */
+html[data-design='patchbay'] .landing-hero h1,
+html[data-design='patchbay'] .landing-title,
+html[data-design='patchbay'] .hero h1 {
+  font-family: var(--design-display-font);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  /* Space Grotesk runs wider than Console's Geist and Atelier's Newsreader,
+   * so 9vw breaks into 4 lines where the others wrap into 2. Trim to 8vw. */
+  font-size: clamp(40px, 6vw, 85px);
+  line-height: 0.92;
+}
+html[data-design='patchbay'] .landing-hero em,
+html[data-design='patchbay'] .hero em {
+  color: var(--accent-2);
+  font-style: normal;
+}
+
+/* ── Code blocks — terminal-style monochrome ─────────────────────────── */
+html[data-design='patchbay'] pre,
+html[data-design='patchbay'] code {
+  font-family: var(--design-mono-font);
+}
+html[data-design='patchbay'] pre {
+  background: var(--bg);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--design-radius);
+  padding: 16px;
+  color: var(--fg-dim);
+  line-height: 1.7;
+}
+
+/* ── Mobile / small-screen adjustments ─────────────────────────────── */
+@media (max-width: 720px) {
+  html[data-design='patchbay'] body::before {
+    background-size: 24px 24px;
+    opacity: 0.4;
+  }
+  html[data-design='patchbay'] .prefs-btn,
+  html[data-design='patchbay'] button.btn {
+    font-size: 10px;
+    padding: 8px 12px;
+    letter-spacing: 0.06em;
+  }
+}
+
+@media (max-width: 480px) {
+  html[data-design='patchbay'] h1,
+  html[data-design='patchbay'] h2,
+  html[data-design='patchbay'] h3 {
+    letter-spacing: -0.02em;
+  }
+  html[data-design='patchbay'] .landing-hero h1,
+  html[data-design='patchbay'] .landing-title,
+  html[data-design='patchbay'] .hero h1 {
+    font-size: clamp(40px, 12vw, 68px);
+  }
+}

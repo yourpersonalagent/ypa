@@ -1,0 +1,19 @@
+{
+  "name": "multichat-personnel",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Internal-employee personnel — owns /v1/employees/* CRUD + raw-MD edit routes, the in-memory employee map, and the on-disk bridge/employees/<id>.md persistence. Seeds the standard `ceodave` employee on first boot. Registers an `employee` entry in the `participantKinds` register so the multichat invitee picker (and any future register-based participant resolver) sees employees only when this module is active. Data dir bridge/employees/ stays at bridge root — user state, not module state. Disabling this module 404s the /v1/employees/* routes; the FE participant picker should fall back to '[unloaded participant]' for any session that still references an employee id (deferred to a follow-up FE task).",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/employees"
+    ],
+    "bridgeRegisters": [
+      "participantKinds"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "multichat"
+}

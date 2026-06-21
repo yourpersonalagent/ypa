@@ -1,0 +1,681 @@
+{
+  "name": "green-soul",
+  "label": "Green Soul",
+  "description": "Hatched pet — compact chibi sprite, leaf-shaped silhouette around body.",
+  "homeSpot": {
+    "x": null,
+    "y": 420
+  },
+  "spriteFormat": "square-frame-sequence",
+  "spriteSize": 960,
+  "poses": {
+    "idle": {
+      "label": "Ready",
+      "src": "/pets/green-soul/idle-01.png?nudge=1778022969320",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/idle-01.png?nudge=1778022969320",
+          "duration": 200
+        },
+        {
+          "src": "/pets/green-soul/idle-02.png?nudge=1778022969320",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/idle-03.png?nudge=1778022969320",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/idle-04.png?nudge=1778022969320",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/idle-05.png?nudge=1778022969320",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/idle-06.png?nudge=1778022969320",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/idle-07.png?nudge=1778022969320",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/idle-08.png?nudge=1778022969320",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/idle-09.png?nudge=1778022969320",
+          "duration": 180
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "thinking": {
+      "label": "Thinking",
+      "src": "/pets/green-soul/review-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/review-01.png",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/review-02.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/review-03.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/review-04.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/review-05.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/review-06.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/review-07.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/review-08.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/review-09.png",
+          "duration": 190
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "streaming": {
+      "label": "Working",
+      "src": "/pets/green-soul/working-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/working-01.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/working-02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/working-03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/working-04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/working-05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/working-06.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/working-07.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/working-08.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/working-09.png",
+          "duration": 130
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 440,
+        "height": 440,
+        "top": -145,
+        "left": -145
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "error": {
+      "label": "Stumbled",
+      "src": "/pets/green-soul/failed-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/failed-01.png",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/failed-02.png",
+          "duration": 130
+        },
+        {
+          "src": "/pets/green-soul/failed-03.png",
+          "duration": 130
+        },
+        {
+          "src": "/pets/green-soul/failed-04.png",
+          "duration": 130
+        },
+        {
+          "src": "/pets/green-soul/failed-05.png",
+          "duration": 130
+        },
+        {
+          "src": "/pets/green-soul/failed-06.png",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/failed-07.png",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/failed-08.png",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/failed-09.png",
+          "duration": 240
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "reconnecting": {
+      "label": "Recovering",
+      "src": "/pets/green-soul/waiting-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/waiting-01.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/waiting-02.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/waiting-03.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/waiting-04.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/waiting-05.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/waiting-06.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/waiting-07.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/waiting-08.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/waiting-09.png",
+          "duration": 190
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "happy": {
+      "label": "Waving!",
+      "src": "/pets/green-soul/waving-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/waving-01.png",
+          "duration": 60
+        },
+        {
+          "src": "/pets/green-soul/waving-02.png",
+          "duration": 70
+        },
+        {
+          "src": "/pets/green-soul/waving-03.png",
+          "duration": 70
+        },
+        {
+          "src": "/pets/green-soul/waving-04.png",
+          "duration": 70
+        },
+        {
+          "src": "/pets/green-soul/waving-05.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/waving-06.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/waving-07.png",
+          "duration": 70
+        },
+        {
+          "src": "/pets/green-soul/waving-08.png",
+          "duration": 70
+        },
+        {
+          "src": "/pets/green-soul/waving-09.png",
+          "duration": 130
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "jumping": {
+      "label": "Jumping!",
+      "src": "/pets/green-soul/jumping-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/jumping-01.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/jumping-02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/jumping-03.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/jumping-04.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/jumping-05.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/jumping-06.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/jumping-07.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/jumping-08.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/jumping-09.png",
+          "duration": 180
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "running": {
+      "label": "Running!",
+      "src": "/pets/green-soul/running-right-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/running-right-01.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-right-02.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-right-03.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-right-04.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-right-05.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-right-06.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-right-07.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/running-right-08.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/running-right-09.png",
+          "duration": 200
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "runningLeft": {
+      "label": "Running (left)!",
+      "src": "/pets/green-soul/running-left-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/running-left-01.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-left-02.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-left-03.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-left-04.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-left-05.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-left-06.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/running-left-07.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/running-left-08.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/running-left-09.png",
+          "duration": 200
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "powermove": {
+      "label": "Power Move!",
+      "src": "/pets/green-soul/powermove-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/powermove-01.png",
+          "duration": 100
+        },
+        {
+          "src": "/pets/green-soul/powermove-02.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/powermove-03.png",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/powermove-04.png",
+          "duration": 130
+        },
+        {
+          "src": "/pets/green-soul/powermove-05.png",
+          "duration": 130
+        },
+        {
+          "src": "/pets/green-soul/powermove-06.png",
+          "duration": 170
+        },
+        {
+          "src": "/pets/green-soul/powermove-07.png",
+          "duration": 160
+        },
+        {
+          "src": "/pets/green-soul/powermove-08.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/green-soul/powermove-09.png",
+          "duration": 200
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 560,
+        "height": 560,
+        "top": -220,
+        "left": -210
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "fighting": {
+      "label": "Fighting!",
+      "src": "/pets/green-soul/fighting-01.png?nudge=1778015483352",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/fighting-01.png?nudge=1778015483352",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/fighting-02.png?nudge=1778015483352",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/fighting-03.png?nudge=1778015483352",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/fighting-04.png?nudge=1778015483352",
+          "duration": 110
+        },
+        {
+          "src": "/pets/green-soul/fighting-05.png?nudge=1778015483352",
+          "duration": 160
+        },
+        {
+          "src": "/pets/green-soul/fighting-06.png?nudge=1778015483352",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/fighting-07.png?nudge=1778015483352",
+          "duration": 120
+        },
+        {
+          "src": "/pets/green-soul/fighting-08.png?nudge=1778015483352",
+          "duration": 130
+        },
+        {
+          "src": "/pets/green-soul/fighting-09.png?nudge=1778015483352",
+          "duration": 220
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 440,
+        "height": 440,
+        "top": -145,
+        "left": -145
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    },
+    "xpeffect": {
+      "label": "XP!",
+      "src": "/pets/green-soul/xpeffect-01.png",
+      "fallback": null,
+      "frames": [
+        {
+          "src": "/pets/green-soul/xpeffect-01.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-02.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-06.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-07.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-08.png",
+          "duration": 80
+        },
+        {
+          "src": "/pets/green-soul/xpeffect-09.png",
+          "duration": 160
+        }
+      ],
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 360,
+        "height": 360,
+        "top": -100,
+        "left": -110
+      },
+      "stripLayout": {
+        "cols": 3,
+        "rows": 3
+      }
+    }
+  },
+  "xpeffectStyle": "gold-stars",
+  "xpeffectInterval": {
+    "min": 180,
+    "max": 540
+  },
+  "hatch": {
+    "spec": {
+      "id": "green-soul",
+      "name": "Green Soul",
+      "silhouette": "compact chibi sprite, leaf-shaped silhouette around body",
+      "palette": "moss green, light brown, soft yellow accents",
+      "props": "small wooden flute or mushroom cap",
+      "signatureMove": "lifts flute, attached pollen swirl touching cheeks",
+      "faceLanguage": "simple readable face, expressive eyes, tiny mouth",
+      "styleNotes": "",
+      "species": "sprite"
+    },
+    "plan": "full",
+    "archetypeId": "forest-sprite"
+  }
+}

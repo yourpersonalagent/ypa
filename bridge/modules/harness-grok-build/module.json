@@ -1,0 +1,15 @@
+{
+  "name": "harness-grok-build",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Grok Build CLI harness — spawns the local `grok` (xAI Grok Build) binary. Two routes (clear binary vs sdk parallel to claude-binary / claude-sdk): label \"grok\" (default headless -p streaming-json + resume + rich events) and \"grok-acp\" (ACP `grok agent stdio` long-lived agent protocol). Both are switchable via HarnessInstance (or per-grok-instance advanced config). The Go core (grokbuild + grok-acp packages) owns the actual work; this is the registration shim only.",
+  "provides": {
+    "bridgeRegisters": [
+      "harnesses"
+    ]
+  },
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "harness"
+}

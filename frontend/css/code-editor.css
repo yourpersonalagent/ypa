@@ -1,0 +1,134 @@
+/* CodeEditorPane + CodeMinimap — shared styling used by both the modal
+   FileEditor and the VS-Code view's EditorRegion. The minimap rules live
+   here (not in layouts/code.css) so the modal pane gets the strip too. */
+
+/* ── Editor + minimap stage ─────────────────────────────────────────────── */
+.cm-host-stage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+}
+
+/* ── CodeMirror host ────────────────────────────────────────────────────── */
+.cm-host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+.cm-host .cm-editor {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.cm-host .cm-scroller {
+  overflow: auto;
+}
+.cm-host .cm-editor.cm-focused { outline: none; }
+
+/* CM injects an inline background on its theme; let our --bg show instead so
+   the editor matches the surrounding window. */
+.cm-host .cm-editor,
+.cm-host .cm-scroller,
+.cm-host .cm-gutters {
+  background-color: transparent !important;
+}
+
+/* ── CodeMinimap — 40 px navigation strip on the right of the editor body ─ */
+.cv-minimap {
+  position: relative;
+  flex: 0 0 40px;
+  background: var(--surface);
+  border-left: 1px solid var(--stroke);
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+.cv-minimap-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 4px 0;
+  gap: 0;
+}
+.cv-minimap-bar {
+  flex: 1 1 0;
+  min-height: 1px;
+  background: var(--accent);
+  opacity: 0.42;
+  min-width: 2px;
+}
+.cv-minimap-viewport {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: var(--hl);
+  border-top: 1px solid var(--stroke-2);
+  border-bottom: 1px solid var(--stroke-2);
+  pointer-events: none;
+}
+.cv-minimap:hover .cv-minimap-bar {
+  opacity: 0.7;
+}
+
+/* ── Editor toolbar (save / discard / reload) ───────────────────────────── */
+/* Shared by the VS-Code view's tabbar and the modal FileEditor. */
+.ed-toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  flex: 0 0 auto;
+}
+.ed-tb-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  color: var(--fg-dim);
+  cursor: pointer;
+  transition: background-color 90ms linear, color 90ms linear;
+}
+.ed-tb-btn:hover:not(:disabled) {
+  color: var(--fg);
+  background: var(--hl);
+}
+.ed-tb-btn:disabled {
+  color: var(--fg-mute);
+  opacity: 0.45;
+  cursor: default;
+}
+.ed-tb-btn[data-attention='true'] {
+  color: var(--accent);
+}
+.ed-tb-btn[data-attention='true']:hover {
+  color: var(--accent);
+  background: var(--hl);
+}
+.ed-tb-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--surface);
+}

@@ -1,0 +1,6 @@
+{
+  "name": "pm2-processes",
+  "label": "PM2 processes",
+  "version": "0.1.0",
+  "icon": "server"
+}

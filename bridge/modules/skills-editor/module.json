@@ -1,0 +1,16 @@
+{
+  "name": "skills-editor",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "SKILL.md editor + persistence half of the meta-bridge feature. Owns /v1/meta/* routes, the on-disk SKILL.md tree (skills/<name>/SKILL.md), the _state.json mount file, and the legacy bridge/skills/*.md → nested-layout migration that runs at activate-time. The MCP-server side (bridge/mcp/meta-bridge-server.js) still lives in core for this batch — it just requires lib.js from the new path; it moves into the future `mcp-servers` module in a follow-up. Disabling this module 404s the prefs-UI skills tab and the migrate-on-boot fallback; the MCP child keeps reading the on-disk layout regardless.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/meta"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "system"
+}

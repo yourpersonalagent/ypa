@@ -1,0 +1,14 @@
+{
+  "name": "render",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Generic render-handler registry (markdown / raw / data: json, xml, csv, tsv). Reuses the vendor.ts markdown-it singleton and the shiki highlighter so chat and this module never diverge on parser config; only post-render (raw toggle, data-normalizers) lives here. Sub-handlers for data formats normalize into markdown and call back into the markdown handler — single rendering head. Not yet wired into chat (intentional, see modules/render/README in plan); consumed via render(text, format, opts) or <RenderView/>.",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": []
+  },
+  "lifecycle": {
+    "hot": false,
+    "drainTimeoutMs": 0
+  }
+}

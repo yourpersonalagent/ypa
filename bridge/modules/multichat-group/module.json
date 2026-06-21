@@ -1,0 +1,20 @@
+{
+  "name": "multichat-group",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Agentic multichat groups — N permanent sibling sessions sharing a turn cursor. Each slot owns its own session; the group orchestrates parallel fan-out. Implements plan-mode (plan → decide → execute) and direct-execute. Proxy routes under /proxy/multichat-agents/ allow the agent-multichat MCP server to read group state.",
+  "needs": [
+    "multichat-broadcast",
+    "multichat-personnel"
+  ],
+  "provides": {
+    "routes": [
+      "/v1/multichat/groups",
+      "/proxy/multichat-agents"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "multichat"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "files-rclone",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "General /v1/rclone/* surface — list/create/delete remotes, browse any remote, sync arbitrary local paths to any remote. Split out of bridge/files/ftp.ts. The FTP-specific /v1/ftp/sync route uses rclone too but lives in files-ftp because its URL prefix and connection store are FTP-bound.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/rclone/remotes",
+      "/v1/rclone/browse",
+      "/v1/rclone/sync"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "files"
+}

@@ -1,0 +1,384 @@
+/* css/layout/plugins.css
+ *
+ * Styles for the CWD-scoped plugins system:
+ *   • Declarative widgets (.pw-*) — host-rendered React widgets that
+ *     plugins target via tile.json `template`. They inherit the YHA theme
+ *     so plugins automatically match the user's color scheme.
+ *   • Tile chrome (.plugin-tile-decl) — wrapper around any widget, hosts
+ *     the loading/error/reload affordances.
+ *   • Trust prompt (.plugins-trust-*) — one-time per-CWD opt-in to let the
+ *     bridge run a CWD's `data.ts` loaders.
+ *
+ * The legacy sandboxed-iframe path (.plugin-tile-iframe) still works as
+ * an escape hatch and is styled inline in TileIframe.tsx.
+ */
+
+/* ── Dropdown body sizing ────────────────────────────────────────────────
+ * Sized so it adapts both to the 320px vertical sidebar (effective inner
+ * width ~292px after #header padding) and the horizontal popover sizing
+ * (which CSS in header-bar.css already widens through `.hs-section-wide`).
+ * Everything inside (`.plugins-group`, `.plugins-tile-row`, tiles) sets
+ * `min-width: 0` so long file paths / hashes wrap instead of pushing the
+ * dropdown wider than its container. */
+.plugins-dropdown,
+.plugins-dropdown-empty {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.plugins-dropdown .plugins-group,
+.plugins-dropdown .plugins-tile-row { min-width: 0; }
+.plugins-dropdown .plugin-tile-decl { box-sizing: border-box; }
+
+/* ── Tile chrome ─────────────────────────────────────────────────────── */
+.plugin-tile-decl {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--fg);
+}
+/* Chrome sits on the outer (non-scrolling) wrapper so the reload button's
+ * hit area never overlaps the scrollbar gutter inside `.pw-tile-scroll`,
+ * and stays visible while the content scrolls. The widget title gets a
+ * right gutter so the button doesn't sit on top of the title text. */
+.plugin-tile-decl .pw-tile-chrome {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+  opacity: 0.85;
+  pointer-events: auto;
+}
+.plugin-tile-decl .pw-tile-chrome .pw-tile-loading { color: var(--fg-dim); }
+.plugin-tile-decl .pw-tile-chrome .pw-tile-error { color: var(--danger); font-weight: 700; cursor: help; }
+.plugin-tile-decl .pw-tile-chrome .pw-tile-reload {
+  appearance: none;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  color: inherit;
+  border-radius: 4px;
+  width: 22px; height: 22px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.plugin-tile-decl .pw-tile-chrome .pw-tile-reload:hover { background: var(--hl); }
+.plugin-tile-decl .pw-tile-chrome .pw-tile-reload:disabled { opacity: 0.3; cursor: default; }
+.plugin-tile-decl .pw-tile-scroll { min-width: 0; }
+/* Reserve room on the right so chrome doesn't sit on top of the title. */
+.plugin-tile-decl .pw-tile-scroll .pw-headline-title,
+.plugin-tile-decl .pw-tile-scroll .pw-kv-title,
+.plugin-tile-decl .pw-tile-scroll .pw-list-title,
+.plugin-tile-decl .pw-tile-scroll .pw-table-title {
+  padding-right: 32px;
+}
+
+.plugin-tile-missing { color: var(--danger); }
+.plugin-tile-missing .pw-tile-error-title { font-weight: 600; margin-bottom: 4px; }
+.plugin-tile-missing .pw-tile-error-hint { opacity: 0.7; }
+
+/* ── Section titles shared across widgets ────────────────────────────── */
+.pw-headline-title,
+.pw-kv-title,
+.pw-list-title,
+.pw-table-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+  margin-bottom: 6px;
+}
+
+/* ── Headline ────────────────────────────────────────────────────────── */
+.pw-headline-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.pw-headline-value {
+  font-size: 28px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.pw-headline-label { font-size: 13px; opacity: 0.7; }
+.pw-headline-trend.is-up { color: var(--accent); }
+.pw-headline-trend.is-down { color: var(--danger); }
+.pw-headline-trend.is-flat { color: var(--fg-dim); }
+
+/* ── Kv ──────────────────────────────────────────────────────────────── */
+.pw-kv-list { margin: 0; padding: 0; }
+.pw-kv-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 30%) 1fr;
+  gap: 8px;
+  padding: 3px 0;
+  border-top: 1px solid var(--stroke);
+}
+.pw-kv-row:first-child { border-top: none; }
+.pw-kv-row dt { opacity: 0.65; margin: 0; }
+.pw-kv-row dd { margin: 0; word-break: break-word; }
+.pw-kv-empty { opacity: 0.5; font-style: italic; }
+
+/* ── List ────────────────────────────────────────────────────────────── */
+.pw-list-rows { list-style: none; margin: 0; padding: 0; }
+.pw-list-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "primary trailing"
+    "secondary trailing";
+  column-gap: 8px;
+  padding: 5px 0;
+  border-top: 1px solid var(--stroke);
+}
+.pw-list-row.has-leading {
+  grid-template-columns: 22px 1fr auto;
+  grid-template-areas:
+    "leading primary trailing"
+    "leading secondary trailing";
+  column-gap: 8px;
+}
+.pw-list-row:first-child { border-top: none; }
+.pw-list-leading {
+  grid-area: leading;
+  align-self: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  user-select: none;
+}
+.pw-list-primary { grid-area: primary; word-break: break-word; }
+.pw-list-secondary { grid-area: secondary; opacity: 0.6; font-size: 11px; }
+.pw-list-trailing {
+  grid-area: trailing;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  align-self: center;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.pw-list-row.is-clickable { cursor: pointer; border-radius: 4px; padding-left: 4px; padding-right: 4px; }
+.pw-list-row.is-clickable:hover { background: var(--hl); }
+.pw-list-row.is-clickable:focus-visible { outline: 1px solid var(--accent, #4a8); outline-offset: -1px; }
+.pw-list-empty { opacity: 0.5; font-style: italic; padding: 4px 0; }
+
+/* ── Table ───────────────────────────────────────────────────────────── */
+.pw-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.pw-table th,
+.pw-table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--stroke);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.pw-table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10px;
+  opacity: 0.6;
+}
+.pw-table tbody tr.is-clickable { cursor: pointer; }
+.pw-table tbody tr.is-clickable:hover { background: var(--hl); }
+.pw-table-empty { opacity: 0.5; font-style: italic; padding: 4px 0; }
+
+/* Proportional bar inside a table cell (TableColumn.bar). The fill sits
+ * behind the cell text so size + magnitude read at a glance. */
+.pw-table-bar-cell { position: relative; min-width: 60px; }
+.pw-table-bar {
+  position: absolute;
+  inset: 4px 6px 4px 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+  z-index: 0;
+}
+.pw-table-bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    var(--accent, #4a8) 0%,
+    color-mix(in oklab, var(--accent, #4a8) 70%, transparent) 100%
+  );
+  opacity: 0.45;
+}
+.pw-table-bar-label {
+  position: relative;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Header quickinfo (replaces `+` glyph when plugins exist) ─────────── */
+/* In vertical sidebar mode the toggle stretches to the full sidebar width
+   like every other .hm-item — no max-width clamp here. The horizontal-bar
+   override below re-applies a 220px cap so the popover anchor stays compact.
+   `overflow: hidden` is always safe — the quickinfo text already ellipsises. */
+.hs-toggle.has-quickinfo {
+  overflow: hidden;
+}
+#header[data-orient='h'] .hs-toggle.has-quickinfo {
+  max-width: 220px;
+}
+.plugins-quickinfo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.2;
+  min-width: 0;
+}
+.plugins-quickinfo-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+/* Horizontal-bar mode keeps a tight readout cap (toggle is a popover anchor,
+   not a full-width row). Vertical sidebar lets the text grow with the button. */
+#header[data-orient='h'] .plugins-quickinfo-text {
+  max-width: 160px;
+}
+.plugins-quickinfo-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+.plugins-quickinfo-loading .plugins-quickinfo-text { opacity: 0.4; }
+.plugins-quickinfo-count .plugins-quickinfo-text { opacity: 0.8; }
+.plugins-quickinfo-error .plugins-quickinfo-text { color: var(--danger); }
+.plugins-quickinfo-error .plugins-quickinfo-label {
+  color: var(--danger);
+  opacity: 0.75;
+}
+
+/* ── Plugin group header (label + reorder controls + TOP badge) ──────── */
+.plugins-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.plugins-group-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.plugins-group-checkbox {
+  flex: 0 0 auto;
+  margin: 0;
+  cursor: pointer;
+}
+.plugins-group-empty {
+  opacity: 0.6;
+  font-size: 11px;
+  padding: 2px 0 6px 30px;
+}
+.plugins-tile-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 8px;
+}
+.plugins-tile-sublabel {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  padding-left: 2px;
+}
+.plugins-group-reorder {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 0 0 auto;
+}
+.plugins-reorder-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--stroke);
+  color: inherit;
+  padding: 0;
+  width: 16px;
+  height: 10px;
+  line-height: 8px;
+  font-size: 7px;
+  cursor: pointer;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+.plugins-reorder-btn:hover:not(:disabled) { background: var(--hl); opacity: 1; }
+.plugins-reorder-btn:disabled { opacity: 0.2; cursor: default; }
+.plugins-group-top-badge {
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--accent, #4a8) 22%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent, #4a8) 40%, transparent);
+  color: var(--accent, #4a8);
+}
+
+/* ── Trust prompt ────────────────────────────────────────────────────── */
+.plugins-trust-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  background: var(--surface);
+  margin-bottom: 8px;
+}
+.plugins-trust-prompt .plugins-trust-headline {
+  font-weight: 600;
+}
+.plugins-trust-prompt .plugins-trust-detail {
+  opacity: 0.7;
+  font-size: 12px;
+}
+.plugins-trust-actions {
+  display: flex;
+  gap: 8px;
+}
+.plugins-trust-actions button {
+  flex: 1;
+}

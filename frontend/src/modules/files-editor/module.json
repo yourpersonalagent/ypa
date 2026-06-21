@@ -1,0 +1,14 @@
+{
+  "name": "files-editor",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "FileEditor moveable window — markdown click-to-edit + CodeMirror code editor. Imported lazily from App.tsx so CodeMirror only enters the user's bundle when a code file is opened in edit mode (saves ~600 KB on the initial chunk per registers-doc §4.21e). The bridge object `fileEditor.open()` stays in core (frontend/src/modals/file-editor.ts) so vanilla callers (FilePicker, chat.ts, FileManager) keep working unchanged.",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": []
+  },
+  "lifecycle": {
+    "hot": false,
+    "drainTimeoutMs": 0
+  }
+}

@@ -1,0 +1,11 @@
+# compiled binaries land in /bin under the repo root
+# (handled by yha.sh; nothing here)
+
+# go test cache, profiling output
+/coverage.out
+/cpu.pprof
+/mem.pprof
+
+# editor / OS noise
+.DS_Store
+*.swp

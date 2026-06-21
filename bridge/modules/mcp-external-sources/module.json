@@ -1,0 +1,18 @@
+{
+  "name": "mcp-external-sources",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Catalog of user-added EXTERNAL MCP servers (kind: 'external') — the third-party counterpart to the shipped mcp-servers internal catalog. Owns the source definitions (CRUD + import of Claude/Cursor/Codex mcpServers configs) at /v1/mcp/sources/*, stored in the gitignored bridge/mcp-external-sources.json. mcp-client's readUpstreamRegistry() reads that file directly and merges external sources into the runnable registry, so they get lifecycle/supervisor/audience/aggregation for free. External sources default OFF until the user enables them.",
+  "needs": [
+    "mcp-client"
+  ],
+  "provides": {
+    "routes": [
+      "/v1/mcp/sources/*"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "mcp"
+}

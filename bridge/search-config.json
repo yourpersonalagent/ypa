@@ -1,0 +1,47 @@
+{
+  "surface": "both",
+  "providers": [
+    {
+      "name": "tavily",
+      "enabled": true,
+      "priority": 1,
+      "endpoint": "https://api.tavily.com/search"
+    },
+    {
+      "name": "exa",
+      "enabled": true,
+      "priority": 2,
+      "endpoint": "https://api.exa.ai/search"
+    },
+    {
+      "name": "google_cse",
+      "enabled": true,
+      "priority": 5,
+      "endpoint": "https://www.googleapis.com/customsearch/v1"
+    },
+    {
+      "name": "bing",
+      "enabled": false,
+      "priority": 7,
+      "endpoint": "https://api.bing.microsoft.com/v7.0/search"
+    },
+    {
+      "name": "playwright_mcp",
+      "enabled": true,
+      "priority": 4,
+      "endpoint": ""
+    },
+    {
+      "name": "web_mcp",
+      "enabled": true,
+      "priority": 3,
+      "endpoint": ""
+    },
+    {
+      "name": "brave",
+      "enabled": false,
+      "priority": 6,
+      "endpoint": "https://api.search.brave.com/res/v1/web/search"
+    }
+  ]
+}

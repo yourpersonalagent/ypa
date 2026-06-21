@@ -1,0 +1,408 @@
+/* ============================================================
+   Empty-state hero — centered input + YHA brand for new chats
+   ============================================================
+   Animation philosophy: only `transform` and `opacity` are transitioned
+   (GPU-accelerated, layout-free). Layout-affecting properties (max-width,
+   margin, height, flex-basis) are not transitioned — they snap on class
+   toggle. The pure-transform lift is what the eye reads, so the snap is
+   invisible. This keeps the transition ≤ 60fps even on slow paint paths.
+   --------------------------------------------------------------- */
+
+.view-chat {
+  position: relative; /* anchor for absolute hero */
+}
+.chat-controls-area {
+  position: relative; /* anchor for hero inside */
+  z-index: 1;
+  transform: translateY(0);
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* No `will-change: transform` — that promoted a permanent compositor layer
+     for an animation that fires only on the empty↔content transition (~once
+     per session). One-shot transitions stay smooth without it; the always-on
+     GPU memory + paint isolation cost was a measurable fraction of idle
+     usage. (See ChatEmptyBg / globe.css headers for the wider context.) */
+}
+.chat-scroll-wrap { z-index: 1; }
+
+/* WebGL backdrop for empty-chat idle state. Sits behind everything; only
+   becomes visible when .chat-empty AND .chat-idle (10s no activity) are both
+   present on #view-chat. Fades in/out via opacity transitions. */
+.chat-empty-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  /* Soft, slower fade — trails the input/hero hand-off when chat fills. */
+  transition: opacity 16s cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* Per-frame compositor cost is dominated by the filter chain on this
+     fullscreen layer (each pass is a framebuffer-read + shader run). The
+     canvas already runs at 0.45× resolution so the upscale gives a soft
+     look for free; we only need a light saturation/blend pass on top.
+     Earlier the chain was `saturate blur(12px) contrast(2.2)` — three
+     additional passes that ran every frame regardless of WebGL fps. */
+  mix-blend-mode: screen;
+  filter: saturate(1.1) blur(2px);
+}
+html[data-variant='bright'] .chat-empty-bg {
+  mix-blend-mode: multiply;
+  filter: saturate(1.3) brightness(0.75) blur(2px);
+}
+/* Empty-chat backdrop ladder:
+   • .chat-empty-bg-on (JS-applied APPEAR_MS after chat-empty) → half-visible
+     baseline. Stays on as long as chat is empty, regardless of activity.
+   • + .chat-idle (no input/click for IDLE_MS)                 → boost to full.
+   When chat fills, both classes are removed and the canvas fades out softly. */
+.view-chat.chat-empty-bg-on .chat-empty-bg {
+  opacity: 0.28;
+}
+html[data-variant='bright'] .view-chat.chat-empty-bg-on .chat-empty-bg {
+  opacity: 0.42;
+}
+.view-chat.chat-empty-bg-on.chat-idle .chat-empty-bg {
+  opacity: 0.55;
+}
+html[data-variant='bright'] .view-chat.chat-empty-bg-on.chat-idle .chat-empty-bg {
+  opacity: 0.85;
+}
+
+.chat-empty-hero {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 24px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* No `will-change` — see comment on .chat-controls-area. The fade-in only
+     fires when chat is first emptied; permanent layer promotion isn't worth
+     the always-on cost for a 220ms one-shot. */
+}
+
+.brand-hero-logo {
+  margin: 0;
+  font-family: var(--font);
+  font-size: clamp(56px, 11cqi, 128px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  user-select: none;
+  color: transparent;
+  /* background: linear-gradient(180deg,
+    color-mix(in srgb, var(--fg) 14%, transparent) 0%,
+    color-mix(in srgb, var(--fg) 4%, transparent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--fg) 6%, transparent),
+    0 -1px 0 color-mix(in srgb, var(--bg) 60%, transparent); */
+}
+.brand-hero-block {
+  display: inline-block;
+  font-family: var(--font-mono);
+}
+
+/* Smart greeting line, separately positioned ~20% above the YHA hero in the
+   empty-chat state. Picked from greetings.md by local hour + date (themed
+   days take precedence). Asymmetric choreography: very slow & extra-soft
+   blurred entry that trails the bg animation, then a quick 1s exit when the
+   empty state ends. Styled like the brand-hero — thick font, stamped /
+   embossed into the background, just a touch more transparent. */
+.chat-empty-greeting {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 20cqh);
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
+  pointer-events: none;
+  opacity: 0;
+  filter: blur(80px);
+  /* Default = fade out path: kicks in when .chat-empty is removed. */
+  transition: opacity 1s ease, filter 1s ease;
+  /* No `will-change: filter` — with the worst-case `blur(80px)` baseline,
+     promoting the layer up-front meant the compositor pre-allocated a
+     dilated framebuffer big enough for an 80-pixel blur kernel and held it
+     for the lifetime of the element, even while sitting at blur(0) during
+     the empty state. The 1s blur-out runs fine without permanent promotion. */
+  z-index: 1;
+}
+.chat-empty-greeting-text {
+  max-width: 1100px;
+  text-align: center;
+  font-family: var(--font);
+  font-size: clamp(14px, 1.73cqi, 41px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  user-select: none;
+  color: transparent;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--fg) 11%, transparent) 0%,
+    color-mix(in srgb, var(--fg) 4%, transparent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--fg) 4%, transparent),
+    0 -1px 0 color-mix(in srgb, var(--bg) 60%, transparent);
+    margin-bottom:5%;
+}
+
+/* Full layout: the greeting is mounted INSIDE `.chat-empty-hero` (see
+   ChatEmptyGreeting.tsx) and takes the brand mark's slot — the hero keeps
+   its original footprint just above the input. The YHA wordmark is hidden
+   so only the welcome message occupies the hero's anchor point. */
+[data-layout="full"] .chat-empty-hero > .brand-hero-logo {
+  display: none;
+}
+[data-layout="full"] .chat-empty-hero > .chat-empty-greeting {
+  position: static;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  width: 100%;
+  padding: 0 24px;
+}
+
+/* Empty state: lift the controls bar via transform (no layout change),
+   reveal the hero. Layout-only properties (max-width / border-radius)
+   snap instantly so the transform stays smooth. */
+.view-chat.chat-empty .chat-controls-area {
+  /* -50cqh moves up half the pane height; +50% adds back half the element's own
+     height — net effect: element is centered in the pane regardless of pane size */
+  transform: translateY(calc(-50cqh + 50%));
+}
+.view-chat.chat-empty .chat-empty-hero {
+  opacity: .55;
+  transform: translateY(0);
+  pointer-events: auto;
+  cursor: crosshair;
+}
+/* When the synth is active, swap the crosshair for a speaker-icon cursor
+   so the gesture-affordance reads as "press to play sound", not "aim".
+   When muted, no special cursor — the hero has no interaction. */
+.view-chat.chat-empty.synth-on .chat-empty-hero {
+  cursor:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'><g stroke='black' stroke-width='3.5'><path d='M11 5 6 9H2v6h4l5 4z'/><path d='M15.54 8.46a5 5 0 0 1 0 7.07'/><path d='M19.07 4.93a10 10 0 0 1 0 14.14'/></g><g stroke='white' stroke-width='2'><path d='M11 5 6 9H2v6h4l5 4z'/><path d='M15.54 8.46a5 5 0 0 1 0 7.07'/><path d='M19.07 4.93a10 10 0 0 1 0 14.14'/></g></svg>") 16 16,
+    crosshair;
+}
+html[data-variant='bright'] .view-chat.chat-empty.synth-on .chat-empty-hero {
+  cursor:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'><g stroke='white' stroke-width='3.5'><path d='M11 5 6 9H2v6h4l5 4z'/><path d='M15.54 8.46a5 5 0 0 1 0 7.07'/><path d='M19.07 4.93a10 10 0 0 1 0 14.14'/></g><g stroke='black' stroke-width='2'><path d='M11 5 6 9H2v6h4l5 4z'/><path d='M15.54 8.46a5 5 0 0 1 0 7.07'/><path d='M19.07 4.93a10 10 0 0 1 0 14.14'/></g></svg>") 16 16,
+    crosshair;
+}
+.view-chat.chat-empty.synth-off .chat-empty-hero {
+  cursor: default;
+}
+
+/* Speaker toggle pill in the hero's top-right corner. Only interactive while
+   the hero itself is interactive (.chat-empty), and overrides whatever cursor
+   the hero is showing so it always reads as a button. */
+.hero-synth-toggle {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--fg) 14%, transparent);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  color: color-mix(in srgb, var(--fg) 55%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity 220ms ease, color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.view-chat.chat-empty .hero-synth-toggle {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+.view-chat.chat-empty .hero-synth-toggle:hover,
+.view-chat.chat-empty .hero-synth-toggle:focus-visible {
+  opacity: 1;
+  color: var(--fg);
+  border-color: color-mix(in srgb, var(--fg) 32%, transparent);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+.view-chat.chat-empty .hero-synth-toggle[aria-pressed='false'] {
+  color: color-mix(in srgb, var(--fg) 38%, transparent);
+}
+/* Always pointer on the button, never the speaker-cursor inherited from the hero. */
+.view-chat.chat-empty .chat-empty-hero .hero-synth-toggle {
+  cursor: pointer;
+}
+.view-chat.chat-empty .chat-empty-greeting {
+  opacity: 1;
+  filter: blur(0);
+  /* Slow extra-soft reveal that follows the bg animation
+     (ChatEmptyBg.APPEAR_MS = 6000ms). */
+  transition: opacity 8s ease, filter 8s ease;
+  transition-delay: 6.5s;
+}
+.view-chat.chat-empty .chat-input-container {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  background: none;
+}
+.view-chat.chat-empty .chat-input-wrapper {
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+}
+.view-chat.chat-empty .chat-input-wrapper::before {
+  border-radius: var(--radius-md);
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+/* Empty state: file picker + play button stretch to fill the side-cluster
+   height so they span the 2 rows that the small buttons wrap into,
+   instead of forcing a separate taller row of their own. */
+.view-chat.chat-empty .cb-right-send {
+  align-self: stretch;
+  align-items: stretch;
+}
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.file-btn,
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.send-btn {
+  padding: 8px 16px;
+  min-height: 54px;
+  min-width: 54px;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.file-btn {
+  width: max-content;
+  padding: 10px 18px;
+  gap: 12px;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.file-btn svg {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+/* Empty state — let the working-dir label size naturally so the button
+   grows to fit its text instead of clipping with ellipsis. */
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.file-btn .fp-wd-display {
+  max-width: none;
+  margin-left: 0;
+  line-height: 1.2;
+}
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.file-btn .fp-wd-parent {
+  font-size: 11px;
+  opacity: 0.7;
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+}
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.file-btn .fp-wd-name {
+  font-size: 15px;
+  font-weight: 600;
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+}
+.view-chat.chat-empty .chat-input-bar .chat-bar-btn.send-btn {
+  font-size: 26px;
+  line-height: 1;
+}
+
+/* Inline #btw block — sits between tool calls / text in the assistant turn */
+.msg-btw-inline {
+  margin: 8px 0;
+  padding: 6px 10px;
+  background: color-mix(in srgb, #e8b800 7%, var(--bg-2));
+  border: 1px solid color-mix(in srgb, #e8b800 20%, transparent);
+  border-left: 3px solid color-mix(in srgb, #e8b800 48%, transparent);
+  color: color-mix(in srgb, #e8c840 70%, var(--fg));
+  font-size: 13px;
+  font-style: italic;
+  border-radius: var(--radius-sm);
+}
+.msg-btw-inline::before {
+  content: '↪ ';
+  font-style: normal;
+  opacity: 0.6;
+  font-size: 11px;
+}
+html[data-variant='bright'] .msg-btw-inline {
+  background: color-mix(in srgb, #a07000 8%, var(--bg-2));
+  border: 1px solid color-mix(in srgb, #a07000 18%, transparent);
+  border-left: 3px solid color-mix(in srgb, #a07000 42%, transparent);
+  color: color-mix(in srgb, #6b4a00 90%, transparent);
+}
+/* Tiny suffix on the right of the btw bubble: tells the user whether
+   the model will actually pick this btw up mid-stream (direct API) or
+   only on the next turn (subscription / CLI harness). See
+   docs/yhaBTWnurTeilweise.md for the path-by-path matrix. */
+.msg-btw-hint {
+  display: inline-block;
+  margin-left: 10px;
+  font-style: normal;
+  font-size: 11px;
+  opacity: 0.65;
+  letter-spacing: 0.01em;
+}
+.msg-btw-hint--live {
+  color: color-mix(in srgb, #5fb872 80%, var(--fg));
+  opacity: 0.75;
+}
+
+/* Inline disconnect / reconnect / restart sidenotes inside one assistant turn */
+.msg-interrupt-inline {
+  margin: 8px 0;
+  padding: 7px 10px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, #7aa2ff 7%, var(--bg-2));
+  border: 1px solid color-mix(in srgb, #7aa2ff 14%, transparent);
+  border-left: 3px solid color-mix(in srgb, #7aa2ff 40%, transparent);
+  color: color-mix(in srgb, #c7d7ff 78%, var(--fg));
+  font-size: 12px;
+  line-height: 1.45;
+}
+.msg-interrupt-inline[data-kind='disconnect'] {
+  background: color-mix(in srgb, #d28f32 7%, var(--bg-2));
+  border-color: color-mix(in srgb, #d28f32 15%, transparent);
+  border-left-color: color-mix(in srgb, #d28f32 44%, transparent);
+}
+.msg-interrupt-inline[data-kind='server-restart'] {
+  background: color-mix(in srgb, #d46a6a 8%, var(--bg-2));
+  border-color: color-mix(in srgb, #d46a6a 16%, transparent);
+  border-left-color: color-mix(in srgb, #d46a6a 45%, transparent);
+}
+.msg-interrupt-title {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.82;
+  margin-bottom: 2px;
+}
+.msg-interrupt-text {
+  opacity: 0.92;
+}
+.msg-interrupt-meta {
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.68;
+}
+html[data-variant='bright'] .msg-interrupt-inline {
+  background: color-mix(in srgb, #3659aa 6%, var(--bg-2));
+  border-color: color-mix(in srgb, #3659aa 12%, transparent);
+  border-left-color: color-mix(in srgb, #3659aa 36%, transparent);
+  color: color-mix(in srgb, #21396d 92%, transparent);
+}

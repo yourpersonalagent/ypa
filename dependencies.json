@@ -1,0 +1,252 @@
+{
+  "_comment": "Canonical, machine-readable inventory of YHA's EXTERNAL / system dependencies — the things that live outside the bun/go package trees (container runtime, CLI binaries, API keys, Python venvs). The human-readable companion is DEPENDENCIES.md (§1-§8); keep the two in sync. The bridge scanner (bridge/lib/deps.ts → GET /v1/system/deps, surfaced in Preferences -> Dependencies) probes every entry below for live present/missing status, and MCP/core code calls deps.assertDep(id) so a missing dep fails with an actionable message instead of a raw spawn error.",
+  "version": 1,
+  "detectKinds": {
+    "binary": "Found on PATH (PATHEXT-aware on Windows), or at an explicit `paths` candidate, or at the absolute path held in `configPath` (dotted key into config.json) / `envPath` (env var). `altNames` are alternate executable names that satisfy the same need. `versionArgs` (optional) are run once, when found, to capture a version string.",
+    "env": "Present when any name in `names` is set to a non-empty value in the process environment or bridge/.env. Only the matched NAME is ever reported — never the secret value.",
+    "path": "A file/dir that must exist. `path` is ~-expanded and, when relative, resolved against the repo root. `envOverride` lets an env var relocate it.",
+    "port": "A TCP port that must accept a connection on `host` (default 127.0.0.1)."
+  },
+  "dependencies": [
+    {
+      "id": "bun",
+      "label": "Bun",
+      "category": "runtime",
+      "optional": false,
+      "detect": { "kind": "binary", "name": "bun", "versionArgs": ["--version"] },
+      "requiredBy": ["bridge server", "all 19 MCP servers (every one is launched via `bun`)"],
+      "installHint": "https://bun.sh — `engines.bun` requires >= 1.2"
+    },
+    {
+      "id": "go",
+      "label": "Go toolchain",
+      "category": "runtime",
+      "optional": false,
+      "detect": { "kind": "binary", "name": "go", "versionArgs": ["version"] },
+      "requiredBy": ["go-core (TUI + core build)"],
+      "installHint": "https://go.dev/dl — go-core/go.mod requires >= 1.25"
+    },
+    {
+      "id": "python3",
+      "label": "Python 3",
+      "category": "runtime",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "python3", "altNames": ["python"], "versionArgs": ["--version"] },
+      "requiredBy": ["knowledge-memory (graphify)", "google-workspace skill", "notebooklm", "inline python3 exec"],
+      "installHint": "3.x. Note: very new releases (3.14) may lack prebuilt wheels for graphifyy / google libs."
+    },
+    {
+      "id": "git",
+      "label": "Git",
+      "category": "runtime",
+      "optional": false,
+      "detect": { "kind": "binary", "name": "git", "versionArgs": ["--version"] },
+      "requiredBy": ["repo ops", "/v1/version self-update", "rewind history"],
+      "installHint": "https://git-scm.com — Git for Windows also supplies unzip/nice"
+    },
+    {
+      "id": "node",
+      "label": "Node.js",
+      "category": "runtime",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "node", "versionArgs": ["--version"] },
+      "requiredBy": ["claude-sdk harness path (only if active)", "node-sandbox code-exec/meta-bridge tools"],
+      "installHint": "Optional — Bun covers the JS runtime for normal operation."
+    },
+    {
+      "id": "docker",
+      "label": "Container runtime (Docker/Podman)",
+      "category": "container",
+      "optional": true,
+      "detect": {
+        "kind": "binary",
+        "name": "docker",
+        "altNames": ["podman"],
+        "paths": ["C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe"],
+        "versionArgs": ["--version"]
+      },
+      "requiredBy": ["code-exec MCP (run_python / run_nodejs)"],
+      "installHint": "Docker Desktop, Podman, or Docker-in-WSL — AND author the two images `my-python-app` & `my-nodejs-app` (no Dockerfiles in repo). Only code-exec needs this; the Windows browser path does not."
+    },
+    {
+      "id": "claude",
+      "label": "Claude CLI",
+      "category": "cli",
+      "optional": false,
+      "detect": { "kind": "binary", "name": "claude", "envPath": "CLAUDE_BIN", "configPath": "defaults.claudeBin" },
+      "requiredBy": ["core harness (claudebinary/spawn.go)", "bridge providers"],
+      "installHint": "Config-pathed (CLAUDE_BIN / config.defaults.claudeBin) — already running if you can read this."
+    },
+    {
+      "id": "codex",
+      "label": "Codex CLI",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "codex", "envPath": "CODEX_BIN", "configPath": "defaults.codexBin" },
+      "requiredBy": ["codex harness"],
+      "installHint": "OpenAI Codex CLI (config-pathed via CODEX_BIN)."
+    },
+    {
+      "id": "grok",
+      "label": "Grok CLI",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "grok", "envPath": "GROK_BIN", "configPath": "defaults.grokBin" },
+      "requiredBy": ["grok harness", "ask-grok skill"],
+      "installHint": "Grok CLI / OAuth (~/.grok)."
+    },
+    {
+      "id": "tailscale",
+      "label": "Tailscale",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "tailscale", "paths": ["C:\\Program Files\\Tailscale\\tailscale.exe"] },
+      "requiredBy": ["TUI funnel/serve status", "security checks"],
+      "installHint": "https://tailscale.com/download"
+    },
+    {
+      "id": "gh",
+      "label": "GitHub CLI",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "gh", "paths": ["C:\\Program Files\\GitHub CLI\\gh.exe"] },
+      "requiredBy": ["review / to-issues / triage skills"],
+      "installHint": "https://cli.github.com"
+    },
+    {
+      "id": "rg",
+      "label": "ripgrep",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "rg", "versionArgs": ["--version"] },
+      "requiredBy": ["knowledge-memory synthesis search", "Grep tool (bridge + go-core)"],
+      "installHint": "winget install BurntSushi.ripgrep.MSVC (Go Grep degrades gracefully without it)."
+    },
+    {
+      "id": "ffmpeg",
+      "label": "FFmpeg",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "ffmpeg", "versionArgs": ["-version"] },
+      "requiredBy": ["pet media transcode (pet/lib/hatch.ts)"],
+      "installHint": "winget install Gyan.FFmpeg"
+    },
+    {
+      "id": "rclone",
+      "label": "rclone",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "rclone", "versionArgs": ["version"] },
+      "requiredBy": ["rclone MCP", "files-rclone cloud sync"],
+      "installHint": "https://rclone.org/downloads"
+    },
+    {
+      "id": "notebooklm",
+      "label": "notebooklm CLI",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "notebooklm", "configPath": "defaults.notebooklm_bin" },
+      "requiredBy": ["notebooklm MCP"],
+      "installHint": "External Python-venv CLI; set config.defaults.notebooklm_bin to its path."
+    },
+    {
+      "id": "unzip",
+      "label": "unzip",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "unzip" },
+      "requiredBy": ["files-manager extract", "pet hatch"],
+      "installHint": "Bundled with Git for Windows (usr/bin)."
+    },
+    {
+      "id": "zip",
+      "label": "zip",
+      "category": "cli",
+      "optional": true,
+      "detect": { "kind": "binary", "name": "zip" },
+      "requiredBy": ["files-manager archive-create (POSIX path)"],
+      "installHint": "Git for Windows ships unzip but NOT zip; archive-create may fail on Windows."
+    },
+    {
+      "id": "openai-key",
+      "label": "OpenAI API key",
+      "category": "apikey",
+      "optional": true,
+      "detect": { "kind": "env", "names": ["OPENAI_API_KEY"] },
+      "requiredBy": ["media-gen (image / audio / video)"],
+      "installHint": "Set OPENAI_API_KEY in bridge/.env or add an OpenAI provider in config.json."
+    },
+    {
+      "id": "google-key",
+      "label": "Google API key",
+      "category": "apikey",
+      "optional": true,
+      "detect": { "kind": "env", "names": ["GOOGLE_API_KEY", "GEMINI_API_KEY"] },
+      "requiredBy": ["media-gen (Gemini / Imagen)"],
+      "installHint": "Set GOOGLE_API_KEY in bridge/.env or add a Google provider."
+    },
+    {
+      "id": "xai-key",
+      "label": "xAI / Grok API key",
+      "category": "apikey",
+      "optional": true,
+      "detect": { "kind": "env", "names": ["XAI_API_KEY"] },
+      "requiredBy": ["media-gen (Grok image) — or ~/.grok OAuth instead"],
+      "installHint": "Set XAI_API_KEY, or rely on the grok CLI OAuth session."
+    },
+    {
+      "id": "tavily-key",
+      "label": "Tavily search key",
+      "category": "apikey",
+      "optional": true,
+      "detect": { "kind": "env", "names": ["TAVILY_API_KEY"] },
+      "requiredBy": ["websearch MCP (primary provider)"],
+      "installHint": "Optional — websearch falls back to free DuckDuckGo/Brave without it."
+    },
+    {
+      "id": "exa-key",
+      "label": "Exa search key",
+      "category": "apikey",
+      "optional": true,
+      "detect": { "kind": "env", "names": ["EXA_API_KEY"] },
+      "requiredBy": ["websearch MCP (fallback provider)"],
+      "installHint": "Optional secondary websearch provider."
+    },
+    {
+      "id": "nvidia-key",
+      "label": "NVIDIA NIM key",
+      "category": "apikey",
+      "optional": true,
+      "detect": { "kind": "env", "names": ["NVIDIA_API_KEY"] },
+      "requiredBy": ["rag-search reranker (optional)", "cheap-model lane"],
+      "installHint": "https://build.nvidia.com/settings/api-keys"
+    },
+    {
+      "id": "anthropic-key",
+      "label": "Anthropic API key",
+      "category": "apikey",
+      "optional": true,
+      "detect": { "kind": "env", "names": ["ANTHROPIC_API_KEY"] },
+      "requiredBy": ["claude-api skill (when running generated code)"],
+      "installHint": "Set ANTHROPIC_API_KEY. The interactive harness uses the claude CLI session instead."
+    },
+    {
+      "id": "graphify-venv",
+      "label": "Graphify Python venv",
+      "category": "venv",
+      "optional": true,
+      "detect": { "kind": "path", "path": "bridge/mcp/.graphify-venv" },
+      "requiredBy": ["knowledge-memory code-graph (build_code_graph)"],
+      "installHint": "Self-bootstraps on first use (python3 -m venv + pip install graphifyy==0.7.0); also needs rg."
+    },
+    {
+      "id": "hermes-skills",
+      "label": "Hermes skills directory",
+      "category": "venv",
+      "optional": true,
+      "detect": { "kind": "path", "path": "~/.hermes/skills", "envOverride": "HERMES_SKILLS_DIR" },
+      "requiredBy": ["hermes-skills MCP"],
+      "installHint": "Import skills via the hermeshub skill to populate ~/.hermes/skills."
+    }
+  ]
+}

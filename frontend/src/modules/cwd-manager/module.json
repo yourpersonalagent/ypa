@@ -1,0 +1,6 @@
+{
+  "name": "cwd-manager",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Frontend controls for the per-CWD heartbeat supervisor: dropdown controls, task-strip toggle, agent/worker opt-in controls, and status hydration from cwd-manager:status SSE events."
+}

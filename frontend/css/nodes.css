@@ -1,0 +1,977 @@
+/* Node editor canvas, nodes (summary), edges, expanded overlay */
+
+#editor-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Editor handles its own gestures (pan/drag/connect/pinch) via Pointer Events.
+     touch-action:none stops the browser from claiming touches as scroll/zoom — so
+     the rest of the app can stay user-scalable=no without killing canvas touch. */
+  touch-action: none;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.04), transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.03), transparent 45%);
+}
+#edge-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  transform-origin: 0 0;
+}
+#node-layer {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  pointer-events: none; /* let bg clicks + edge hits pass through; nodes opt back in */
+}
+#node-layer .node {
+  pointer-events: auto;
+}
+#edge-layer {
+  z-index: 1;
+}
+#node-layer {
+  z-index: 2;
+}
+
+.node {
+  position: absolute;
+  min-width: 200px;
+  max-width: 260px;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  box-shadow: var(--shadow-1);
+  transition:
+    border-color var(--dur-fast),
+    box-shadow var(--dur-fast),
+    transform var(--dur-fast);
+  user-select: none;
+}
+.node:hover {
+  border-color: var(--stroke-2);
+  box-shadow: var(--shadow-2);
+}
+.node.active {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+}
+.node.running {
+  border-color: var(--accent-3);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.node.error {
+  border-color: var(--danger);
+}
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 3px rgba(92, 200, 255, 0.18);
+  }
+}
+
+/* Trigger node — golden/amber accent */
+.node.trigger {
+  border-color: rgba(255, 190, 60, 0.35);
+  background: linear-gradient(135deg, rgba(255, 190, 60, 0.06) 0%, transparent 60%);
+}
+.node.trigger .node-icon {
+  color: #ffbe3c;
+}
+.node.trigger:hover {
+  border-color: rgba(255, 190, 60, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(255, 190, 60, 0.18),
+    var(--shadow-1);
+}
+
+/* Trigger status indicator in node overlay */
+.trigger-node-status {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.trigger-node-status.on {
+  background: rgba(255, 190, 60, 0.15);
+  color: #ffbe3c;
+  border: 1px solid rgba(255, 190, 60, 0.3);
+}
+.trigger-node-status.off {
+  background: var(--stroke);
+  color: var(--fg-mute);
+  border: 1px solid var(--stroke-2);
+}
+
+.node-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  background: var(--hl);
+  color: var(--accent);
+  flex: 0 0 28px;
+}
+.node-body {
+  flex: 1;
+  min-width: 0;
+}
+.node-title {
+  font-size: 12px;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.node-summary {
+  margin-top: 2px;
+  color: var(--fg);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+/* Ports integrated into node border - input ports empty (outline), output ports filled */
+.port {
+  position: absolute;
+  width: 10px;
+  height: 28px;
+  background: transparent;
+  border: 2px solid var(--stroke);
+  cursor: crosshair;
+  transition:
+    width var(--dur-med) var(--ease),
+    height var(--dur-med) var(--ease),
+    background var(--dur-fast),
+    border-color var(--dur-fast);
+  z-index: 1;
+}
+
+/* Input ports - empty/outline style (can be on any side) */
+.port.in {
+  top: 50%;
+  transform: translateY(-50%);
+  left: -11px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-right: none;
+  background: transparent;
+}
+
+/* Input port on different sides */
+.port.in.top {
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+
+.port.in.bottom {
+  bottom: -11px;
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+
+.port.in.right {
+  top: 50%;
+  transform: translateY(-50%);
+  left: auto;
+  right: -11px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-left: none;
+}
+
+/* Output ports - filled style (default right) */
+.port.out {
+  top: 50%;
+  transform: translateY(-50%);
+  right: -11px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-left: none;
+  background: var(--stroke);
+}
+
+/* Output ports on different sides */
+.port.out.top {
+  top: -11px;
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+
+.port.out.bottom {
+  bottom: -11px;
+  top: auto;
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+
+.port.out.left {
+  top: 50%;
+  right: auto;
+  left: -11px;
+  transform: translateY(-50%);
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-right: none;
+}
+
+/* If node true/false output ports — same shape as normal, colored dot indicator */
+/* These use the regular .port.out direction classes for positioning on the correct side.
+   We only override the vertical/horizontal offset to split true at 30% and false at 70%. */
+
+/* Default (right side) */
+.node.if .port.out.true,
+.node.if .port.out.true.right {
+  top: 30%;
+  transform: translateY(-50%);
+  background: var(--stroke);
+  border-color: var(--stroke);
+}
+.node.if .port.out.false,
+.node.if .port.out.false.right {
+  top: 70%;
+  transform: translateY(-50%);
+  background: var(--stroke);
+  border-color: var(--stroke);
+}
+
+/* Left side */
+.node.if .port.out.true.left {
+  top: 30%;
+  transform: translateY(-50%);
+  right: auto;
+  left: -13px;
+  border-radius: 12px 0 0 12px;
+  border-right: none;
+  border-left: 2px solid var(--stroke);
+}
+.node.if .port.out.false.left {
+  top: 70%;
+  transform: translateY(-50%);
+  right: auto;
+  left: -13px;
+  border-radius: 12px 0 0 12px;
+  border-right: none;
+  border-left: 2px solid var(--stroke);
+}
+
+/* Top side */
+.node.if .port.out.true.top {
+  top: -13px;
+  left: 35%;
+  right: auto;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+.node.if .port.out.false.top {
+  top: -13px;
+  left: 65%;
+  right: auto;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+
+/* Bottom side */
+.node.if .port.out.true.bottom {
+  bottom: -13px;
+  top: auto;
+  left: 35%;
+  right: auto;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  border-radius: 0 0 12px 12px;
+  border-top: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+.node.if .port.out.false.bottom {
+  bottom: -13px;
+  top: auto;
+  left: 65%;
+  right: auto;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  border-radius: 0 0 12px 12px;
+  border-top: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+
+/* Colored dots — always visible */
+.node.if .port.out.true::after {
+  background: #2ecc71;
+  opacity: 1;
+  width: 6px;
+  height: 6px;
+}
+.node.if .port.out.false::after {
+  background: #e74c3c;
+  opacity: 1;
+  width: 6px;
+  height: 6px;
+}
+
+/* Port hover state */
+.port::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: white;
+  transform: translate(-50%, -50%);
+  transition:
+    background var(--dur-fast),
+    width var(--dur-fast),
+    height var(--dur-fast);
+  opacity: 0;
+}
+
+/* Black dot for input ports */
+.port.in::after {
+  background: #000;
+}
+
+/* White dot for output ports */
+.port.out::after {
+  background: white;
+}
+
+.port:hover {
+  width: 16px;
+  height: 36px;
+}
+.port:hover.top,
+.port:hover.bottom {
+  width: 36px;
+  height: 16px;
+}
+.port:hover::after {
+  opacity: 1;
+  width: 6px;
+  height: 6px;
+}
+.port.connected::after {
+  opacity: 1;
+}
+
+/* If node ports — slightly larger than normal to fit dual outputs */
+.node.if .port {
+  width: 12px;
+  height: 32px;
+}
+
+/* If-node input port: border-radius + background only.
+   Direction-class rules below use higher specificity to override left:-13px for other sides. */
+.node.if .port.in {
+  left: -13px;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  background: transparent;
+}
+.node.if .port.in.right {
+  left: auto;
+  right: -13px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-left: 2px solid var(--stroke);
+  border-right: none;
+}
+.node.if .port.in.top {
+  top: -13px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+.node.if .port.in.bottom {
+  bottom: -13px;
+  top: auto;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  border-radius: 0 0 12px 12px;
+  border-top: none;
+  border-left: 2px solid var(--stroke);
+  border-right: 2px solid var(--stroke);
+}
+
+/* If-node output port: border-radius only.
+   right:-13px is the default; direction classes provide left/top/bottom overrides. */
+.node.if .port.out {
+  right: -13px;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.node.if .port:hover {
+  width: 18px;
+  height: 40px;
+}
+
+/* edges — same muted neutral color as the node border */
+#edge-layer {
+  pointer-events: none;
+  overflow: visible;
+}
+.edge-hit {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.001);
+  stroke-width: 16;
+  pointer-events: visibleStroke;
+  cursor: pointer;
+}
+@media (pointer: coarse) {
+  .edge-hit {
+    stroke-width: 36;
+  }
+}
+.edge {
+  fill: none;
+  stroke: var(--stroke-2);
+  stroke-width: 1.5;
+  opacity: 0.9;
+  transition:
+    opacity var(--dur-fast),
+    stroke var(--dur-fast),
+    stroke-width var(--dur-fast);
+  pointer-events: none;
+  stroke-linecap: round;
+}
+.edge-hit:hover + .edge {
+  stroke: var(--danger);
+  stroke-width: 2;
+  opacity: 1;
+}
+.edge.provisional {
+  stroke-dasharray: 5 4;
+  opacity: 0.7;
+}
+.edge-label {
+  font-size: 11px;
+  fill: var(--fg-mute);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  opacity: 0.7;
+  transition:
+    opacity var(--dur-fast),
+    fill var(--dur-fast);
+}
+.edge-hit:hover ~ .edge-label {
+  fill: var(--danger);
+  opacity: 1;
+}
+
+/* Deactivated node — bypassed in workflow; dashed border, muted look */
+.node.disabled {
+  opacity: 0.55;
+}
+.node.disabled .node-summary {
+  text-decoration: line-through;
+  text-decoration-color: var(--fg-mute);
+}
+.node.disabled {
+  border-style: dashed;
+}
+
+/* expanded overlay */
+.node-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: grid;
+  place-items: center;
+  z-index: 900;
+  animation: fade var(--dur-med) var(--ease);
+}
+.node-overlay[hidden] {
+  display: none;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+.node-overlay-card {
+  width: min(640px, 92vw);
+  max-height: 80vh;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.noc-header {
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--stroke);
+}
+.noc-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.noc-header .dim {
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.noc-body {
+  padding: 14px 18px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+}
+.noc-body::-webkit-scrollbar {
+  width: 6px;
+}
+.noc-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.noc-body::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+.noc-body::-webkit-scrollbar-thumb:hover {
+  background: var(--stroke);
+}
+.noc-field label {
+  display: block;
+  font-size: 11px;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.noc-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.noc-field-header label {
+  margin-bottom: 0;
+}
+.noc-input-mode {
+  display: flex;
+  gap: 2px;
+}
+.noc-mode-btn {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--stroke);
+  background: transparent;
+  color: var(--fg-dim);
+  cursor: pointer;
+  font-family: var(--font-sans, sans-serif);
+  letter-spacing: 0.03em;
+}
+.noc-mode-btn.active {
+  background: var(--accent, #4a9eff);
+  border-color: var(--accent, #4a9eff);
+  color: #fff;
+}
+.noc-mode-btn:hover:not(.active) {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+.noc-upstream-preview {
+  opacity: 0.55;
+  font-style: italic;
+}
+.noc-field textarea,
+.noc-field input,
+.noc-field select {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  resize: vertical;
+  outline: none;
+}
+.noc-field select {
+  resize: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%2388a090' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+.noc-field select:focus {
+  border-color: var(--accent);
+}
+.noc-field select option {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+.noc-field textarea {
+  min-height: 80px;
+}
+.noc-output {
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  max-height: 260px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  color: var(--fg-dim);
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+}
+.noc-output::-webkit-scrollbar {
+  width: 6px;
+}
+.noc-output::-webkit-scrollbar-track {
+  background: transparent;
+}
+.noc-output::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+.noc-output::-webkit-scrollbar-thumb:hover {
+  background: var(--stroke);
+}
+
+/* Per-node agent config (chat nodes) */
+.noc-model-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+}
+.noc-model-label {
+  flex: 1;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--fg);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.noc-model-pick-btn,
+.noc-model-clear-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 2px;
+  line-height: 1;
+}
+.noc-model-pick-btn:hover,
+.noc-model-clear-btn:hover {
+  color: var(--fg);
+}
+
+.noc-agent-config {
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+.noc-agent-summary {
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--fg-dim);
+  letter-spacing: 0.04em;
+  user-select: none;
+  list-style: none;
+}
+.noc-agent-summary::-webkit-details-marker { display: none; }
+.noc-agent-summary::before {
+  content: '\25B8\0020';
+  font-size: 10px;
+}
+details[open] .noc-agent-summary::before { content: '\25BE\0020'; }
+.noc-agent-body {
+  padding: 8px 10px 4px;
+  border-top: 1px solid var(--stroke);
+}
+.noc-agent-body .noc-field {
+  margin-bottom: 8px;
+}
+.noc-caps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.noc-cap-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--fg);
+}
+.noc-cap-select {
+  flex: 1;
+  min-width: 110px;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 4px 28px 4px 8px;
+  color: var(--fg);
+  font-size: 12px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%2388a090' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.noc-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--stroke);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.noc-footer .actions {
+  display: flex;
+  gap: 6px;
+}
+.noc-btn {
+  border: 1px solid var(--stroke);
+  background: var(--surface);
+  color: var(--fg);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast),
+    border-color var(--dur-fast),
+    box-shadow var(--dur-fast),
+    transform var(--dur-fast);
+}
+.noc-btn.primary {
+  background: var(--accent);
+  color: #001a10;
+  border-color: transparent;
+  font-weight: 600;
+}
+.noc-btn.danger {
+  color: var(--danger);
+}
+.noc-btn.stop-btn,
+.noc-btn.is-running {
+  background: rgba(231, 76, 60, 0.14);
+  color: var(--danger);
+  border-color: rgba(231, 76, 60, 0.35);
+  animation: noc-stop-pulse 1.2s ease-in-out infinite;
+}
+.noc-btn.stop-btn:hover,
+.noc-btn.is-running:hover {
+  background: rgba(231, 76, 60, 0.2);
+  animation: none;
+}
+@keyframes noc-stop-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.22);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(231, 76, 60, 0);
+    transform: scale(1.03);
+  }
+}
+
+/* Toggle switch for activate/deactivate */
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+.toggle-input {
+  display: none;
+}
+.toggle-slider {
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  background: var(--fg-mute);
+  border: 1px solid var(--stroke);
+  border-radius: 10px;
+  position: relative;
+  transition:
+    background var(--dur-fast),
+    border-color var(--dur-fast);
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  left: 1px;
+  top: 1px;
+  transition:
+    left var(--dur-fast),
+    background var(--dur-fast);
+}
+.toggle-input:checked + .toggle-slider {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.toggle-input:checked + .toggle-slider::before {
+  left: 21px;
+  background: var(--surface-2);
+}
+
+/* Larger port hit-areas on touch devices */
+@media (pointer: coarse) {
+  .port {
+    width: 20px;
+    height: 44px;
+  }
+  .port.in {
+    left: -21px;
+  }
+  .port.in.right {
+    right: -21px;
+    left: auto;
+  }
+  .port.in.top {
+    top: -21px;
+    left: 50%;
+    width: 44px;
+    height: 20px;
+  }
+  .port.in.bottom {
+    bottom: -21px;
+    left: 50%;
+    width: 44px;
+    height: 20px;
+  }
+  .port.out {
+    right: -21px;
+  }
+  .port.out.left {
+    left: -21px;
+    right: auto;
+  }
+  .port.out.top {
+    top: -21px;
+    left: 50%;
+    width: 44px;
+    height: 20px;
+  }
+  .port.out.bottom {
+    bottom: -21px;
+    left: 50%;
+    width: 44px;
+    height: 20px;
+  }
+  .port:hover {
+    width: 24px;
+    height: 50px;
+  }
+  .port:hover.top,
+  .port:hover.bottom {
+    width: 50px;
+    height: 24px;
+  }
+}

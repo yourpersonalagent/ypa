@@ -1,0 +1,18 @@
+{
+  "name": "plugins-folder",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "CWD-scoped visual plugins. Scans <cwd>/.yha-plugins/<plugin>/{plugin.json, tiles/<tile>/{tile.json,index.html}} and serves manifests + assets so the frontend can mount each tile as a sandboxed iframe in the header dropdown and as inline chat blocks. v1 owns GET /v1/plugins and GET /v1/plugins/asset; the watcher (SSE re-broadcast) lands in a follow-up cut. The frontend plugins-folder module is the loader and consumes these endpoints.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/plugins",
+      "/v1/plugins/asset",
+      "/v1/plugins/data"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "productivity"
+}

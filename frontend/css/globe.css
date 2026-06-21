@@ -1,0 +1,6 @@
+/* ── WebGL canvas styles removed ─────────────────────────────────────────────
+ * Previously styled #bg-canvas, #logo-canvas, .chat-empty-bg, .voice-bg with
+ * filter: contrast/saturate/blur and mix-blend-mode. Removed along with the
+ * WebGL animation system — CSS filters on WebGL canvases force Chrome to
+ * re-composite the full viewport at 60fps on every vsync regardless of draw
+ * rate, costing 33-35% GPU constantly. RIP. */

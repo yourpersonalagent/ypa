@@ -1,0 +1,1067 @@
+goroutine 50 [running]:
+main.writeGoroutineDump({0x14000206000, 0x27})
+	/Users/michael/ypa/go-core/cmd/yha-core/goroutinedump_unix.go:61 +0x98
+main.installGoroutineDump.func1()
+	/Users/michael/ypa/go-core/cmd/yha-core/goroutinedump_unix.go:38 +0x5c
+created by main.installGoroutineDump in goroutine 1
+	/Users/michael/ypa/go-core/cmd/yha-core/goroutinedump_unix.go:36 +0xbc
+
+goroutine 1 [select, 302 minutes]:
+main.main()
+	/Users/michael/ypa/go-core/cmd/yha-core/main.go:1289 +0x16ec
+
+goroutine 37 [syscall]:
+os/signal.signal_recv()
+	/usr/local/go/src/runtime/sigqueue.go:149 +0x2c
+os/signal.loop()
+	/usr/local/go/src/os/signal/signal_unix.go:23 +0x1c
+created by os/signal.Notify.func1.1 in goroutine 1
+	/usr/local/go/src/os/signal/signal.go:152 +0x28
+
+goroutine 49 [select, 302 minutes]:
+os/signal.NotifyContext.func1()
+	/usr/local/go/src/os/signal/signal.go:289 +0x64
+created by os/signal.NotifyContext in goroutine 1
+	/usr/local/go/src/os/signal/signal.go:288 +0x134
+
+goroutine 38 [select, 302 minutes]:
+os/signal.NotifyContext.func1()
+	/usr/local/go/src/os/signal/signal.go:289 +0x64
+created by os/signal.NotifyContext in goroutine 1
+	/usr/local/go/src/os/signal/signal.go:288 +0x134
+
+goroutine 51 [runnable]:
+os.underlyingErrorIs({0x0?, 0x0?}, {0x1013f16d8, 0x1017ee220})
+	/usr/local/go/src/os/error.go:117 +0x274
+os.IsNotExist(...)
+	/usr/local/go/src/os/error.go:91
+os.(*File).readdir(0x140000644f0, 0xffffffffffffffff, 0x1)
+	/usr/local/go/src/os/dir_darwin.go:92 +0x464
+os.(*File).ReadDir(0x14000734000?, 0x19?)
+	/usr/local/go/src/os/dir.go:101 +0x24
+os.ReadDir({0x14000734000?, 0x9?})
+	/usr/local/go/src/os/dir.go:121 +0x94
+github.com/fsnotify/fsnotify.(*kqueue).dirChange(0x14000714280, {0x14000734000, 0x19})
+	/Users/michael/go/pkg/mod/github.com/fsnotify/fsnotify@v1.10.1/backend_kqueue.go:623 +0x34
+github.com/fsnotify/fsnotify.(*kqueue).readEvents(0x14000714280)
+	/Users/michael/go/pkg/mod/github.com/fsnotify/fsnotify@v1.10.1/backend_kqueue.go:506 +0x4cc
+created by github.com/fsnotify/fsnotify.newBackend in goroutine 1
+	/Users/michael/go/pkg/mod/github.com/fsnotify/fsnotify@v1.10.1/backend_kqueue.go:203 +0x1f0
+
+goroutine 10 [select, 1 minutes]:
+github.com/yha/core/internal/state.(*ConfigWatcher).run(0x1400014e030)
+	/Users/michael/ypa/go-core/internal/state/watcher.go:99 +0xbc
+created by github.com/yha/core/internal/state.(*Store).WatchConfig in goroutine 1
+	/Users/michael/ypa/go-core/internal/state/watcher.go:71 +0x138
+
+goroutine 11 [select]:
+github.com/yha/core/internal/stream.(*SessionBuffer).runStaleStreamWatchdog(0x14000114480, 0x8bb2c97000, 0x0?, 0x1400002e230)
+	/Users/michael/ypa/go-core/internal/stream/buffer.go:619 +0xa0
+created by github.com/yha/core/internal/stream.(*SessionBuffer).EnableStaleStreamWatchdog in goroutine 1
+	/Users/michael/ypa/go-core/internal/stream/buffer.go:596 +0x1bc
+
+goroutine 12 [select, 302 minutes]:
+database/sql.(*DB).connectionOpener(0x1400019a5b0, {0x1013f5420, 0x14000042960})
+	/usr/local/go/src/database/sql/sql.go:1261 +0x80
+created by database/sql.OpenDB in goroutine 1
+	/usr/local/go/src/database/sql/sql.go:841 +0x114
+
+goroutine 13 [IO wait]:
+internal/poll.runtime_pollWait(0x1286ef400, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000524380?, 0x100d4f9fc?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Accept(0x14000524380)
+	/usr/local/go/src/internal/poll/fd_unix.go:613 +0x21c
+net.(*netFD).accept(0x14000524380)
+	/usr/local/go/src/net/fd_unix.go:161 +0x28
+net.(*TCPListener).accept(0x140000c0b80)
+	/usr/local/go/src/net/tcpsock_posix.go:159 +0x24
+net.(*TCPListener).Accept(0x140000c0b80)
+	/usr/local/go/src/net/tcpsock.go:380 +0x2c
+net/http.(*Server).Serve(0x14000526100, {0x1013f4fb8, 0x140000c0b80})
+	/usr/local/go/src/net/http/server.go:3463 +0x24c
+github.com/yha/core/internal/server.(*Server).Run(0x140007266e0)
+	/Users/michael/ypa/go-core/internal/server/server.go:137 +0xe8
+main.main.func3()
+	/Users/michael/ypa/go-core/cmd/yha-core/main.go:1253 +0x24
+created by main.main in goroutine 1
+	/Users/michael/ypa/go-core/cmd/yha-core/main.go:1253 +0x11d8
+
+goroutine 81689 [IO wait]:
+internal/poll.runtime_pollWait(0x101cf2000, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000ac4b00?, 0x1400062a000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000ac4b00, {0x1400062a000, 0x8000, 0x8000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000ac4b00, {0x1400062a000?, 0x140008d0d38?, 0x100d38d8c?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000064458, {0x1400062a000?, 0x140008d0d88?, 0x100c989d8?})
+	/usr/local/go/src/net/net.go:196 +0x34
+io.copyBuffer({0x101cb1258, 0x14000fc20a8}, {0x1013f29a0, 0x1400052c058}, {0x0, 0x0, 0x0})
+	/usr/local/go/src/io/io.go:429 +0x18c
+io.Copy(...)
+	/usr/local/go/src/io/io.go:388
+net.genericWriteTo(0x140008d0e78?, {0x101cb1258, 0x14000fc20a8})
+	/usr/local/go/src/net/net.go:796 +0x58
+net.(*TCPConn).writeTo(0x10135c220?, {0x101cb1258?, 0x14000fc20a8?})
+	/usr/local/go/src/net/tcpsock_posix.go:61 +0x28
+net.(*TCPConn).WriteTo(0x14000064458, {0x101cb1258?, 0x14000fc20a8?})
+	/usr/local/go/src/net/tcpsock.go:177 +0x30
+io.copyBuffer({0x101cb1258, 0x14000fc20a8}, {0x12871a800, 0x14000064458}, {0x0, 0x0, 0x0})
+	/usr/local/go/src/io/io.go:411 +0x98
+io.Copy(...)
+	/usr/local/go/src/io/io.go:388
+net/http/httputil.switchProtocolCopier.copyToBackend({{0x101cb1358?, 0x14000064458?}, {0x101cb1380?, 0x14000fc20a8?}}, 0x14000ac09a0)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:842 +0xac
+created by net/http/httputil.(*ReverseProxy).handleUpgradeResponse in goroutine 81633
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:807 +0x788
+
+goroutine 83615 [select, 2 minutes]:
+net/http.(*persistConn).readLoop(0x140004c0000)
+	/usr/local/go/src/net/http/transport.go:2395 +0xa6c
+created by net/http.(*Transport).dialConn in goroutine 83612
+	/usr/local/go/src/net/http/transport.go:1944 +0x111c
+
+goroutine 83414 [IO wait]:
+internal/poll.runtime_pollWait(0x101cb0400, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000df0c80?, 0x140006da000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000df0c80, {0x140006da000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000df0c80, {0x140006da000?, 0x5f?, 0x0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x1400092a068, {0x140006da000?, 0x14000df0b80?, 0x1400066ae10?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*persistConn).Read(0x1400011a7e0, {0x140006da000?, 0x1400066aec8?, 0x100ea95ac?})
+	/usr/local/go/src/net/http/transport.go:2122 +0x48
+bufio.(*Reader).fill(0x14000ffe480)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).ReadSlice(0x14000ffe480, 0xa)
+	/usr/local/go/src/bufio/bufio.go:380 +0x30
+net/http/internal.readChunkLine(0x1400066af98?)
+	/usr/local/go/src/net/http/internal/chunked.go:156 +0x20
+net/http/internal.(*chunkedReader).beginChunk(0x14000eb3d40)
+	/usr/local/go/src/net/http/internal/chunked.go:49 +0x24
+net/http/internal.(*chunkedReader).Read(0x14000eb3d40, {0x14000b9c000?, 0x1400066b038?, 0x100cadc10?})
+	/usr/local/go/src/net/http/internal/chunked.go:125 +0x120
+net/http.(*body).readLocked(0x140002d0b00, {0x14000b9c000?, 0x1400066b0b8?, 0x10119d438?})
+	/usr/local/go/src/net/http/transfer.go:845 +0x34
+net/http.(*body).Read(0x1019d85c0?, {0x14000b9c000?, 0x1400066b148?, 0x10119b814?})
+	/usr/local/go/src/net/http/transfer.go:837 +0x104
+net/http.(*bodyEOFSignal).Read(0x140002d0b40, {0x14000b9c000, 0x8000, 0x8000})
+	/usr/local/go/src/net/http/transport.go:2997 +0x154
+net/http/httputil.(*ReverseProxy).copyBuffer(0x14000042140, {0x1013f2f80, 0x140002d0b80}, {0x1013f17f8, 0x140002d0b40}, {0x0?, 0x8000?, 0x3?})
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:661 +0xb4
+net/http/httputil.(*ReverseProxy).copyResponse(0x14000042140, {0x1013f4d48, 0x1400016ee60}, {0x1013f17f8, 0x140002d0b40}, 0xffffffffffffffff)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:649 +0x18c
+net/http/httputil.(*ReverseProxy).ServeHTTP(0x14000042140, {0x1013f4d48, 0x1400016ee60}, 0x1400074e3c0)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:533 +0xd34
+net/http.(*ServeMux).ServeHTTP(0x14000e0cf90?, {0x1013f4d48, 0x1400016ee60}, 0x1400074e3c0)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400016ee60}, 0x1400074e3c0)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x1400066b858?, {0x1013f4d48?, 0x1400016ee60?}, 0x100cf855c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400016ee40}, 0x1400074e3c0)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400066ba38?, {0x1013f4f58?, 0x1400016ee40?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x14000a76960}, 0x1400074e3c0)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400016ee20?, {0x1013f4e38?, 0x14000a76960?}, 0x1400066bb50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x140002d1300?}, {0x1013f4e38?, 0x14000a76960?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x140008aa510, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 83760 [IO wait]:
+internal/poll.runtime_pollWait(0x128882600, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000524680?, 0x1400097f000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000524680, {0x1400097f000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000524680, {0x1400097f000?, 0x52?, 0x0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x1400092a000, {0x1400097f000?, 0x14000db2380?, 0x140005ece10?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*persistConn).Read(0x140001f0120, {0x1400097f000?, 0x140005ecec8?, 0x100ea95ac?})
+	/usr/local/go/src/net/http/transport.go:2122 +0x48
+bufio.(*Reader).fill(0x14000b06000)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).ReadSlice(0x14000b06000, 0xa)
+	/usr/local/go/src/bufio/bufio.go:380 +0x30
+net/http/internal.readChunkLine(0x140005ecf98?)
+	/usr/local/go/src/net/http/internal/chunked.go:156 +0x20
+net/http/internal.(*chunkedReader).beginChunk(0x140003c2b40)
+	/usr/local/go/src/net/http/internal/chunked.go:49 +0x24
+net/http/internal.(*chunkedReader).Read(0x140003c2b40, {0x140006c2000?, 0x140005ed038?, 0x100cadc10?})
+	/usr/local/go/src/net/http/internal/chunked.go:125 +0x120
+net/http.(*body).readLocked(0x14000618300, {0x140006c2000?, 0x140005ed0b8?, 0x10119d438?})
+	/usr/local/go/src/net/http/transfer.go:845 +0x34
+net/http.(*body).Read(0x1019d93e8?, {0x140006c2000?, 0x140005ed148?, 0x10119b814?})
+	/usr/local/go/src/net/http/transfer.go:837 +0x104
+net/http.(*bodyEOFSignal).Read(0x14000618340, {0x140006c2000, 0x8000, 0x8000})
+	/usr/local/go/src/net/http/transport.go:2997 +0x154
+net/http/httputil.(*ReverseProxy).copyBuffer(0x14000042140, {0x1013f2f80, 0x14000618380}, {0x1013f17f8, 0x14000618340}, {0x0?, 0x8000?, 0x1?})
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:661 +0xb4
+net/http/httputil.(*ReverseProxy).copyResponse(0x14000042140, {0x1013f4d48, 0x1400035a600}, {0x1013f17f8, 0x14000618340}, 0xffffffffffffffff)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:649 +0x18c
+net/http/httputil.(*ReverseProxy).ServeHTTP(0x14000042140, {0x1013f4d48, 0x1400035a600}, 0x140006b2f00)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:533 +0xd34
+net/http.(*ServeMux).ServeHTTP(0x14000eb2c30?, {0x1013f4d48, 0x1400035a600}, 0x140006b2f00)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400035a600}, 0x140006b2f00)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x140005ed858?, {0x1013f4d48?, 0x1400035a600?}, 0x100cf855c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400035a5e0}, 0x140006b2f00)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x140005eda38?, {0x1013f4f58?, 0x1400035a5e0?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x14000748870}, 0x140006b2f00)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400035a5c0?, {0x1013f4e38?, 0x14000748870?}, 0x140005edb50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x140002d0200?}, {0x1013f4e38?, 0x14000748870?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x140008aa990, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 83280 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x128731800, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000df0000?, 0x140002d0021?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000df0000, {0x140002d0021, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000df0000, {0x140002d0021?, 0x0?, 0x0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000720000, {0x140002d0021?, 0x0?, 0x0?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x140002d0000)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83279
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 83420 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x1287f4a00, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000df0980?, 0x140000c1be1?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000df0980, {0x140000c1be1, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000df0980, {0x140000c1be1?, 0x14000d9ab80?, 0x14000b77da9?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000614270, {0x140000c1be1?, 0x1013f5490?, 0x14000d209a0?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x140000c1bc0)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83410
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 83151 [select, 2 minutes]:
+net/http.(*persistConn).writeLoop(0x1400011a7e0)
+	/usr/local/go/src/net/http/transport.go:2597 +0x94
+created by net/http.(*Transport).dialConn in goroutine 83416
+	/usr/local/go/src/net/http/transport.go:1945 +0x1164
+
+goroutine 72476 [IO wait, 39 minutes]:
+internal/poll.runtime_pollWait(0x1287f4800, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000af0480?, 0x1400094e000?, 0x1)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000af0480, {0x1400094e000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+os.(*File).read(...)
+	/usr/local/go/src/os/file_posix.go:29
+os.(*File).Read(0x14000756208, {0x1400094e000?, 0x1400082cf58?, 0x100e9e4fc?})
+	/usr/local/go/src/os/file.go:144 +0x68
+github.com/yha/core/internal/harness/codex.(*Streamer).Run.func3()
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:177 +0x90
+created by github.com/yha/core/internal/harness/codex.(*Streamer).Run in goroutine 72472
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:173 +0x514
+
+goroutine 83279 [IO wait]:
+internal/poll.runtime_pollWait(0x101d1ee00, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000c9c280?, 0x14000995000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000c9c280, {0x14000995000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000c9c280, {0x14000995000?, 0x69?, 0x0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000064860, {0x14000995000?, 0x14000df0000?, 0x14000b50e10?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*persistConn).Read(0x14000746000, {0x14000995000?, 0x14000b50ec8?, 0x100ea95ac?})
+	/usr/local/go/src/net/http/transport.go:2122 +0x48
+bufio.(*Reader).fill(0x14000114d80)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).ReadSlice(0x14000114d80, 0xa)
+	/usr/local/go/src/bufio/bufio.go:380 +0x30
+net/http/internal.readChunkLine(0x14000b50f98?)
+	/usr/local/go/src/net/http/internal/chunked.go:156 +0x20
+net/http/internal.(*chunkedReader).beginChunk(0x14000e0c360)
+	/usr/local/go/src/net/http/internal/chunked.go:49 +0x24
+net/http/internal.(*chunkedReader).Read(0x14000e0c360, {0x14000632000?, 0x14000be1038?, 0x100cadc10?})
+	/usr/local/go/src/net/http/internal/chunked.go:125 +0x120
+net/http.(*body).readLocked(0x14001036300, {0x14000632000?, 0x14000b510b8?, 0x10119d438?})
+	/usr/local/go/src/net/http/transfer.go:845 +0x34
+net/http.(*body).Read(0x1019d8f30?, {0x14000632000?, 0x14000b51148?, 0x10119b814?})
+	/usr/local/go/src/net/http/transfer.go:837 +0x104
+net/http.(*bodyEOFSignal).Read(0x14001036340, {0x14000632000, 0x8000, 0x8000})
+	/usr/local/go/src/net/http/transport.go:2997 +0x154
+net/http/httputil.(*ReverseProxy).copyBuffer(0x14000042140, {0x1013f2f80, 0x14001036380}, {0x1013f17f8, 0x14001036340}, {0x0?, 0x800000?, 0x3?})
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:661 +0xb4
+net/http/httputil.(*ReverseProxy).copyResponse(0x14000042140, {0x1013f4d48, 0x1400016a0e0}, {0x1013f17f8, 0x14001036340}, 0xffffffffffffffff)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:649 +0x18c
+net/http/httputil.(*ReverseProxy).ServeHTTP(0x14000042140, {0x1013f4d48, 0x1400016a0e0}, 0x14000742000)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:533 +0xd34
+net/http.(*ServeMux).ServeHTTP(0x14000eb21b0?, {0x1013f4d48, 0x1400016a0e0}, 0x14000742000)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400016a0e0}, 0x14000742000)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x14000f41858?, {0x1013f4d48?, 0x1400016a0e0?}, 0x100c9eb9c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400016a0c0}, 0x14000742000)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x14000f41a38?, {0x1013f4f58?, 0x1400016a0c0?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x14000560000}, 0x14000742000)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400016a060?, {0x1013f4e38?, 0x14000560000?}, 0x14000f41b50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x140002d0000?}, {0x1013f4e38?, 0x14000560000?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x140006fc000, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 85011 [IO wait]:
+internal/poll.runtime_pollWait(0x128732000, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000df0b00?, 0x14000e88000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000df0b00, {0x14000e88000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000df0b00, {0x14000e88000?, 0x14000be1aa8?, 0x100e9e7bc?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x140000644c8, {0x14000e88000?, 0x72?, 0x14000be1b08?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).Read(0x14001080980, {0x14000e88000, 0x1000, 0x1000})
+	/usr/local/go/src/net/http/server.go:812 +0x230
+bufio.(*Reader).fill(0x14000754120)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).Peek(0x14000754120, 0x4)
+	/usr/local/go/src/bufio/bufio.go:152 +0x58
+net/http.(*conn).serve(0x14000a7bef0, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2145 +0x654
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 72472 [chan receive, 38 minutes]:
+github.com/yha/core/internal/harness/codex.(*Streamer).Run(0x140007561e0, {0x1013f5420, 0x14001000f00}, {{0x14000c32000, 0x5e01}, {0x14000aa0e76, 0x7}, {{0x140003c4c60, 0x1f}, {0x140004bf650, ...}, ...}, ...}, ...)
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:209 +0x574
+github.com/yha/core/internal/harness/codex.(*Codex).Stream(_, {_, _}, {{0x14000aa0e90, 0xe}, {0x14000aa0e90, 0xe}, {0x14000aa0e70, 0xd}, {0x14000c2c000, ...}, ...}, ...)
+	/Users/michael/ypa/go-core/internal/harness/codex/harness.go:234 +0x2cc
+main.main.func2.10({_, _}, {{0x14000aa0e70, 0xd}, {0x140004bf638, 0x14}, {0x14000aa0f50, 0xb}, {0x14000aa0e90, 0xe}, ...}, ...)
+	/Users/michael/ypa/go-core/cmd/yha-core/main.go:793 +0x6b8
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func11()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1125 +0x9c
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 72422
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1116 +0x15f8
+
+goroutine 84799 [IO wait]:
+internal/poll.runtime_pollWait(0x101d1f600, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000c9c580?, 0x1400097e000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000c9c580, {0x1400097e000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000c9c580, {0x1400097e000?, 0x140009cdaa8?, 0x100e9e7bc?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x1400052c0e8, {0x1400097e000?, 0x72?, 0x140009cdb08?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).Read(0x14000d2e500, {0x1400097e000, 0x1000, 0x1000})
+	/usr/local/go/src/net/http/server.go:812 +0x230
+bufio.(*Reader).fill(0x14000754060)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).Peek(0x14000754060, 0x4)
+	/usr/local/go/src/bufio/bufio.go:152 +0x58
+net/http.(*conn).serve(0x140000d2f30, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2145 +0x654
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 83430 [select, 2 minutes]:
+net/http.(*persistConn).readLoop(0x140001f0240)
+	/usr/local/go/src/net/http/transport.go:2395 +0xa6c
+created by net/http.(*Transport).dialConn in goroutine 83441
+	/usr/local/go/src/net/http/transport.go:1944 +0x111c
+
+goroutine 83952 [sync.Cond.Wait]:
+sync.runtime_notifyListWait(0x140002d0610, 0x32)
+	/usr/local/go/src/runtime/sema.go:606 +0x140
+sync.(*Cond).Wait(0x140002d0600)
+	/usr/local/go/src/sync/cond.go:71 +0xa4
+github.com/yha/core/internal/harness/codex.(*parsedQueue).pop(0x1400077df20)
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:497 +0xb8
+github.com/yha/core/internal/harness/codex.processStream({0x1013f2220, 0x14000c32228}, 0x140004bc0e0)
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:407 +0x278
+github.com/yha/core/internal/harness/codex.(*Streamer).Run(0x140000642f0, {0x1013f5420, 0x14000a0e690}, {{0x14000c5f500, 0x63a1}, {0x140004c43c6, 0x7}, {{0x140003c4c60, 0x1f}, {0x1400080a300, ...}, ...}, ...}, ...)
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:198 +0x528
+github.com/yha/core/internal/harness/codex.(*Codex).Stream(_, {_, _}, {{0x140004c4410, 0xe}, {0x140004c4410, 0xe}, {0x140004c43c0, 0xd}, {0x14000c58a80, ...}, ...}, ...)
+	/Users/michael/ypa/go-core/internal/harness/codex/harness.go:234 +0x2cc
+main.main.func2.10({_, _}, {{0x140004c43c0, 0xd}, {0x14000192000, 0xb0}, {0x140004c44e0, 0xb}, {0x140004c4410, 0xe}, ...}, ...)
+	/Users/michael/ypa/go-core/cmd/yha-core/main.go:793 +0x6b8
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func11()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1125 +0x9c
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 83892
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1116 +0x15f8
+
+goroutine 84981 [select]:
+net/http.(*persistConn).writeLoop(0x1400071f200)
+	/usr/local/go/src/net/http/transport.go:2597 +0x94
+created by net/http.(*Transport).dialConn in goroutine 84993
+	/usr/local/go/src/net/http/transport.go:1945 +0x1164
+
+goroutine 84980 [IO wait]:
+internal/poll.runtime_pollWait(0x1286ee800, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x140004ca300?, 0x14000216000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x140004ca300, {0x14000216000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x140004ca300, {0x14000216000?, 0xf?, 0x8?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x1400092a110, {0x14000216000?, 0x140001b6db0?, 0xa2c737879bb1d72b?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*persistConn).Read(0x1400071f200, {0x14000216000?, 0x1013f16d8?, 0x1017ed440?})
+	/usr/local/go/src/net/http/transport.go:2122 +0x48
+bufio.(*Reader).fill(0x140007899e0)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).Peek(0x140007899e0, 0x1)
+	/usr/local/go/src/bufio/bufio.go:152 +0x58
+net/http.(*persistConn).readLoop(0x1400071f200)
+	/usr/local/go/src/net/http/transport.go:2275 +0x110
+created by net/http.(*Transport).dialConn in goroutine 84993
+	/usr/local/go/src/net/http/transport.go:1944 +0x111c
+
+goroutine 83685 [select, 2 minutes]:
+net/http.(*persistConn).writeLoop(0x140001f0120)
+	/usr/local/go/src/net/http/transport.go:2597 +0x94
+created by net/http.(*Transport).dialConn in goroutine 83833
+	/usr/local/go/src/net/http/transport.go:1945 +0x1164
+
+goroutine 83634 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x101cb0e00, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000df0b80?, 0x140002d1321?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000df0b80, {0x140002d1321, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000df0b80, {0x140002d1321?, 0x140007baf58?, 0x14001080494?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000614290, {0x140002d1321?, 0x1013f5490?, 0x1400002ee70?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x140002d1300)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83414
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 72473 [select, 39 minutes]:
+os/exec.(*Cmd).watchCtx(0x14000884a80, 0x14000a4a380)
+	/usr/local/go/src/os/exec/exec.go:789 +0x70
+created by os/exec.(*Cmd).Start in goroutine 72472
+	/usr/local/go/src/os/exec/exec.go:775 +0x678
+
+goroutine 84132 [IO wait, 1 minutes]:
+internal/poll.runtime_pollWait(0x128730800, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000af0f60?, 0x14000656000?, 0x1)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000af0f60, {0x14000656000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+os.(*File).read(...)
+	/usr/local/go/src/os/file_posix.go:29
+os.(*File).Read(0x140000646d0, {0x14000656000?, 0x1400093df98?, 0x1400093df70?})
+	/usr/local/go/src/os/file.go:144 +0x68
+github.com/yha/core/internal/harness/codex.(*Streamer).Run.func3()
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:177 +0x90
+created by github.com/yha/core/internal/harness/codex.(*Streamer).Run in goroutine 83952
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:173 +0x514
+
+goroutine 83549 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x12891f400, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000ac2b80?, 0x140006189e1?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000ac2b80, {0x140006189e1, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000ac2b80, {0x140006189e1?, 0x14000b8df58?, 0x14001080754?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x1400092a118, {0x140006189e1?, 0x0?, 0x100d010d4?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x140006189c0)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83548
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 83949 [select]:
+github.com/yha/core/internal/stream.streamChunksToClient({0x1013f5420, 0x14000a0e4b0}, {0x1013f4d48, 0x1400016a580}, {0x1286f4860, 0x1400016a580}, 0x140008105b0, {0x0, 0x0?, 0x100d010d8?})
+	/Users/michael/ypa/go-core/internal/stream/sse_write.go:165 +0x20c
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func6()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:891 +0x7c
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 83892
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:889 +0x11c8
+
+goroutine 83657 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x128882800, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000bca200?, 0x14000d2e121?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000bca200, {0x14000d2e121, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000bca200, {0x14000d2e121?, 0x140007c1f58?, 0x140010365d4?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000756040, {0x14000d2e121?, 0x0?, 0x100d010d4?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x14000d2e100)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83669
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 83548 [IO wait]:
+internal/poll.runtime_pollWait(0x1288b3800, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000ac2c80?, 0x14000424000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000ac2c80, {0x14000424000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000ac2c80, {0x14000424000?, 0x85?, 0x0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x1400052c148, {0x14000424000?, 0x14000ac2b80?, 0x14000940e10?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*persistConn).Read(0x1400077a900, {0x14000424000?, 0x14000940ec8?, 0x100ea95ac?})
+	/usr/local/go/src/net/http/transport.go:2122 +0x48
+bufio.(*Reader).fill(0x140000cfc80)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).ReadSlice(0x140000cfc80, 0xa)
+	/usr/local/go/src/bufio/bufio.go:380 +0x30
+net/http/internal.readChunkLine(0x14000940f98?)
+	/usr/local/go/src/net/http/internal/chunked.go:156 +0x20
+net/http/internal.(*chunkedReader).beginChunk(0x140003c3bc0)
+	/usr/local/go/src/net/http/internal/chunked.go:49 +0x24
+net/http/internal.(*chunkedReader).Read(0x140003c3bc0, {0x140009d6000?, 0x140009d5038?, 0x100cadc10?})
+	/usr/local/go/src/net/http/internal/chunked.go:125 +0x120
+net/http.(*body).readLocked(0x14000618e40, {0x140009d6000?, 0x140009410b8?, 0x10119d438?})
+	/usr/local/go/src/net/http/transfer.go:845 +0x34
+net/http.(*body).Read(0x1019d93e8?, {0x140009d6000?, 0x14000941148?, 0x10119b814?})
+	/usr/local/go/src/net/http/transfer.go:837 +0x104
+net/http.(*bodyEOFSignal).Read(0x14000618e80, {0x140009d6000, 0x8000, 0x8000})
+	/usr/local/go/src/net/http/transport.go:2997 +0x154
+net/http/httputil.(*ReverseProxy).copyBuffer(0x14000042140, {0x1013f2f80, 0x14000618ec0}, {0x1013f17f8, 0x14000618e80}, {0x0?, 0x8000?, 0x3?})
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:661 +0xb4
+net/http/httputil.(*ReverseProxy).copyResponse(0x14000042140, {0x1013f4d48, 0x14000690860}, {0x1013f17f8, 0x14000618e80}, 0xffffffffffffffff)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:649 +0x18c
+net/http/httputil.(*ReverseProxy).ServeHTTP(0x14000042140, {0x1013f4d48, 0x14000690860}, 0x140009932c0)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:533 +0xd34
+net/http.(*ServeMux).ServeHTTP(0x140003c3230?, {0x1013f4d48, 0x14000690860}, 0x140009932c0)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x14000690860}, 0x140009932c0)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x14000659858?, {0x1013f4d48?, 0x14000690860?}, 0x1018261b0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x14000690840}, 0x140009932c0)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x14000659a38?, {0x1013f4f58?, 0x14000690840?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x14000362870}, 0x140009932c0)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x14000690800?, {0x1013f4e38?, 0x14000362870?}, 0x14000659b50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x140006189c0?}, {0x1013f4e38?, 0x14000362870?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x14000a0b3b0, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 83410 [IO wait]:
+internal/poll.runtime_pollWait(0x101d1e800, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000ac2980?, 0x1400085d000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000ac2980, {0x1400085d000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000ac2980, {0x1400085d000?, 0x5c?, 0x0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000756240, {0x1400085d000?, 0x14000df0980?, 0x140001d4e10?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*persistConn).Read(0x140001f0240, {0x1400085d000?, 0x140001d4ec8?, 0x100ea95ac?})
+	/usr/local/go/src/net/http/transport.go:2122 +0x48
+bufio.(*Reader).fill(0x140009219e0)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).ReadSlice(0x140009219e0, 0xa)
+	/usr/local/go/src/bufio/bufio.go:380 +0x30
+net/http/internal.readChunkLine(0x140001d4f98?)
+	/usr/local/go/src/net/http/internal/chunked.go:156 +0x20
+net/http/internal.(*chunkedReader).beginChunk(0x140003c22a0)
+	/usr/local/go/src/net/http/internal/chunked.go:49 +0x24
+net/http/internal.(*chunkedReader).Read(0x140003c22a0, {0x1400064c000?, 0x140001d5038?, 0x100cadc10?})
+	/usr/local/go/src/net/http/internal/chunked.go:125 +0x120
+net/http.(*body).readLocked(0x14000618180, {0x1400064c000?, 0x140001d50b8?, 0x10119d438?})
+	/usr/local/go/src/net/http/transfer.go:845 +0x34
+net/http.(*body).Read(0x1019d93e8?, {0x1400064c000?, 0x140001d5148?, 0x10119b814?})
+	/usr/local/go/src/net/http/transfer.go:837 +0x104
+net/http.(*bodyEOFSignal).Read(0x140006181c0, {0x1400064c000, 0x8000, 0x8000})
+	/usr/local/go/src/net/http/transport.go:2997 +0x154
+net/http/httputil.(*ReverseProxy).copyBuffer(0x14000042140, {0x1013f2f80, 0x14000618200}, {0x1013f17f8, 0x140006181c0}, {0x0?, 0x80?, 0x3?})
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:661 +0xb4
+net/http/httputil.(*ReverseProxy).copyResponse(0x14000042140, {0x1013f4d48, 0x1400015e0a0}, {0x1013f17f8, 0x140006181c0}, 0xffffffffffffffff)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:649 +0x18c
+net/http/httputil.(*ReverseProxy).ServeHTTP(0x14000042140, {0x1013f4d48, 0x1400015e0a0}, 0x140005f6280)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:533 +0xd34
+net/http.(*ServeMux).ServeHTTP(0x14000d7e150?, {0x1013f4d48, 0x1400015e0a0}, 0x140005f6280)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400015e0a0}, 0x140005f6280)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x140001d5858?, {0x1013f4d48?, 0x1400015e0a0?}, 0x100c9eb9c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400015e080}, 0x140005f6280)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1288732e0?, {0x1013f4f58?, 0x1400015e080?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x1400019e000}, 0x140005f6280)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400015e020?, {0x1013f4e38?, 0x1400019e000?}, 0x140001d5b50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x140000c1bc0?}, {0x1013f4e38?, 0x1400019e000?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x140008aa2d0, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 83448 [select, 2 minutes]:
+net/http.(*persistConn).readLoop(0x14000746000)
+	/usr/local/go/src/net/http/transport.go:2395 +0xa6c
+created by net/http.(*Transport).dialConn in goroutine 83191
+	/usr/local/go/src/net/http/transport.go:1944 +0x111c
+
+goroutine 83892 [select, 1 minutes]:
+github.com/yha/core/internal/stream.dispatchHarnessAdapter({_, _}, _, {0x14000200a20, {0x1013f3610, 0x14000524180}, 0x0, 0x14000159500, 0x140000c1380, 0x0, ...}, ...)
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1134 +0x1678
+github.com/yha/core/internal/stream.RegisterRoute.func1({0x1013f4d48, 0x1400016a580}, 0x14000000c80)
+	/Users/michael/ypa/go-core/internal/stream/route.go:1123 +0x1ba0
+net/http.HandlerFunc.ServeHTTP(0x1400019c0c0?, {0x1013f4d48?, 0x1400016a580?}, 0xa?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.(*ServeMux).ServeHTTP(0x1013b2720?, {0x1013f4d48, 0x1400016a580}, 0x14000000c80)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.func2.17({0x1013f4d48, 0x1400016a580}, 0x14000000c80)
+	/Users/michael/ypa/go-core/cmd/yha-core/main.go:1136 +0xd4
+net/http.HandlerFunc.ServeHTTP(0x1400019c000?, {0x1013f4d48?, 0x1400016a580?}, 0xa?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.(*ServeMux).ServeHTTP(0x1400077cb40?, {0x1013f4d48, 0x1400016a580}, 0x14000000c80)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400016a580}, 0x14000000c80)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x14000945858?, {0x1013f4d48?, 0x1400016a580?}, 0x100cf855c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400016a520}, 0x14000000c80)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1013f1d58?, {0x1013f4f58?, 0x1400016a520?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x140005603c0}, 0x14000000c80)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x10?, {0x1013f4e38?, 0x140005603c0?}, 0x140005603c0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x1013f37a0?}, {0x1013f4e38?, 0x140005603c0?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x14000b385a0, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 72470 [select]:
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func8()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:918 +0x11c
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 72422
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:910 +0x1330
+
+goroutine 83947 [IO wait, 1 minutes]:
+internal/poll.runtime_pollWait(0x128870600, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000c9c180?, 0x140000c0f61?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000c9c180, {0x140000c0f61, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000c9c180, {0x140000c0f61?, 0x0?, 0x100d010d4?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000a04060, {0x140000c0f61?, 0x140006186a0?, 0x140004ee8c0?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x140000c0f40)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83892
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 83488 [select, 2 minutes]:
+net/http.(*persistConn).writeLoop(0x1400077a900)
+	/usr/local/go/src/net/http/transport.go:2597 +0x94
+created by net/http.(*Transport).dialConn in goroutine 83550
+	/usr/local/go/src/net/http/transport.go:1945 +0x1164
+
+goroutine 83431 [select, 2 minutes]:
+net/http.(*persistConn).writeLoop(0x140001f0240)
+	/usr/local/go/src/net/http/transport.go:2597 +0x94
+created by net/http.(*Transport).dialConn in goroutine 83441
+	/usr/local/go/src/net/http/transport.go:1945 +0x1164
+
+goroutine 84131 [select]:
+github.com/yha/core/internal/harness/codex.(*Streamer).Run.func1()
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:151 +0xfc
+created by github.com/yha/core/internal/harness/codex.(*Streamer).Run in goroutine 83952
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:141 +0x23c
+
+goroutine 81688 [select, 2 minutes]:
+net/http/httputil.(*ReverseProxy).handleUpgradeResponse.func1()
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:779 +0x80
+created by net/http/httputil.(*ReverseProxy).handleUpgradeResponse in goroutine 81633
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:776 +0x40c
+
+goroutine 83487 [select, 2 minutes]:
+net/http.(*persistConn).readLoop(0x1400077a900)
+	/usr/local/go/src/net/http/transport.go:2395 +0xa6c
+created by net/http.(*Transport).dialConn in goroutine 83550
+	/usr/local/go/src/net/http/transport.go:1944 +0x111c
+
+goroutine 83449 [select, 2 minutes]:
+net/http.(*persistConn).writeLoop(0x14000746000)
+	/usr/local/go/src/net/http/transport.go:2597 +0x94
+created by net/http.(*Transport).dialConn in goroutine 83191
+	/usr/local/go/src/net/http/transport.go:1945 +0x1164
+
+goroutine 72471 [select]:
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func10()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1052 +0x214
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 72422
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1048 +0x1510
+
+goroutine 83684 [select, 2 minutes]:
+net/http.(*persistConn).readLoop(0x140001f0120)
+	/usr/local/go/src/net/http/transport.go:2395 +0xa6c
+created by net/http.(*Transport).dialConn in goroutine 83833
+	/usr/local/go/src/net/http/transport.go:1944 +0x111c
+
+goroutine 84129 [select, 1 minutes]:
+os/exec.(*Cmd).watchCtx(0x14000d0e900, 0x14000a57340)
+	/usr/local/go/src/os/exec/exec.go:789 +0x70
+created by os/exec.(*Cmd).Start in goroutine 83952
+	/usr/local/go/src/os/exec/exec.go:775 +0x678
+
+goroutine 83213 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x12891dc00, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000ac2800?, 0x140002d10e1?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000ac2800, {0x140002d10e1, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000ac2800, {0x140002d10e1?, 0x14000c24b80?, 0x14000befda9?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x140000647e8, {0x140002d10e1?, 0x1013f5490?, 0x1400056d570?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x140002d10c0)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83373
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 81633 [chan receive, 2 minutes]:
+net/http/httputil.(*ReverseProxy).handleUpgradeResponse(0x14000042140, {0x1013f4d48, 0x1400035a180}, 0x14000b868c0, 0x14000d80750)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:812 +0x7fc
+net/http/httputil.(*ReverseProxy).ServeHTTP(0x14000042140, {0x1013f4d48, 0x1400035a180}, 0x14000b86500)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:508 +0xc68
+net/http.(*ServeMux).ServeHTTP(0x1400133e7b0?, {0x1013f4d48, 0x1400035a180}, 0x14000b86500)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400035a180}, 0x14000b86500)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x14000646858?, {0x1013f4d48?, 0x1400035a180?}, 0x100cf855c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400035a160}, 0x14000b86500)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x14000646a38?, {0x1013f4f58?, 0x1400035a160?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x140007481e0}, 0x14000b86500)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400035a120?, {0x1013f4e38?, 0x140007481e0?}, 0x14000646b50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x140010361c0?}, {0x1013f4e38?, 0x140007481e0?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x14000a2d440, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 83951 [select]:
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func10()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1052 +0x214
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 83892
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1048 +0x1510
+
+goroutine 83150 [select, 2 minutes]:
+net/http.(*persistConn).readLoop(0x1400011a7e0)
+	/usr/local/go/src/net/http/transport.go:2395 +0xa6c
+created by net/http.(*Transport).dialConn in goroutine 83416
+	/usr/local/go/src/net/http/transport.go:1944 +0x111c
+
+goroutine 83906 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x101d20a00, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000db2380?, 0x140002d0221?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000db2380, {0x140002d0221, 0x1, 0x1})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000db2380, {0x140002d0221?, 0x14000b75f58?, 0x140006192d4?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000064258, {0x140002d0221?, 0x0?, 0x100d010d4?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).backgroundRead(0x140002d0200)
+	/usr/local/go/src/net/http/server.go:702 +0x38
+created by net/http.(*connReader).startBackgroundRead in goroutine 83760
+	/usr/local/go/src/net/http/server.go:698 +0xb8
+
+goroutine 84133 [IO wait]:
+internal/poll.runtime_pollWait(0x128732200, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000af0ea0?, 0x1400096c000?, 0x1)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000af0ea0, {0x1400096c000, 0x10000, 0x10000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+os.(*File).read(...)
+	/usr/local/go/src/os/file_posix.go:29
+os.(*File).Read(0x14000064690, {0x1400096c000?, 0x1019d93e8?, 0x40?})
+	/usr/local/go/src/os/file.go:144 +0x68
+github.com/yha/core/internal/harness/codex.(*activityReader).Read(0x14000c32228, {0x1400096c000?, 0x1400053be38?, 0x100d0858c?})
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:534 +0x2c
+bufio.(*Scanner).Scan(0x14000db2300)
+	/usr/local/go/src/bufio/scan.go:219 +0x738
+github.com/yha/core/internal/harness/codex.processStream.func1()
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:391 +0xa0
+created by github.com/yha/core/internal/harness/codex.processStream in goroutine 83952
+	/Users/michael/ypa/go-core/internal/harness/codex/codex.go:390 +0x214
+
+goroutine 83616 [select, 2 minutes]:
+net/http.(*persistConn).writeLoop(0x140004c0000)
+	/usr/local/go/src/net/http/transport.go:2597 +0x94
+created by net/http.(*Transport).dialConn in goroutine 83612
+	/usr/local/go/src/net/http/transport.go:1945 +0x1164
+
+goroutine 83669 [IO wait]:
+internal/poll.runtime_pollWait(0x101d1f200, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000bca000?, 0x14000946000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000bca000, {0x14000946000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000bca000, {0x14000946000?, 0x68?, 0x0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x1400092a2c0, {0x14000946000?, 0x14000bca200?, 0x140005f0e10?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*persistConn).Read(0x140004c0000, {0x14000946000?, 0x140005f0ec8?, 0x100ea95ac?})
+	/usr/local/go/src/net/http/transport.go:2122 +0x48
+bufio.(*Reader).fill(0x14000ffe5a0)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).ReadSlice(0x14000ffe5a0, 0xa)
+	/usr/local/go/src/bufio/bufio.go:380 +0x30
+net/http/internal.readChunkLine(0x140005f0f98?)
+	/usr/local/go/src/net/http/internal/chunked.go:156 +0x20
+net/http/internal.(*chunkedReader).beginChunk(0x1400077c540)
+	/usr/local/go/src/net/http/internal/chunked.go:49 +0x24
+net/http/internal.(*chunkedReader).Read(0x1400077c540, {0x140006e4000?, 0x10180afc0?, 0x100cadc10?})
+	/usr/local/go/src/net/http/internal/chunked.go:125 +0x120
+net/http.(*body).readLocked(0x14001080200, {0x140006e4000?, 0x140005f10b8?, 0x10119d438?})
+	/usr/local/go/src/net/http/transfer.go:845 +0x34
+net/http.(*body).Read(0x1019d85c0?, {0x140006e4000?, 0x140005f1148?, 0x10119b814?})
+	/usr/local/go/src/net/http/transfer.go:837 +0x104
+net/http.(*bodyEOFSignal).Read(0x14001080240, {0x140006e4000, 0x8000, 0x8000})
+	/usr/local/go/src/net/http/transport.go:2997 +0x154
+net/http/httputil.(*ReverseProxy).copyBuffer(0x14000042140, {0x1013f2f80, 0x14001080280}, {0x1013f17f8, 0x14001080240}, {0x0?, 0x80?, 0x3?})
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:661 +0xb4
+net/http/httputil.(*ReverseProxy).copyResponse(0x14000042140, {0x1013f4d48, 0x1400035a2e0}, {0x1013f17f8, 0x14001080240}, 0xffffffffffffffff)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:649 +0x18c
+net/http/httputil.(*ReverseProxy).ServeHTTP(0x14000042140, {0x1013f4d48, 0x1400035a2e0}, 0x14000858000)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:533 +0xd34
+net/http.(*ServeMux).ServeHTTP(0x1400077c270?, {0x1013f4d48, 0x1400035a2e0}, 0x14000858000)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400035a2e0}, 0x14000858000)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x140005f1858?, {0x1013f4d48?, 0x1400035a2e0?}, 0x100cf855c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400035a2c0}, 0x14000858000)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x140005f1a38?, {0x1013f4f58?, 0x1400035a2c0?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x140007482d0}, 0x14000858000)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400035a280?, {0x1013f4e38?, 0x140007482d0?}, 0x140005f1b50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x14000d2e100?}, {0x1013f4e38?, 0x140007482d0?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x14000a2c240, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 81690 [IO wait, 2 minutes]:
+internal/poll.runtime_pollWait(0x128870e00, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000ac2180?, 0x1400061c000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000ac2180, {0x1400061c000, 0x8000, 0x8000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000ac2180, {0x1400061c000?, 0x14000a99d08?, 0x100cfb6e0?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000064748, {0x1400061c000?, 0x100a99d01?, 0x101d3d4a8?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*readWriteCloserBody).Read(0x14000064458?, {0x1400061c000?, 0x14000a99d88?, 0x100c989d8?})
+	/usr/local/go/src/net/http/transport.go:2575 +0x9c
+io.copyBuffer({0x1013f29c0, 0x1400052c050}, {0x101cb13a8, 0x14000fc20a8}, {0x0, 0x0, 0x0})
+	/usr/local/go/src/io/io.go:429 +0x18c
+io.Copy(...)
+	/usr/local/go/src/io/io.go:388
+net.genericReadFrom(0x14000ac4b00?, {0x101cb13a8, 0x14000fc20a8})
+	/usr/local/go/src/net/net.go:772 +0x58
+net.(*TCPConn).readFrom(0x14000064458, {0x101cb13a8, 0x14000fc20a8})
+	/usr/local/go/src/net/tcpsock_posix.go:54 +0x4c
+net.(*TCPConn).ReadFrom(0x14000064458, {0x101cb13a8?, 0x14000fc20a8?})
+	/usr/local/go/src/net/tcpsock.go:165 +0x30
+io.copyBuffer({0x101cb1318, 0x14000064458}, {0x101cb13a8, 0x14000fc20a8}, {0x0, 0x0, 0x0})
+	/usr/local/go/src/io/io.go:415 +0x14c
+io.Copy(...)
+	/usr/local/go/src/io/io.go:388
+net/http/httputil.switchProtocolCopier.copyFromBackend({{0x101cb1358?, 0x14000064458?}, {0x101cb1380?, 0x14000fc20a8?}}, 0x14000ac09a0)
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:827 +0x94
+created by net/http/httputil.(*ReverseProxy).handleUpgradeResponse in goroutine 81633
+	/usr/local/go/src/net/http/httputil/reverseproxy.go:808 +0x7ec
+
+goroutine 83373 [select]:
+github.com/yha/core/internal/stream.RegisterRoute.func5({0x1013f4d48, 0x1400035a1a0}, 0x14000b86000)
+	/Users/michael/ypa/go-core/internal/stream/route.go:1966 +0x484
+net/http.HandlerFunc.ServeHTTP(0x1400019c0c0?, {0x1013f4d48?, 0x1400035a1a0?}, 0xa?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.(*ServeMux).ServeHTTP(0x1013b2720?, {0x1013f4d48, 0x1400035a1a0}, 0x14000b86000)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.func2.17({0x1013f4d48, 0x1400035a1a0}, 0x14000b86000)
+	/Users/michael/ypa/go-core/cmd/yha-core/main.go:1136 +0xd4
+net/http.HandlerFunc.ServeHTTP(0x1400019c000?, {0x1013f4d48?, 0x1400035a1a0?}, 0xa?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.(*ServeMux).ServeHTTP(0x1400077c120?, {0x1013f4d48, 0x1400035a1a0}, 0x14000b86000)
+	/usr/local/go/src/net/http/server.go:2861 +0x190
+main.main.(*Gate).Middleware.func6.1({0x1013f4d48, 0x1400035a1a0}, 0x14000b86000)
+	/Users/michael/ypa/go-core/internal/auth/auth.go:382 +0x168
+net/http.HandlerFunc.ServeHTTP(0x14000bdd858?, {0x1013f4d48?, 0x1400035a1a0?}, 0x100c9eb9c?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+main.main.(*Collector).HTTPMiddleware.func7.1({0x1013f4f58, 0x1400035a100}, 0x14000b86000)
+	/Users/michael/ypa/go-core/internal/metrics/middleware.go:26 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x14000bdda38?, {0x1013f4f58?, 0x1400035a100?}, 0x0?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+github.com/yha/core/internal/server.New.withRequestLog.func2({0x1013f4e38, 0x14000748000}, 0x14000b86000)
+	/Users/michael/ypa/go-core/internal/server/server.go:194 +0xb4
+net/http.HandlerFunc.ServeHTTP(0x1400035a0c0?, {0x1013f4e38?, 0x14000748000?}, 0x14000bddb50?)
+	/usr/local/go/src/net/http/server.go:2322 +0x38
+net/http.serverHandler.ServeHTTP({0x140002d10c0?}, {0x1013f4e38?, 0x14000748000?}, 0x6?)
+	/usr/local/go/src/net/http/server.go:3340 +0xb0
+net/http.(*conn).serve(0x140007399e0, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2109 +0x528
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 84739 [IO wait]:
+internal/poll.runtime_pollWait(0x101d1ec00, 0x72)
+	/usr/local/go/src/runtime/netpoll.go:351 +0xa0
+internal/poll.(*pollDesc).wait(0x14000ac2680?, 0x140003bc000?, 0x0)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28
+internal/poll.(*pollDesc).waitRead(...)
+	/usr/local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0x14000ac2680, {0x140003bc000, 0x1000, 0x1000})
+	/usr/local/go/src/internal/poll/fd_unix.go:165 +0x1e0
+net.(*netFD).Read(0x14000ac2680, {0x140003bc000?, 0x14000e07aa8?, 0x100e9e7bc?})
+	/usr/local/go/src/net/fd_posix.go:68 +0x28
+net.(*conn).Read(0x14000a04160, {0x140003bc000?, 0x72?, 0x14000e07b08?})
+	/usr/local/go/src/net/net.go:196 +0x34
+net/http.(*connReader).Read(0x140002d0ac0, {0x140003bc000, 0x1000, 0x1000})
+	/usr/local/go/src/net/http/server.go:812 +0x230
+bufio.(*Reader).fill(0x140007a69c0)
+	/usr/local/go/src/bufio/bufio.go:113 +0xe0
+bufio.(*Reader).Peek(0x140007a69c0, 0x4)
+	/usr/local/go/src/bufio/bufio.go:152 +0x58
+net/http.(*conn).serve(0x14000b394d0, {0x1013f53e8, 0x140001b66f0})
+	/usr/local/go/src/net/http/server.go:2145 +0x654
+created by net/http.(*Server).Serve in goroutine 13
+	/usr/local/go/src/net/http/server.go:3493 +0x384
+
+goroutine 78650 [chan receive, 2 minutes]:
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func13()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1173 +0x60
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 72422
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:1172 +0x17cc
+
+goroutine 83950 [select]:
+github.com/yha/core/internal/stream.dispatchHarnessAdapter.func8()
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:918 +0x11c
+created by github.com/yha/core/internal/stream.dispatchHarnessAdapter in goroutine 83892
+	/Users/michael/ypa/go-core/internal/stream/route_harness.go:910 +0x1330

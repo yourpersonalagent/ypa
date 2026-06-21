@@ -1,0 +1,6 @@
+{
+  "name": "plugins-folder",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Frontend loader for CWD-scoped visual plugins. Subscribes to the active CWD, fetches the manifest tree from the bridge plugins-folder module, mounts each tile as a sandboxed iframe, and registers per-tile entries in the `/` command palette. Cut 2 surfaces the dropdown via a temporary header icon; cut 3 replaces it with the proper headerSections placement and the `+`/headline rotator."
+}

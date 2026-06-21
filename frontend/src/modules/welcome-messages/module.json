@@ -1,0 +1,14 @@
+{
+  "name": "welcome-messages",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Empty-chat greeting + hero growl. ChatEmptyGreeting fetches /v1/greetings (served by the bridge half of this module) and inserts the hour-and-locale-appropriate line above the YHA hero. ChatHeroGrowl plays a click-and-hold space-drone audio gesture on the hero. Both components are non-essential — disabling the module leaves the empty chat with just the hero (no greeting line, no growl).",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": ["panels"]
+  },
+  "lifecycle": {
+    "hot": true,
+    "drainTimeoutMs": 0
+  }
+}

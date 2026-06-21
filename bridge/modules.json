@@ -1,0 +1,146 @@
+{
+  "$schema": "./core/modules/manifest-schema.ts",
+  "_doc": "Source of truth for which modules the bridge loads. Edit-and-restart works on day one; hot reload via POST /v1/modules/<name>/reload as each module proves a clean deactivate path. See YHA-modular-plan.md §4.1.",
+  "modules": [
+    {
+      "name": "link",
+      "enabled": true
+    },
+    {
+      "name": "context-generator",
+      "enabled": true
+    },
+    {
+      "name": "welcome-messages",
+      "enabled": true
+    },
+    {
+      "name": "search",
+      "enabled": true
+    },
+    {
+      "name": "knowledge",
+      "enabled": true
+    },
+    {
+      "name": "observability-plus",
+      "enabled": true
+    },
+    {
+      "name": "chat-extras",
+      "enabled": true
+    },
+    {
+      "name": "files-ftp",
+      "enabled": true
+    },
+    {
+      "name": "files-rclone",
+      "enabled": true
+    },
+    {
+      "name": "files-github",
+      "enabled": true
+    },
+    {
+      "name": "files-serve-preview",
+      "enabled": true
+    },
+    {
+      "name": "files-manager",
+      "enabled": true
+    },
+    {
+      "name": "todos",
+      "enabled": true
+    },
+    {
+      "name": "pet",
+      "enabled": true
+    },
+    {
+      "name": "context",
+      "enabled": true
+    },
+    {
+      "name": "workflows-and-triggers",
+      "enabled": true
+    },
+    {
+      "name": "skills-editor",
+      "enabled": true
+    },
+    {
+      "name": "mcp-client",
+      "enabled": true
+    },
+    {
+      "name": "mcp-servers",
+      "enabled": true
+    },
+    {
+      "name": "mcp-external-sources",
+      "enabled": true
+    },
+    {
+      "name": "multichat-broadcast",
+      "enabled": true
+    },
+    {
+      "name": "multichat-personnel",
+      "enabled": true
+    },
+    {
+      "name": "multichat-partners",
+      "enabled": true
+    },
+    {
+      "name": "multichat-group",
+      "enabled": true
+    },
+    {
+      "name": "remote-browser",
+      "enabled": true
+    },
+    {
+      "name": "shared-api",
+      "enabled": true
+    },
+    {
+      "name": "chat-minimap",
+      "enabled": true
+    },
+    {
+      "name": "harness-claude-binary",
+      "enabled": true
+    },
+    {
+      "name": "harness-codex",
+      "enabled": true
+    },
+    {
+      "name": "harness-grok-build",
+      "enabled": true
+    },
+    {
+      "name": "harness-direct-api",
+      "enabled": true
+    },
+    {
+      "name": "input-autocomplete",
+      "enabled": true
+    },
+    {
+      "name": "plugins-folder",
+      "enabled": true
+    },
+    {
+      "name": "audio-tts-openai",
+      "enabled": true
+    },
+    {
+      "name": "cwd-manager",
+      "enabled": true
+    }
+  ]
+}

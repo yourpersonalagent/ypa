@@ -1,0 +1,133 @@
+#!/usr/bin/with-contenv bash
+# CDP forwarder — Chromium 113+ silently binds CDP to container-localhost
+# only, regardless of --remote-debugging-address. So Chromium runs on
+# 127.0.0.1:9334 inside the container, and this script exposes the same
+# protocol on 0.0.0.0:9333 so Docker's port map can reach it.
+#
+# Lives at /custom-services.d/cdp-proxy via a bind mount from
+# bridge/browser-init/cdp-proxy. Linuxserver's s6 init picks it up, runs
+# it as a supervised long-lived process, and restarts it if it crashes.
+#
+# Connections that arrive before Chromium is up just fail quickly and the
+# Playwright client retries — no wait loop needed here.
+
+exec /lsiopy/bin/python3 -u -c '
+import socket, threading, sys
+
+LISTEN_HOST = "0.0.0.0"
+LISTEN_PORT = 9333
+TARGET_HOST = "127.0.0.1"
+TARGET_PORT = 9334
+
+# Chromium runs CDP with --remote-allow-origins=*, which disables its built-in
+# cross-origin guard. That guard is what normally stops a malicious web page
+# the user has open (any origin) from connecting to ws://127.0.0.1:9333 and
+# driving the browser. We re-impose it here: the automation client (Playwright /
+# desktop-browser-server.js) is a non-browser WebSocket client and sends no
+# Origin header, so we allow requests with no/empty/null Origin and reject any
+# request whose Origin is a real (non-loopback) web origin.
+def _origin_allowed(head):
+    try:
+        header_block = head.split(b"\r\n\r\n", 1)[0].decode("latin1")
+    except Exception:
+        return False
+    origin = None
+    for line in header_block.split("\r\n")[1:]:
+        if ":" in line:
+            k, v = line.split(":", 1)
+            if k.strip().lower() == "origin":
+                origin = v.strip()
+                break
+    if not origin or origin.lower() == "null":
+        return True
+    low = origin.lower()
+    return (
+        low.startswith("http://127.0.0.1") or low.startswith("https://127.0.0.1")
+        or low.startswith("http://localhost") or low.startswith("https://localhost")
+        or low.startswith("http://[::1]") or low.startswith("https://[::1]")
+    )
+
+def _read_http_head(sock):
+    # Read just the request line + headers (a WS upgrade / CDP HTTP GET has no
+    # body, and the client waits for our 101/200 before sending frames), so we
+    # never swallow protocol bytes.
+    #
+    # Bound the read with a timeout: a peer that connects and then sends nothing
+    # (port scan, half-open socket, a stuck client) must not pin this handler
+    # thread forever — without the timeout each such connection leaks a daemon
+    # thread until the process is restarted. On timeout recv() raises, which the
+    # caller treats as an incomplete head and rejects.
+    sock.settimeout(10)
+    buf = b""
+    try:
+        while b"\r\n\r\n" not in buf:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            buf += chunk
+            if len(buf) > 65536:
+                break
+    finally:
+        sock.settimeout(None)
+    return buf
+
+def pipe(src, dst):
+    try:
+        while True:
+            data = src.recv(65536)
+            if not data:
+                break
+            dst.sendall(data)
+    except Exception:
+        pass
+    finally:
+        try: src.shutdown(socket.SHUT_RD)
+        except Exception: pass
+        try: dst.shutdown(socket.SHUT_WR)
+        except Exception: pass
+
+def handle(client):
+    try:
+        head = _read_http_head(client)
+    except Exception:
+        client.close()
+        return
+    if b"\r\n\r\n" not in head:
+        # Incomplete head: timed out, or the peer hung up before finishing the
+        # request line + headers. Do not forward a partial head to Chromium.
+        try: client.sendall(b"HTTP/1.1 408 Request Timeout\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
+        except Exception: pass
+        client.close()
+        return
+    if not _origin_allowed(head):
+        sys.stderr.write("cdp-proxy: rejected connection with disallowed Origin\n")
+        try: client.sendall(b"HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
+        except Exception: pass
+        client.close()
+        return
+    try:
+        target = socket.create_connection((TARGET_HOST, TARGET_PORT), timeout=5)
+    except Exception as e:
+        sys.stderr.write("cdp-proxy: backend connect failed: " + str(e) + "\n")
+        client.close()
+        return
+    target.settimeout(None)
+    client.settimeout(None)
+    if head:
+        try: target.sendall(head)
+        except Exception:
+            client.close(); target.close(); return
+    threading.Thread(target=pipe, args=(client, target), daemon=True).start()
+    threading.Thread(target=pipe, args=(target, client), daemon=True).start()
+
+srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+srv.bind((LISTEN_HOST, LISTEN_PORT))
+srv.listen(64)
+sys.stderr.write("cdp-proxy: listening on %s:%d -> %s:%d\n" %
+                 (LISTEN_HOST, LISTEN_PORT, TARGET_HOST, TARGET_PORT))
+
+while True:
+    client, addr = srv.accept()
+    threading.Thread(target=handle, args=(client,), daemon=True).start()
+'

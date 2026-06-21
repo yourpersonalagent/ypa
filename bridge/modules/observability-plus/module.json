@@ -1,0 +1,17 @@
+{
+  "name": "observability-plus",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Cost tracking + token tracking + debug snapshot routes + telemetry recorder. Owns /v1/costs/* (registerCostRoutes). Telemetry / debug helpers stay reachable to other bridge files via require('../modules/observability-plus/<name>'). raw-logs.ts intentionally stays in core because it's required at the top of bridge/server.ts (LOG_DIR / SESSION_FILE_PATH constants used during boot) and disabling it would silence every harness's append-only log.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/costs/*",
+      "/v1/telemetry"
+    ]
+  },
+  "lifecycle": {
+    "reload": "never"
+  },
+  "category": "system"
+}

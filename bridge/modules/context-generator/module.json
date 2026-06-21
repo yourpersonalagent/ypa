@@ -1,0 +1,25 @@
+{
+  "name": "context-generator",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "ContextGenerator pipeline — the chained background workers (auto-title → categorizer → sorter → file-categorizer) that build the searchable context graph used by the picker, system-prompt budget, and Obsidian sync. Each worker registers a ctx.workers.add() lifecycle hook so disable / hot reload kills them cleanly. The LINK / vault-sync worker (last leg of the pipeline) lives in the `link` module because its lifecycle is tied to the link routes; this module's sorter chains into it via cross-module require. Routes (/v1/config/{auto-title,context-categorizer,sorter,file-categorizer}/*) still register from bridge/config/handler.ts — those require() the libraries here.",
+  "needs": [
+    "link"
+  ],
+  "provides": {
+    "configKeys": [
+      "defaults.autoTitle",
+      "defaults.contextCategorizer",
+      "defaults.contextSorter",
+      "defaults.fileCategorizer"
+    ],
+    "skills": [
+      "cwd-synthesize",
+      "diagnose-pipeline"
+    ]
+  },
+  "lifecycle": {
+    "reload": "never"
+  },
+  "category": "context"
+}

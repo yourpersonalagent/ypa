@@ -1,0 +1,14 @@
+{
+  "name": "audio-tts-openai",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "OpenAI TTS provider for VoiceMode. Registers an OpenAITTS entry into the `ttsProviders` register; voice mode picks it up when the user selects 'OpenAI' under Settings → Voice → TTS provider. Audio is fetched from /v1/tts/openai (served by the audio-tts-openai bridge module) and played via an HTMLAudioElement. Disabling this FE module removes the 'OpenAI' option without touching voice/.",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": ["ttsProviders"]
+  },
+  "lifecycle": {
+    "hot": true,
+    "drainTimeoutMs": 0
+  }
+}

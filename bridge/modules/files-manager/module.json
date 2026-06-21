@@ -1,0 +1,22 @@
+{
+  "name": "files-manager",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "File Manager — destructive file ops + binary uploads. Companion to the read-only routes that stay in core (filepicker /v1/files /read /write /exists). All routes here mutate the filesystem and are gated by HOME-confine + optional fileManagerRoots prefs. Destructive ops route through .trash/<timestamp>/ for undo.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/files/list",
+      "/v1/files/mkdir",
+      "/v1/files/rename",
+      "/v1/files/move",
+      "/v1/files/delete",
+      "/v1/files/upload",
+      "/v1/files/trash"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "files"
+}

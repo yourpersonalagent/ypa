@@ -1,0 +1,17 @@
+{
+  "name": "workflows-and-triggers",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Trigger persistence + workflow graph storage + headless workflow execution. Owns /v1/triggers* and /v1/workflows* routes, plus the in-process broadcastEvent SSE bus that other bridge code consults to surface trigger fires to the frontend. The trigger and workflow .md files live at bridge/triggers/ and bridge/workflows/ respectively (live user state, not in this module dir). Disabling the module 404s both surfaces and silences event broadcasts; auto-title / categorizer / sorter / sync-runner / context-sensitivity all soft-fail their broadcast attempts under try/catch.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/triggers",
+      "/v1/workflows"
+    ]
+  },
+  "lifecycle": {
+    "reload": "never"
+  },
+  "category": "system"
+}

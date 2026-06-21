@@ -1,0 +1,1039 @@
+/* Container so the wide-bar rule below can react to the bar's actual
+   inline-size, not viewport width (side panels can make the bar much
+   narrower than the window). */
+.chat-input-bar {
+  container-type: inline-size;
+}
+
+/* ── Wide bar (≥1000px), non-empty chat ──────────────────────────────────
+   Let the session-switch button consume the leftover horizontal room so
+   the bar feels full at wide widths. flex-grow only distributes positive
+   free space, so wrap (which fires off hypothetical widths) is unaffected
+   — siblings can't get bumped to a second row by this. Scoped to
+   :not(.chat-empty) so the empty-hero composer keeps its 720px centered
+   layout untouched. */
+@container (min-width: 1000px) {
+  .view-chat:not(.chat-empty) .chat-input-bar .session-group {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .view-chat:not(.chat-empty) .chat-input-bar .session-sw-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Default cap: long session names still get truncated at narrow widths so the
+   button can't push siblings onto a second row. CSS-driven (rather than JS
+   slicing) so the wide-bar @container rule above can lift the cap and let the
+   name use whatever room is actually available. */
+.chat-bar-btn.session-sw-btn {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Narrow bar (bar width < 480px) ─────────────────────────────────────── */
+.chat-input-bar[data-narrow] {
+  flex-wrap: wrap;
+}
+/* Left takes the full first row → all its buttons stay on one line. */
+.chat-input-bar[data-narrow] .chat-bar-left {
+  flex: 1 1 100%;
+  align-items: center; /* file-btn at natural height in non-empty mode */
+}
+/* Right drops to its own row, margin-left:auto keeps it right-aligned. */
+.chat-input-bar[data-narrow] .chat-bar-right {
+  align-items: center;
+}
+/* Empty mode: restore stretch so file-btn and send-btn go big again. */
+.view-chat.chat-empty .chat-input-bar[data-narrow] .chat-bar-left,
+.view-chat.chat-empty .chat-input-bar[data-narrow] .chat-bar-right {
+  align-items: stretch;
+}
+
+/* ─── Pending attachment strip (images/files queued before send) ─── */
+.chat-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0 6px;
+  border-bottom: 1px solid var(--stroke);
+  margin-bottom: 6px;
+}
+
+.chat-att {
+  position: relative;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--stroke-2);
+  overflow: hidden;
+  background: var(--bg-2);
+  display: flex;
+  align-items: center;
+}
+
+.chat-att img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+}
+
+.chat-att.chat-att-file {
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--fg-dim);
+  gap: 4px;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-att-rm {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 1px 4px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+}
+.chat-att:hover .chat-att-rm {
+  opacity: 1;
+}
+
+/* Render uploaded images inline in chat messages */
+.msg-bubble img {
+  max-width: 100%;
+  max-height: 360px;
+  border-radius: var(--radius-sm);
+  display: block;
+  margin: 6px 0;
+}
+
+/* Sent-image thumbnails in user message bubbles */
+.msg-sent-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.msg-sent-img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid var(--stroke);
+}
+
+.chat-bar-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  /* color: var(--fg-mute); */
+  cursor: pointer;
+  font-size: 13px;
+  touch-action: manipulation; /* no double-tap zoom on mobile */
+  transition:
+    opacity var(--dur-fast),
+    background var(--dur-fast);
+  opacity: 0.18;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.chat-bar-btn:hover {
+  color: var(--fg);
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.chat-bar-btn.send-btn {
+  color: var(--accent);
+  opacity: 0.3;
+  font-weight: 600;
+}
+.chat-bar-btn.send-btn:hover {
+  opacity: 1;
+  background: rgba(0, 204, 0, 0.1);
+  transform: scale(1.05);
+}
+
+.chat-bar-btn.stop-btn {
+  color: var(--danger);
+  opacity: 1;
+  /* No animation: stop-pulse was keeping the GPU compositor at 60fps.
+     Combined with other compositor layers (pet overlay, shimmer) that was
+     enough to force 30% GPU during streaming. The red colour is sufficient
+     to distinguish the stop button without a pulse. */
+}
+.chat-bar-btn.stop-btn:hover {
+  background: rgba(231, 76, 60, 0.18);
+  opacity: 1;
+}
+
+.chat-bar-select {
+  background: transparent;
+  border: none;
+  color: var(--fg-dim);
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.18;
+  transition: opacity var(--dur-fast);
+  padding: 2px 4px;
+  max-width: 140px;
+}
+.chat-bar-select:hover {
+  opacity: 0.9;
+}
+
+/* Left side: outer row of [file-btn | small-button cluster].
+   align-items:stretch lets file-btn span the full bar height when
+   cb-left-rest wraps to multiple rows (no extra row added). */
+.chat-bar-left {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.cb-left-rest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  gap: 8px;
+  row-gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Right side: outer row of [small-button cluster | send/stop].
+   align-items:stretch lets send-btn span the full bar height when
+   cb-right-rest wraps to multiple rows. margin-left:auto pushes the
+   whole cluster to the right edge. */
+.chat-bar-right {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  margin-left: auto;
+}
+/* Source order is reversed; row-reverse paints visually L→R as
+   [effort, sys, skills, model]. The last source item (effort) wraps
+   first so send/stop stay anchored top-right. */
+.cb-right-rest {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+  justify-content: flex-start;
+  gap: 8px;
+  row-gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+.cb-right-send {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: 4px;
+  /* Anchors the absolutely-positioned #chat-btw-insert overlay so it floats
+     above the stop button without participating in the flex layout. */
+  position: relative;
+}
+
+/* Insert-into-flow overlay: appears one button-height + a small gap above
+   the stop button while a stream is live AND there is composer text. Sized
+   to match the stop button via the shared .chat-bar-btn class. Absolute
+   position keeps it out of the flex flow so it never reshapes the input
+   bar across narrow/empty/messenger/zen layouts. */
+#chat-btw-insert {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  display: none;
+  color: var(--accent);
+  opacity: 0.85;
+}
+#chat-btw-insert svg { display: block; }
+#chat-btw-insert:hover {
+  opacity: 1;
+  background: rgba(74, 222, 128, 0.10);
+}
+
+/* Session nav buttons: higher base opacity so they're always findable */
+.chat-bar-btn.session-btn,
+.chat-bar-btn.session-sw-btn {
+  opacity: 0.62;
+}
+.chat-bar-btn.session-btn {
+  background: var(--hl);
+}
+.chat-bar-btn.session-btn:hover,
+.chat-bar-btn.session-sw-btn:hover {
+  opacity: 0.95;
+}
+
+/* Focus-within: raise all bar elements */
+.chat-input-wrapper:focus-within .chat-bar-btn {
+  opacity: 0.7;
+}
+.chat-input-wrapper:focus-within .composer-mode-switch .cms-active {
+  opacity: 0.65;
+}
+.chat-input-wrapper:focus-within .chat-bar-btn.send-btn {
+  opacity: 1;
+}
+.chat-input-wrapper:focus-within .chat-bar-btn.stop-btn {
+  opacity: 1;
+}
+.chat-input-wrapper:focus-within .chat-bar-select {
+  opacity: 0.7;
+}
+.chat-input-wrapper:focus-within .chat-bar-btn.session-btn,
+.chat-input-wrapper:focus-within .chat-bar-btn.session-sw-btn {
+  opacity: 0.82;
+}
+
+/* ── Composer mode switcher ───────────────────────────────────────────────── */
+.composer-mode-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* row-reverse parent means this lands rightmost in source = leftmost visually,
+     but we want it next to the model button so push it to the end via order. */
+  order: 99;
+}
+.composer-mode-switch .cms-active {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--fg-mute);
+  opacity: 0.18;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.1s, opacity 0.1s, background 0.1s;
+}
+.composer-mode-switch .cms-active svg { display: block; }
+.composer-mode-switch .cms-active:hover {
+  opacity: 1;
+  color: var(--accent);
+  background: rgba(74, 222, 128, 0.10);
+}
+.composer-mode-switch.open .cms-active {
+  opacity: 1;
+  color: var(--accent);
+  background: rgba(74, 222, 128, 0.12);
+  border-color: var(--stroke);
+}
+/* Popover: rendered via React portal to document.body so it escapes any
+   CSS transform on an ancestor (empty-state lifts the controls area with
+   translateY, which would hijack position:fixed otherwise). Selectors use
+   .cms-popover directly — no parent needed since it lives in <body>. */
+.cms-popover {
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 130px;
+  padding: 4px;
+  z-index: 2000;
+}
+.cms-popover .cms-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  opacity: 0.85;
+  cursor: pointer;
+  font-size: 12.5px;
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+  transition: color 0.1s, opacity 0.1s, background 0.1s;
+}
+.cms-popover .cms-opt:hover {
+  opacity: 1;
+  color: var(--accent);
+  background: rgba(74, 222, 128, 0.10);
+}
+.cms-popover .cms-opt-icon { color: var(--fg-mute); }
+.cms-popover .cms-opt:hover .cms-opt-icon { color: inherit; }
+.cms-popover .cms-opt svg { display: block; }
+.cms-popover .cms-label {
+  font-size: 12.5px;
+}
+
+/* ── Hide LLM-only chat-bar surfaces when in image/audio/video mode ───────── */
+.chat-input-bar:not([data-composer-mode='chat']) #chat-cmd,
+.chat-input-bar:not([data-composer-mode='chat']) #chat-sys-btn,
+.chat-input-bar:not([data-composer-mode='chat']) .ef-inline-wrap,
+.chat-input-bar:not([data-composer-mode='chat']) .cap-group,
+.chat-input-bar:not([data-composer-mode='chat']) #chat-notes-btn,
+.chat-input-bar:not([data-composer-mode='chat']) #chat-rag-btn,
+.chat-input-bar:not([data-composer-mode='chat']) .voice-group {
+  display: none !important;
+}
+
+/* ── Media param panel ────────────────────────────────────────────────────── */
+.media-param-panel {
+  margin: 4px 8px 0;
+  padding: 8px 10px;
+  background: var(--bg-2, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--bo, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--fg, currentColor);
+}
+.media-param-panel .mpp-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.media-param-panel .mpp-mode-label {
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+.media-param-panel .mpp-model {
+  opacity: 0.85;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
+  font-size: 11px;
+}
+.media-param-panel .mpp-provider {
+  opacity: 0.55;
+}
+.media-param-panel .mpp-no-model {
+  color: var(--warn, #d4a017);
+}
+.media-param-panel .mpp-deprecation {
+  color: var(--warn, #d4a017);
+  font-size: 11px;
+  background: rgba(212, 160, 23, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: help;
+}
+.media-param-panel .mpp-enhance-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 100px;
+  border: 1px solid var(--bo, rgba(255, 255, 255, 0.18));
+  background: transparent;
+  color: var(--fg-mute, rgba(255, 255, 255, 0.55));
+  font-size: 11px;
+  line-height: 1.7;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.media-param-panel .mpp-enhance-btn:hover {
+  color: var(--fg, rgba(255, 255, 255, 0.85));
+  border-color: var(--bo-hi, rgba(255, 255, 255, 0.32));
+}
+.media-param-panel .mpp-enhance-btn.active {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+/* status dot */
+.media-param-panel .mpp-enhance-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg-mute, rgba(255, 255, 255, 0.28));
+  flex-shrink: 0;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.media-param-panel .mpp-enhance-btn.active .mpp-enhance-dot {
+  background: #4caf50;
+  box-shadow: 0 0 5px #4caf5099;
+}
+.media-param-panel .mpp-close-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--bo, rgba(255, 255, 255, 0.18));
+  background: transparent;
+  color: var(--fg-mute, rgba(255, 255, 255, 0.55));
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.media-param-panel .mpp-close-btn:hover {
+  color: var(--fg, rgba(255, 255, 255, 0.9));
+  border-color: var(--bo-hi, rgba(255, 255, 255, 0.32));
+  background: rgba(255, 255, 255, 0.05);
+}
+.media-param-panel .mpp-hint,
+.media-param-panel .mpp-loading {
+  font-size: 11px;
+  opacity: 0.65;
+  font-style: italic;
+}
+.media-param-panel .mpp-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: flex-end;
+}
+.media-param-panel .mpp-field {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.media-param-panel .mpp-field.mpp-multiline {
+  flex: 1 1 200px;
+}
+.media-param-panel .mpp-label {
+  font-size: 10px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.media-param-panel .mpp-field select,
+.media-param-panel .mpp-field input[type='text'],
+.media-param-panel .mpp-field input[type='number'],
+.media-param-panel .mpp-field textarea {
+  background: var(--bg-3, rgba(255, 255, 255, 0.05));
+  color: var(--fg, currentColor);
+  border: 1px solid var(--bo, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 12px;
+  min-height: 24px;
+}
+.media-param-panel .mpp-field.mpp-bool {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+.media-param-panel .mpp-field.mpp-bool input { accent-color: var(--hl, #78aaff); }
+.media-param-panel .mpp-field.mpp-bool .mpp-label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.media-param-panel .mpp-range-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.media-param-panel .mpp-range-wrap input[type='range'] {
+  accent-color: var(--hl, #78aaff);
+  width: 90px;
+}
+.media-param-panel .mpp-range-value {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  opacity: 0.7;
+  min-width: 18px;
+  text-align: right;
+}
+
+/* Aspect-ratio visual tiles */
+.media-param-panel .mpp-aspect-grid {
+  display: inline-flex;
+  gap: 4px;
+}
+.media-param-panel .mpp-aspect-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 6px;
+  background: transparent;
+  border: 1px solid var(--bo, rgba(255, 255, 255, 0.1));
+  border-radius: 4px;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.65;
+  transition: opacity 0.12s, background 0.12s, border-color 0.12s;
+}
+.media-param-panel .mpp-aspect-btn:hover { opacity: 0.9; }
+.media-param-panel .mpp-aspect-btn.active {
+  opacity: 1;
+  border-color: var(--hl, #78aaff);
+  background: rgba(120, 170, 255, 0.1);
+}
+.media-param-panel .mpp-aspect-tile {
+  display: block;
+  background: currentColor;
+  opacity: 0.4;
+  border-radius: 1px;
+}
+.media-param-panel .mpp-aspect-tile.ratio-1-1   { width: 14px; height: 14px; }
+.media-param-panel .mpp-aspect-tile.ratio-9-16  { width:  9px; height: 16px; }
+.media-param-panel .mpp-aspect-tile.ratio-3-4   { width: 11px; height: 14px; }
+.media-param-panel .mpp-aspect-tile.ratio-16-9  { width: 18px; height: 10px; }
+.media-param-panel .mpp-aspect-tile.ratio-4-3   { width: 16px; height: 12px; }
+.media-param-panel .mpp-aspect-name {
+  font-size: 9px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  opacity: 0.7;
+}
+
+/* Mic / notes / RAG buttons */
+.chat-bar-btn.mic-btn,
+.chat-bar-btn.notes-btn,
+.chat-bar-btn.rag-btn {
+  opacity: 0.42;
+  padding: 4px 7px;
+  display: inline-flex;
+  align-items: center;
+}
+.chat-bar-btn.rag-btn:hover {
+  opacity: 0.82;
+}
+.chat-input-wrapper:focus-within .chat-bar-btn.rag-btn {
+  opacity: 0.72;
+}
+.chat-bar-btn.rag-btn svg { display: block; }
+/* Context-creation button (notes-btn): icon coloring + state switch only,
+   NO animation. Override the transition inherited from .chat-bar-btn so
+   default ↔ hover ↔ focus-within state changes snap instantly.
+   Kept previous animated rules commented for later re-enable. */
+.chat-bar-btn.notes-btn {
+  /* transition: opacity var(--dur-fast), background var(--dur-fast); */
+  transition: none;
+}
+.chat-bar-btn.notes-btn:hover {
+  opacity: 0.82;
+}
+.chat-input-wrapper:focus-within .chat-bar-btn.notes-btn {
+  opacity: 0.72;
+}
+
+/* File picker button — wider when WD is shown */
+.chat-bar-btn.file-btn {
+  opacity: 0.42;
+  padding: 4px 7px;
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  max-width: 160px;
+}
+.chat-bar-btn.file-btn:hover {
+  opacity: 0.9;
+}
+.chat-input-wrapper:focus-within .chat-bar-btn.file-btn {
+  opacity: 0.72;
+}
+.chat-bar-btn.mic-btn:hover {
+  opacity: 0.82;
+}
+.chat-bar-btn.mic-btn.mic-active {
+  opacity: 1;
+  color: #ff5e7a;
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+.chat-input-wrapper:focus-within .chat-bar-btn.mic-btn {
+  opacity: 0.72;
+}
+@keyframes mic-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Voice mode button (signal/curves icon, sits next to mic) */
+.chat-bar-btn.voice-mode-btn {
+  opacity: 0.42;
+  padding: 4px 7px;
+  display: inline-flex;
+  align-items: center;
+}
+.chat-bar-btn.voice-mode-btn:hover { opacity: 0.92; }
+.chat-input-wrapper:focus-within .chat-bar-btn.voice-mode-btn { opacity: 0.72; }
+
+/* Voice mode modal — colors driven by --voice-color (set inline per-state by JS).
+   All accent uses CSS color-mix() so a single inline custom property recolors
+   the orb rings, avatar, status pill, and the WebGL backdrop tint.
+   Surfaces & text follow the global theme tokens so the modal flips with
+   bright/dark mode. */
+.voice-modal {
+  --voice-color: var(--accent-2);
+  --voice-surface: color-mix(in srgb, var(--bg) 86%, transparent);
+  --voice-panel: var(--bg-2);
+  --voice-fg: var(--fg);
+  --voice-fg-dim: var(--fg-dim);
+  --voice-fg-mute: var(--fg-mute);
+  --voice-stroke: var(--stroke);
+  position: fixed;
+  inset: 0;
+  background: var(--voice-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: voice-bg-in 3s ease forwards;
+  overflow: hidden;
+}
+.voice-modal[data-closing='1'] {
+  animation: voice-bg-out 3s ease forwards;
+  pointer-events: none;
+}
+@keyframes voice-bg-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes voice-bg-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* Shader backdrop — same recipe as the empty-chat backdrop so the animation
+   reads correctly in both themes. Dark mode brightens the canvas with screen
+   blending; bright mode darkens it with multiply + brightness, otherwise the
+   shader washes out against a light page. */
+.voice-modal .voice-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.33;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.3s ease;
+  mix-blend-mode: screen;
+  filter: saturate(1.1) blur(14px) contrast(2.2);
+}
+html[data-variant='bright'] .voice-modal .voice-bg {
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+  filter: saturate(1.4) brightness(0.7) blur(14px) contrast(2.8);
+}
+
+.voice-modal-panel {
+  position: relative;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%,
+    color-mix(in srgb, var(--voice-panel) 88%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 94%, transparent) 78%);
+  border: 1px solid color-mix(in srgb, var(--voice-color) 30%, var(--voice-stroke));
+  border-radius: 50%;
+  width: clamp(360px, 44vmin, 520px);
+  height: clamp(360px, 44vmin, 520px);
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  padding: 0;
+  cursor: pointer;
+  color: var(--voice-fg);
+  box-shadow:
+    0 20px 60px color-mix(in srgb, var(--bg) 70%, transparent),
+    0 0 80px color-mix(in srgb, var(--voice-color) 18%, transparent);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  animation: voice-panel-in 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.voice-modal[data-closing='1'] .voice-modal-panel {
+  animation: voice-panel-out 1s cubic-bezier(0.55, 0, 0.68, 0.2) forwards;
+}
+@keyframes voice-panel-in {
+  from { transform: scale(0.04); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+@keyframes voice-panel-out {
+  from { transform: scale(1);    opacity: 1; }
+  to   { transform: scale(0.04); opacity: 0; }
+}
+
+.voice-top, .voice-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 78%;
+  padding: 0 8%;
+}
+.voice-top { align-self: end; padding-bottom: 8px; }
+.voice-bottom { align-self: start; padding-top: 8px; }
+
+/* Avatar + orb stage */
+.voice-stage {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-avatar {
+  position: relative;
+  z-index: 2;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 600;
+  /* Auto-contrast over the (potentially user-picked) avatar color: pick black
+     on light avatars, near-white on dark avatars. Works in both themes. */
+  color: color-mix(in srgb, var(--voice-color) 8%, var(--bg));
+  background: var(--voice-color);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--voice-color) 50%, transparent);
+  transition: background 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+.voice-orb {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.voice-orb span {
+  position: absolute;
+  border: 2px solid color-mix(in srgb, var(--voice-color) 60%, transparent);
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  animation: voice-pulse 2.4s ease-out infinite;
+}
+.voice-orb span:nth-child(2) { animation-delay: 0.8s; }
+.voice-orb span:nth-child(3) { animation-delay: 1.6s; }
+@keyframes voice-pulse {
+  0% { width: 56px; height: 56px; opacity: 0.85; }
+  100% { width: 160px; height: 160px; opacity: 0; }
+}
+
+/* Speaker name + state pill */
+.voice-speaker-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--voice-color);
+  letter-spacing: 0.2px;
+  transition: color 0.3s ease;
+}
+.voice-status {
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--voice-fg-dim);
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--voice-fg) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--voice-color) 30%, var(--voice-stroke));
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.voice-status[data-state="listening"],
+.voice-status[data-state="speaking"] {
+  color: color-mix(in srgb, var(--voice-color) 70%, var(--voice-fg) 30%);
+}
+.voice-status[data-state="thinking"] { color: var(--voice-fg-dim); letter-spacing: 1.6px; }
+
+.voice-transcript {
+  min-height: 28px;
+  max-height: 96px;
+  overflow-y: auto;
+  width: 78%;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--voice-fg);
+  padding: 2px 4px;
+}
+.voice-modal[data-state="listening"] .voice-transcript:empty::before {
+  content: "Listening…";
+  color: var(--voice-fg-mute);
+  font-style: italic;
+}
+.voice-modal[data-muted="1"][data-state="listening"] .voice-transcript:empty::before {
+  content: "Muted";
+  color: var(--voice-fg-mute);
+  font-style: italic;
+}
+
+/* Mic-muted badge: small chip overlaying the bottom-right of the avatar stage,
+   only present while muted. Click is absorbed by the panel's toggle handler. */
+.voice-mic-muted {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--voice-color) 40%, var(--voice-stroke));
+  color: #ff5a5a;
+  box-shadow: 0 0 16px color-mix(in srgb, #ff5a5a 35%, transparent);
+  pointer-events: none;
+  animation: voice-mic-muted-in 220ms ease-out;
+}
+@keyframes voice-mic-muted-in {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+/* Dim the orb pulse + avatar slightly while muted so the visual state reads. */
+.voice-modal[data-muted="1"] .voice-orb { opacity: 0.35; }
+.voice-modal[data-muted="1"] .voice-avatar { opacity: 0.55; }
+
+.voice-hint {
+  font-size: 11px;
+  color: var(--voice-fg-mute);
+  text-align: center;
+  line-height: 1.35;
+  width: 78%;
+}
+
+/* ── Minimized voice mode ─────────────────────────────────────────────────
+   Used when the pet module is the active voice submit target and the user
+   opens voice mode by clicking the pet. The full-screen backdrop is
+   suppressed (`pointer-events: none` outside the panel) so the pet stays
+   visible next to the panel and the rest of the page remains interactive.
+   The panel shrinks to ~220px and is positioned per-frame next to the live
+   `.pet-overlay` element via inline left/top (set by VoiceMode.tsx's rAF
+   loop, mirroring PetConsoleBubble's anchoring). The right/bottom values
+   below are only the fallback for when the pet is not in the DOM. Users
+   can maximize back to the regular full-screen modal via the ⤢ button. */
+.voice-modal[data-mode='minimized'] {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  pointer-events: none;
+  animation: none;
+}
+.voice-modal[data-mode='minimized'] .voice-bg {
+  display: none;
+}
+.voice-modal[data-mode='minimized'] .voice-modal-panel {
+  pointer-events: auto;
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 220px;
+  height: 220px;
+  padding: 16px;
+  cursor: pointer;
+  animation: voice-mini-in 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes voice-mini-in {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.voice-modal[data-mode='minimized'] .voice-stage {
+  width: 80px;
+  height: 80px;
+}
+.voice-modal[data-mode='minimized'] .voice-avatar {
+  width: 38px;
+  height: 38px;
+  font-size: 14px;
+}
+.voice-modal[data-mode='minimized'] .voice-orb span {
+  width: 38px;
+  height: 38px;
+}
+.voice-modal[data-mode='minimized'] .voice-speaker-name {
+  font-size: 12px;
+}
+.voice-modal[data-mode='minimized'] .voice-status {
+  font-size: 9px;
+  padding: 2px 6px;
+  letter-spacing: 0.8px;
+}
+.voice-modal[data-mode='minimized'] .voice-transcript {
+  font-size: 11px;
+  max-height: 36px;
+  min-height: 18px;
+}
+.voice-modal[data-mode='minimized'] .voice-hint {
+  display: none;
+}
+.voice-modal[data-mode='minimized'] .voice-top {
+  padding: 0 4%;
+  gap: 2px;
+  padding-bottom: 4px;
+}
+.voice-modal[data-mode='minimized'] .voice-bottom {
+  padding: 4px 4% 0;
+  gap: 2px;
+}
+.voice-mini-controls {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  z-index: 4;
+}
+.voice-mini-btn {
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--voice-color) 30%, var(--voice-stroke));
+  color: var(--voice-fg-dim);
+  font-size: 14px;
+  line-height: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.voice-mini-btn:hover {
+  color: var(--voice-fg);
+  border-color: color-mix(in srgb, var(--voice-color) 60%, var(--voice-stroke));
+}
+
+/* ── Collapsed minimized voice mode ──────────────────────────────────────
+   Pet-click on an active minimized voice mode tucks the panel away
+   without ending the conversation. The DOM stays alive (STT / TTS /
+   stream-text listeners all keep working), only the rendered surface
+   disappears. Re-clicking the pet flips data-collapsed back off and the
+   panel slides in via the existing voice-mini-in keyframe. */
+.voice-modal[data-mode='minimized'][data-collapsed='1'] .voice-modal-panel {
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.voice-modal[data-mode='minimized'][data-collapsed='1'] .voice-mini-controls {
+  pointer-events: none;
+}
+

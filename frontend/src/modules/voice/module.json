@@ -1,0 +1,14 @@
+{
+  "name": "voice",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Voice mode — STT/TTS/VAD overlay (BrowserSTT + BrowserTTS) plus the language detector used by chat-actions for auto-pick of TTS voices. The activate() is a no-op today: VoiceMode is still mounted statically by App.tsx and lang-detect is still imported by chat/chat-actions.ts. Adding register-side wiring (e.g. a chatBarLeftButtons entry to open the overlay) is a follow-up — file move first, slot integration later.",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": []
+  },
+  "lifecycle": {
+    "hot": false,
+    "drainTimeoutMs": 0
+  }
+}

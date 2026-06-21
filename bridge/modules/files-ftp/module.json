@@ -1,0 +1,21 @@
+{
+  "name": "files-ftp",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "FTP connection store, dir-mapping management, and FTP-side rclone sync. Owns the /v1/ftp/* routes plus the import-ini and per-CWD sync workflow. The general /v1/rclone/* surface (remotes CRUD, browse, sync from any local path) is in the sibling files-rclone module per registers-doc §4.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/ftp/connections",
+      "/v1/ftp/dirs",
+      "/v1/ftp/import-ini",
+      "/v1/ftp/sync",
+      "/v1/ftp/test-connection",
+      "/v1/ftp/browse"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "files"
+}

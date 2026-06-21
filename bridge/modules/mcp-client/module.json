@@ -1,0 +1,21 @@
+{
+  "name": "mcp-client",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "MCP client cluster — registry + stdio protocol + discovery + materialize-into-harness-configs + the MCP-Tools aggregator HTTP route. Talks to upstream MCP servers (the YHA-owned ones lifted into the `mcp-servers` module, plus any external ones the user adds to mcp-registry.json) and exposes their aggregate tool list to harnesses via `/proxy/mcp-bridge/rpc` (the stub) plus `/v1/mcp/*` REST. User state files (mcp-state.json, mcp-registry.json) intentionally stay at bridge/ root — they are user intent, not module state.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/mcp/*",
+      "/v1/bash-console/*",
+      "/v1/knowledge/*",
+      "/v1/tools/*",
+      "/proxy/mcp-bridge/*",
+      "/proxy/tool"
+    ]
+  },
+  "lifecycle": {
+    "reload": "never"
+  },
+  "category": "mcp"
+}

@@ -1,0 +1,84 @@
+{
+  "_comment": "Canonical MCP server registry. Materialized into each registered harness instance's config dir on bridge startup. See bridge/mcp-internal/materialize.ts. Paths are relative to bridge/ (the spawn cwd); command is `bun` which runs both .js and .ts files identically on Linux and Windows. \"enabledByDefault\": false opts a server OUT of the all-on-by-default boot set (absent ⇒ on); it is the installer/public-repo knob. Per-install on/off intent lives in the gitignored mcp-state.json (disabled[]/enabled[] overrides), NOT here.",
+  "mcpServers": {
+    "media-gen": {
+      "command": "bun",
+      "args": ["./mcp/media-server.js"]
+    },
+    "code-exec": {
+      "command": "bun",
+      "args": ["./mcp/code-server.js"]
+    },
+    "playwright-mcp": {
+      "command": "bun",
+      "args": ["./mcp/playwright-server.js"]
+    },
+    "web": {
+      "command": "bun",
+      "args": ["./mcp/desktop-browser-server.js"]
+    },
+    "notebooklm": {
+      "command": "bun",
+      "args": ["./mcp/notebooklm-server.js"],
+      "enabledByDefault": false
+    },
+    "bash-console": {
+      "command": "bun",
+      "args": ["./mcp/bash-console-server.js"]
+    },
+    "knowledge-memory": {
+      "command": "bun",
+      "args": ["./mcp/knowledge-server.js"]
+    },
+    "rclone": {
+      "command": "bun",
+      "args": ["./mcp/rclone-server.js"]
+    },
+    "data-access": {
+      "command": "bun",
+      "args": ["./mcp/data-server.js"]
+    },
+    "flat-data": {
+      "command": "bun",
+      "args": ["./mcp/flatdata-server.js"]
+    },
+    "hermes-skills": {
+      "command": "bun",
+      "args": ["./mcp/hermes-skills-server.js"]
+    },
+    "websearch": {
+      "command": "bun",
+      "args": ["./mcp/websearch-server.js"]
+    },
+    "meta-bridge": {
+      "command": "bun",
+      "args": ["./mcp/meta-bridge-server.js"]
+    },
+    "important": {
+      "command": "bun",
+      "args": ["./mcp/important-server.js"]
+    },
+    "agent-multichat": {
+      "command": "bun",
+      "args": ["./mcp/agent-multichat-server.js"]
+    },
+    "agent-tools": {
+      "command": "bun",
+      "args": ["./mcp/agent-tools-server.js"]
+    },
+    "rag-search": {
+      "command": "bun",
+      "args": ["./mcp/rag-search-server.js"]
+    },
+    "chat-history": {
+      "command": "bun",
+      "args": ["./mcp/chat-history-server.js"]
+    },
+    "pet-vision": {
+      "command": "bun",
+      "args": ["./mcp/pet-vision-server.js"],
+      "audience": "pet-only",
+      "enabledByDefault": false
+    }
+  }
+}

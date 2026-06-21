@@ -1,0 +1,17 @@
+{
+  "name": "welcome-messages",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Holiday + themed greetings shown above the YHA hero in the empty-chat state. Owns 28 .md banks under data/ (any-day generics + each holiday) and the /v1/greetings + /v1/greetings/reload routes. Disabling the module makes the empty-chat state fall back to the frontend's static default greeting (plan §4.1 — disabling welcome-messages is not a blank-screen trap).",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/greetings",
+      "/v1/greetings/reload"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "chat"
+}

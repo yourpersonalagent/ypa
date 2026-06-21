@@ -1,0 +1,1313 @@
+/* Design tokens — one source of truth for theme, spacing, motion.
+ *
+ * The theme system has two orthogonal axes, both carried as data attrs on
+ * <html>:
+ *
+ *   data-theme   → the colour *family* (default | minimal | ocean | sunset)
+ *   data-variant → dark or bright
+ *
+ * Generic dark/bright look-and-feel is defined once on
+ * `html[data-variant='dark|bright']`; each non-default family overrides
+ * accents/backgrounds/avatars on top of that base. The "default" family
+ * inherits the variant base unchanged — that is what dark/bright used to
+ * be before the family axis was introduced.
+ *
+ * Adding a new family:
+ *   1. Append a `html[data-theme='<id>'][data-variant='dark']` and a
+ *      matching `[data-variant='bright']` block below.
+ *   2. Add an entry in `frontend/src/themes-config.ts` (THEME_FAMILIES).
+ *   3. Add a matching `html[data-theme='<id>'] .emoji-mono { filter: … }`
+ *      rule in `frontend/css/chat.css` so chat-stream emojis (Stage 2)
+ *      pick up a mood that fits the new theme. Without it, the new theme
+ *      falls back to the default grayscale filter — which may clash with
+ *      a colorful palette. See chat.css "Stage 2 — uncurated emojis".
+ *
+ * Avatar palette: `--avatar-1` … `--avatar-7` are the 7 user-selectable
+ * "letter colors". Every variant block is expected to redefine all 7 so
+ * the choice stays visually distinct but harmonised with the surrounding
+ * theme colours. Legacy CSS that targeted `html[data-theme='bright']` was
+ * migrated to `html[data-variant='bright']` so it now applies across all
+ * families.
+ */
+:root {
+  /* Universal (theme-independent) tokens */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 36px;
+
+  --dur-fast: 140ms;
+  --dur-med: 260ms;
+  --dur-slow: 520ms;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  /* Last-resort fallbacks if no data-variant is set yet (e.g. before init) */
+  --accent: #00e08a;
+  --accent-2: #ff9a3d;
+  --accent-3: #5cc8ff;
+  --danger: #ff5b6e;
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 0 1px rgba(0, 224, 138, 0.25), 0 6px 20px rgba(0, 224, 138, 0.12);
+
+  --avatar-1: #00e08a;
+  --avatar-2: #5cc8ff;
+  --avatar-3: #ff9a3d;
+  --avatar-4: #b06aff;
+  --avatar-5: #ff5e7a;
+  --avatar-6: #ffd87a;
+  --avatar-7: #00c8b4;
+}
+
+/* ── Generic variant bases (the "default" family inherits these) ─────── */
+
+html[data-variant='dark'] {
+  --bg: #111;
+  --bg-2: #000;
+  --surface: rgb(28, 28, 28);
+  --surface-1: rgb(18, 18, 18);
+  --surface-2: rgb(38, 38, 38);
+  --stroke: rgba(255, 255, 255, 0.06);
+  --stroke-2: rgba(255, 255, 255, 0.14);
+  --border: rgba(255, 255, 255, 0.14);
+  --bg-soft: rgb(28, 28, 28);
+  --bg-elevated: rgb(30, 30, 30);
+  --fg: #e6eef7;
+  --fg-dim: #88a0b4;
+  --fg-mute: #506576;
+  --hl: rgba(0, 224, 138, 0.08);
+  --text-1: #eaeaea;
+  --text-2: #a8a8a8;
+  --text-3: #6e6e6e;
+
+  --accent: #00e08a;
+  --accent-2: #ff9a3d;
+  --accent-3: #5cc8ff;
+  --danger: #ff5b6e;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 0 1px rgba(0, 224, 138, 0.25), 0 6px 20px rgba(0, 224, 138, 0.12);
+
+  --avatar-1: #00e08a;
+  --avatar-2: #5cc8ff;
+  --avatar-3: #ff9a3d;
+  --avatar-4: #b06aff;
+  --avatar-5: #ff5e7a;
+  --avatar-6: #ffd87a;
+  --avatar-7: #00c8b4;
+}
+
+html[data-variant='bright'] {
+  --bg: #f6f5f1;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-1: rgb(236, 236, 236);
+  --surface-2: rgb(255, 255, 255);
+  --stroke: rgba(0, 0, 0, 0.08);
+  --stroke-2: rgba(0, 0, 0, 0.18);
+  --border: rgba(0, 0, 0, 0.18);
+  --bg-soft: rgb(230, 230, 228);
+  --bg-elevated: rgb(242, 241, 238);
+  --fg: #0a1410;
+  --fg-dim: #4a5e58;
+  --fg-mute: #7a8c87;
+  --hl: rgba(0, 180, 110, 0.12);
+  --text-1: #1c1c1e;
+  --text-2: #505050;
+  --text-3: #888888;
+
+  --accent: #00b870;
+  --accent-2: #e07820;
+  --accent-3: #2c9eda;
+  --danger: #d83a4e;
+
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-glow: 0 0 0 1px rgba(0, 184, 112, 0.20), 0 4px 14px rgba(0, 184, 112, 0.10);
+
+  --avatar-1: #00b870;
+  --avatar-2: #2c9eda;
+  --avatar-3: #e07820;
+  --avatar-4: #8c4dd0;
+  --avatar-5: #d8425e;
+  --avatar-6: #d8a040;
+  --avatar-7: #00a094;
+}
+
+/* ── Minimal — desaturated, near-monochrome with one slate-teal accent ── */
+
+html[data-theme='minimal'][data-variant='dark'] {
+  --bg: #101113;
+  --bg-2: #181a1d;
+  --surface: rgb(28, 30, 34);
+  --surface-2: rgb(36, 38, 42);
+  --stroke: rgba(255, 255, 255, 0.06);
+  --stroke-2: rgba(255, 255, 255, 0.14);
+  --fg: #e8e9eb;
+  --fg-dim: #9aa0a6;
+  --fg-mute: #6b7076;
+  --hl: rgba(140, 170, 184, 0.08);
+
+  --accent: #8caab8;
+  --accent-2: #a0a8b0;
+  --accent-3: #6f8d9c;
+  --danger: #d87080;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.40);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 0 1px rgba(140, 170, 184, 0.22), 0 6px 20px rgba(140, 170, 184, 0.12);
+
+  --avatar-1: #7ec0a0;
+  --avatar-2: #84b6d8;
+  --avatar-3: #e0a878;
+  --avatar-4: #a898c8;
+  --avatar-5: #d894a4;
+  --avatar-6: #e8cc88;
+  --avatar-7: #78bcb4;
+}
+
+html[data-theme='minimal'][data-variant='bright'] {
+  --bg: #f7f7f8;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-2: rgb(255, 255, 255);
+  --stroke: rgba(0, 0, 0, 0.07);
+  --stroke-2: rgba(0, 0, 0, 0.16);
+  --fg: #18191c;
+  --fg-dim: #5a5e64;
+  --fg-mute: #9aa0a6;
+  --hl: rgba(91, 138, 153, 0.10);
+
+  --accent: #5b8a99;
+  --accent-2: #7a8a9a;
+  --accent-3: #4a6a7a;
+  --danger: #c45c6c;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-2: 0 6px 18px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 0 1px rgba(91, 138, 153, 0.18), 0 4px 14px rgba(91, 138, 153, 0.10);
+
+  --avatar-1: #6aa089;
+  --avatar-2: #6e9aba;
+  --avatar-3: #d0945a;
+  --avatar-4: #9080b0;
+  --avatar-5: #c47a8a;
+  --avatar-6: #d4b878;
+  --avatar-7: #5fa098;
+}
+
+/* ── Ocean — navy/teal with sky-blue accent ─────────────────────────── */
+
+html[data-theme='ocean'][data-variant='dark'] {
+  --bg: #061520;
+  --bg-2: #0a1f33;
+  --surface: rgb(14, 36, 56);
+  --surface-2: rgb(18, 44, 68);
+  --stroke: rgba(140, 200, 255, 0.07);
+  --stroke-2: rgba(140, 200, 255, 0.16);
+  --fg: #d8eaf7;
+  --fg-dim: #6e9bb6;
+  --fg-mute: #4a6e84;
+  --hl: rgba(92, 200, 255, 0.10);
+
+  --accent: #5cc8ff;
+  --accent-2: #00c8b4;
+  --accent-3: #7fa8d8;
+  --danger: #ff7a8e;
+
+  --shadow-1: 0 2px 6px rgba(0, 8, 16, 0.40);
+  --shadow-2: 0 10px 30px rgba(0, 8, 16, 0.50);
+  --shadow-glow: 0 0 0 1px rgba(92, 200, 255, 0.28), 0 6px 20px rgba(92, 200, 255, 0.16);
+
+  --avatar-1: #4ec8a8;
+  --avatar-2: #5cc8ff;
+  --avatar-3: #ffb070;
+  --avatar-4: #8a9ce6;
+  --avatar-5: #ff8aa0;
+  --avatar-6: #ffd87a;
+  --avatar-7: #00d4c0;
+}
+
+html[data-theme='ocean'][data-variant='bright'] {
+  --bg: #eaf4fb;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-2: rgb(255, 255, 255);
+  --stroke: rgba(20, 80, 130, 0.10);
+  --stroke-2: rgba(20, 80, 130, 0.20);
+  --fg: #0a2233;
+  --fg-dim: #3e6680;
+  --fg-mute: #7a9ab0;
+  --hl: rgba(46, 140, 200, 0.10);
+
+  --accent: #2e8cc8;
+  --accent-2: #009a9e;
+  --accent-3: #5e7ea8;
+  --danger: #d04a60;
+
+  --shadow-1: 0 1px 3px rgba(20, 60, 100, 0.08);
+  --shadow-2: 0 8px 24px rgba(20, 60, 100, 0.14);
+  --shadow-glow: 0 0 0 1px rgba(46, 140, 200, 0.20), 0 4px 14px rgba(46, 140, 200, 0.10);
+
+  --avatar-1: #2ea088;
+  --avatar-2: #2e8cc8;
+  --avatar-3: #d8783a;
+  --avatar-4: #6878c8;
+  --avatar-5: #d05878;
+  --avatar-6: #c8a040;
+  --avatar-7: #009a9e;
+}
+
+/* ── Sunset — plum bg + warm orange/coral accents ──────────────────── */
+
+html[data-theme='sunset'][data-variant='dark'] {
+  --bg: #1a0f18;
+  --bg-2: #2a1424;
+  --surface: rgb(50, 24, 42);
+  --surface-2: rgb(60, 28, 50);
+  --stroke: rgba(255, 200, 180, 0.08);
+  --stroke-2: rgba(255, 200, 180, 0.18);
+  --fg: #f5e0d4;
+  --fg-dim: #b08c80;
+  --fg-mute: #7a5a55;
+  --hl: rgba(255, 154, 61, 0.10);
+
+  --accent: #ff9a3d;
+  --accent-2: #ff5e7a;
+  --accent-3: #ffd87a;
+  --danger: #ff4d62;
+
+  --shadow-1: 0 2px 6px rgba(20, 0, 10, 0.35);
+  --shadow-2: 0 10px 30px rgba(20, 0, 10, 0.50);
+  --shadow-glow: 0 0 0 1px rgba(255, 154, 61, 0.28), 0 6px 20px rgba(255, 154, 61, 0.18);
+
+  --avatar-1: #5cd8a0;
+  --avatar-2: #8ad0e0;
+  --avatar-3: #ff9a3d;
+  --avatar-4: #d090ff;
+  --avatar-5: #ff5e7a;
+  --avatar-6: #ffd87a;
+  --avatar-7: #ff7050;
+}
+
+html[data-theme='sunset'][data-variant='bright'] {
+  --bg: #fbf2eb;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 250, 244);
+  --surface-2: rgb(255, 252, 248);
+  --stroke: rgba(160, 80, 50, 0.10);
+  --stroke-2: rgba(160, 80, 50, 0.20);
+  --fg: #2a1614;
+  --fg-dim: #6c4a40;
+  --fg-mute: #a08278;
+  --hl: rgba(220, 110, 50, 0.10);
+
+  --accent: #d96a1f;
+  --accent-2: #d04060;
+  --accent-3: #c8923a;
+  --danger: #c8344a;
+
+  --shadow-1: 0 1px 3px rgba(120, 40, 20, 0.08);
+  --shadow-2: 0 8px 24px rgba(120, 40, 20, 0.14);
+  --shadow-glow: 0 0 0 1px rgba(217, 106, 31, 0.22), 0 4px 14px rgba(217, 106, 31, 0.12);
+
+  --avatar-1: #1f9a6e;
+  --avatar-2: #3a8ec0;
+  --avatar-3: #d96a1f;
+  --avatar-4: #985cd0;
+  --avatar-5: #d04060;
+  --avatar-6: #c8923a;
+  --avatar-7: #d04a30;
+}
+
+/* ── High contrast — pure black + white only.
+   No greys in the chrome (only #000 and #fff). The 7 avatar slots are a
+   mid-tone greyscale ramp because we still need them to be visually
+   distinguishable, but they stay strictly monochrome. */
+
+html[data-theme='contrast'][data-variant='dark'] {
+  --bg: #000000;
+  --bg-2: #000000;
+  --surface: #000000;
+  --surface-2: #000000;
+  --stroke: #ffffff;
+  --stroke-2: #ffffff;
+  --fg: #ffffff;
+  --fg-dim: #ffffff;
+  --fg-mute: #ffffff;
+  --hl: #ffffff;
+
+  --accent: #ffffff;
+  --accent-2: #ffffff;
+  --accent-3: #ffffff;
+  --danger: #ffffff;
+
+  --shadow-1: 0 0 0 1px #ffffff;
+  --shadow-2: 0 0 0 2px #ffffff;
+  --shadow-glow: 0 0 0 2px #ffffff;
+
+  --avatar-1: #ffffff;
+  --avatar-2: #d8d8d8;
+  --avatar-3: #b0b0b0;
+  --avatar-4: #888888;
+  --avatar-5: #606060;
+  --avatar-6: #383838;
+  --avatar-7: #181818;
+}
+
+html[data-theme='contrast'][data-variant='bright'] {
+  --bg: #ffffff;
+  --bg-2: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #ffffff;
+  --stroke: #000000;
+  --stroke-2: #000000;
+  --fg: #000000;
+  --fg-dim: #000000;
+  --fg-mute: #000000;
+  --hl: #000000;
+
+  --accent: #000000;
+  --accent-2: #000000;
+  --accent-3: #000000;
+  --danger: #000000;
+
+  --shadow-1: 0 0 0 1px #000000;
+  --shadow-2: 0 0 0 2px #000000;
+  --shadow-glow: 0 0 0 2px #000000;
+
+  --avatar-1: #000000;
+  --avatar-2: #282828;
+  --avatar-3: #505050;
+  --avatar-4: #787878;
+  --avatar-5: #a0a0a0;
+  --avatar-6: #c8c8c8;
+  --avatar-7: #e8e8e8;
+}
+
+/* Per-element text-colour fixups previously lived here (modal footer
+   button, msg-avatars). They are now subsumed by the contrast override
+   layer at the bottom of this file, which handles every "hardcoded hex
+   that breaks on inverted bg" case in one place. */
+
+/* ── Kinetic — performance black + volt orange (sport/motion vibe) ──── */
+
+html[data-theme='kinetic'][data-variant='dark'] {
+  --bg: #000000;
+  --bg-2: #0d0d0d;
+  --surface: rgb(20, 20, 20);
+  --surface-2: rgb(30, 30, 30);
+  --stroke: rgba(255, 255, 255, 0.08);
+  --stroke-2: rgba(255, 255, 255, 0.22);
+  --fg: #ffffff;
+  --fg-dim: #a0a0a0;
+  --fg-mute: #606060;
+  --hl: rgba(250, 84, 0, 0.10);
+
+  --accent: #fa5400;
+  --accent-2: #c8ff1a;
+  --accent-3: #f0f0f0;
+  --danger: #ff3b3b;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.55);
+  --shadow-2: 0 12px 36px rgba(0, 0, 0, 0.65);
+  --shadow-glow: 0 0 0 1px rgba(250, 84, 0, 0.30), 0 6px 22px rgba(250, 84, 0, 0.20);
+
+  --avatar-1: #fa5400;
+  --avatar-2: #c8ff1a;
+  --avatar-3: #ff2d55;
+  --avatar-4: #00b8ff;
+  --avatar-5: #ff7a18;
+  --avatar-6: #f5f5f5;
+  --avatar-7: #6cf500;
+}
+
+html[data-theme='kinetic'][data-variant='bright'] {
+  --bg: #fafafa;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-2: #ffffff;
+  --stroke: rgba(0, 0, 0, 0.12);
+  --stroke-2: rgba(0, 0, 0, 0.28);
+  --fg: #050505;
+  --fg-dim: #4a4a4a;
+  --fg-mute: #8a8a8a;
+  --hl: rgba(250, 84, 0, 0.09);
+
+  --accent: #e64a00;
+  --accent-2: #98c800;
+  --accent-3: #1a1a1a;
+  --danger: #d92020;
+
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --shadow-glow: 0 0 0 1px rgba(230, 74, 0, 0.20), 0 4px 14px rgba(230, 74, 0, 0.10);
+
+  --avatar-1: #e64a00;
+  --avatar-2: #6a9e00;
+  --avatar-3: #d62040;
+  --avatar-4: #0090c8;
+  --avatar-5: #d86a18;
+  --avatar-6: #2a2a2a;
+  --avatar-7: #4ac000;
+}
+
+/* ── Kawaii — pastel pink + cotton-candy (cute, playful) ─────────────── */
+
+html[data-theme='kawaii'][data-variant='dark'] {
+  --bg: #2a1530;
+  --bg-2: #361a3e;
+  --surface: rgb(70, 35, 78);
+  --surface-2: rgb(86, 44, 96);
+  --stroke: rgba(255, 200, 230, 0.10);
+  --stroke-2: rgba(255, 200, 230, 0.22);
+  --fg: #ffe6f2;
+  --fg-dim: #d090b8;
+  --fg-mute: #946884;
+  --hl: rgba(255, 122, 192, 0.12);
+
+  --accent: #ff7ac0;
+  --accent-2: #ffc8d8;
+  --accent-3: #a8daff;
+  --danger: #ff5577;
+
+  --shadow-1: 0 2px 6px rgba(40, 12, 30, 0.40);
+  --shadow-2: 0 10px 30px rgba(40, 12, 30, 0.55);
+  --shadow-glow: 0 0 0 1px rgba(255, 122, 192, 0.30), 0 6px 22px rgba(255, 122, 192, 0.18);
+
+  --avatar-1: #ff7ac0;
+  --avatar-2: #a8daff;
+  --avatar-3: #ffb88a;
+  --avatar-4: #d8a8ff;
+  --avatar-5: #ff9aaf;
+  --avatar-6: #fff0a0;
+  --avatar-7: #a8e8c8;
+}
+
+html[data-theme='kawaii'][data-variant='bright'] {
+  --bg: #fff5f9;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 250, 252);
+  --surface-2: #ffffff;
+  --stroke: rgba(255, 122, 192, 0.18);
+  --stroke-2: rgba(255, 122, 192, 0.34);
+  --fg: #4a1f3a;
+  --fg-dim: #885070;
+  --fg-mute: #b08aa0;
+  --hl: rgba(255, 122, 192, 0.10);
+
+  --accent: #ff5fa8;
+  --accent-2: #6cb8ff;
+  --accent-3: #ff9a4a;
+  --danger: #d83a60;
+
+  --shadow-1: 0 1px 3px rgba(180, 40, 100, 0.08);
+  --shadow-2: 0 8px 24px rgba(180, 40, 100, 0.12);
+  --shadow-glow: 0 0 0 1px rgba(255, 95, 168, 0.22), 0 4px 14px rgba(255, 95, 168, 0.12);
+
+  --avatar-1: #ff5fa8;
+  --avatar-2: #6cb8ff;
+  --avatar-3: #ff8c4a;
+  --avatar-4: #b878e8;
+  --avatar-5: #ff5e78;
+  --avatar-6: #e8a020;
+  --avatar-7: #4ac0a0;
+}
+
+/* ── Neural — minimal monochrome + signature green (sleek AI vibe) ──── */
+
+html[data-theme='neural'][data-variant='dark'] {
+  --bg: #0d0d0e;
+  --bg-2: #18181a;
+  --surface: rgb(30, 30, 32);
+  --surface-2: rgb(42, 42, 46);
+  --stroke: rgba(255, 255, 255, 0.07);
+  --stroke-2: rgba(255, 255, 255, 0.16);
+  --fg: #ececec;
+  --fg-dim: #8e8e8e;
+  --fg-mute: #5a5a5a;
+  --hl: rgba(16, 163, 127, 0.10);
+
+  --accent: #10a37f;
+  --accent-2: #6e6e7a;
+  --accent-3: #ababab;
+  --danger: #c5524d;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.45);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 0 1px rgba(16, 163, 127, 0.22), 0 6px 20px rgba(16, 163, 127, 0.10);
+
+  --avatar-1: #10a37f;
+  --avatar-2: #b0b0b8;
+  --avatar-3: #d8b070;
+  --avatar-4: #9a8acc;
+  --avatar-5: #d8788a;
+  --avatar-6: #e0d8a8;
+  --avatar-7: #6ec0b8;
+}
+
+html[data-theme='neural'][data-variant='bright'] {
+  --bg: #ffffff;
+  --bg-2: #f7f7f8;
+  --surface: rgb(255, 255, 255);
+  --surface-2: #ffffff;
+  --stroke: rgba(0, 0, 0, 0.08);
+  --stroke-2: rgba(0, 0, 0, 0.18);
+  --fg: #050507;
+  --fg-dim: #4a4a4e;
+  --fg-mute: #8e8e94;
+  --hl: rgba(16, 163, 127, 0.08);
+
+  --accent: #10a37f;
+  --accent-2: #6e6e7a;
+  --accent-3: #2c2c2e;
+  --danger: #b22a30;
+
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-glow: 0 0 0 1px rgba(16, 163, 127, 0.18), 0 4px 14px rgba(16, 163, 127, 0.08);
+
+  --avatar-1: #10a37f;
+  --avatar-2: #6a6a72;
+  --avatar-3: #b8843a;
+  --avatar-4: #7058a8;
+  --avatar-5: #b04858;
+  --avatar-6: #b8a850;
+  --avatar-7: #3a8a82;
+}
+
+/* ── Ochre — warm paper-cream + clay terracotta (earthy, organic) ───── */
+
+html[data-theme='ochre'][data-variant='dark'] {
+  --bg: #1f1612;
+  --bg-2: #2a1d18;
+  --surface: rgb(50, 36, 28);
+  --surface-2: rgb(64, 46, 36);
+  --stroke: rgba(220, 178, 140, 0.08);
+  --stroke-2: rgba(220, 178, 140, 0.20);
+  --fg: #f0e3d0;
+  --fg-dim: #b89880;
+  --fg-mute: #7e6552;
+  --hl: rgba(197, 126, 92, 0.12);
+
+  --accent: #c57e5c;
+  --accent-2: #d8a878;
+  --accent-3: #94786a;
+  --danger: #c54a4a;
+
+  --shadow-1: 0 2px 6px rgba(20, 12, 6, 0.45);
+  --shadow-2: 0 10px 30px rgba(20, 12, 6, 0.55);
+  --shadow-glow: 0 0 0 1px rgba(197, 126, 92, 0.28), 0 6px 22px rgba(197, 126, 92, 0.16);
+
+  --avatar-1: #c57e5c;
+  --avatar-2: #d8a878;
+  --avatar-3: #b86840;
+  --avatar-4: #a89070;
+  --avatar-5: #d88478;
+  --avatar-6: #e8c890;
+  --avatar-7: #7ea08a;
+}
+
+html[data-theme='ochre'][data-variant='bright'] {
+  --bg: #f4f0e8;
+  --bg-2: #fbf8f0;
+  --surface: rgb(252, 248, 240);
+  --surface-2: #fffdf6;
+  --stroke: rgba(120, 80, 50, 0.12);
+  --stroke-2: rgba(120, 80, 50, 0.24);
+  --fg: #1a1410;
+  --fg-dim: #5e4a3a;
+  --fg-mute: #94785e;
+  --hl: rgba(181, 107, 72, 0.10);
+
+  --accent: #b56b48;
+  --accent-2: #8a6342;
+  --accent-3: #5e4838;
+  --danger: #a83838;
+
+  --shadow-1: 0 1px 3px rgba(120, 70, 30, 0.08);
+  --shadow-2: 0 8px 24px rgba(120, 70, 30, 0.14);
+  --shadow-glow: 0 0 0 1px rgba(181, 107, 72, 0.20), 0 4px 14px rgba(181, 107, 72, 0.10);
+
+  --avatar-1: #b56b48;
+  --avatar-2: #8a6342;
+  --avatar-3: #c87830;
+  --avatar-4: #6e5840;
+  --avatar-5: #c4504c;
+  --avatar-6: #c89030;
+  --avatar-7: #4a7868;
+}
+
+/* ── Fable — midnight blue + magic gold (storybook fairy-tale) ──────── */
+
+html[data-theme='fable'][data-variant='dark'] {
+  --bg: #060d22;
+  --bg-2: #0c1538;
+  --surface: rgb(20, 32, 70);
+  --surface-2: rgb(30, 44, 88);
+  --stroke: rgba(255, 215, 130, 0.10);
+  --stroke-2: rgba(255, 215, 130, 0.22);
+  --fg: #e8edf8;
+  --fg-dim: #95a6c8;
+  --fg-mute: #5a6a8e;
+  --hl: rgba(255, 215, 80, 0.12);
+
+  --accent: #ffd770;
+  --accent-2: #6fa8ff;
+  --accent-3: #d0a8ff;
+  --danger: #ff5a78;
+
+  --shadow-1: 0 2px 6px rgba(0, 4, 16, 0.55);
+  --shadow-2: 0 12px 36px rgba(0, 4, 16, 0.65);
+  --shadow-glow: 0 0 0 1px rgba(255, 215, 112, 0.28), 0 6px 22px rgba(255, 215, 112, 0.18);
+
+  --avatar-1: #ffd770;
+  --avatar-2: #6fa8ff;
+  --avatar-3: #ffa078;
+  --avatar-4: #d0a8ff;
+  --avatar-5: #ff7e9c;
+  --avatar-6: #f0eaa0;
+  --avatar-7: #8edcc0;
+}
+
+html[data-theme='fable'][data-variant='bright'] {
+  --bg: #f0f6ff;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-2: #ffffff;
+  --stroke: rgba(15, 45, 92, 0.10);
+  --stroke-2: rgba(15, 45, 92, 0.22);
+  --fg: #0f2d5c;
+  --fg-dim: #44608c;
+  --fg-mute: #7c92b4;
+  --hl: rgba(212, 158, 32, 0.10);
+
+  --accent: #d49e20;
+  --accent-2: #2c70d0;
+  --accent-3: #8a5cd4;
+  --danger: #c83454;
+
+  --shadow-1: 0 1px 3px rgba(15, 45, 92, 0.10);
+  --shadow-2: 0 8px 24px rgba(15, 45, 92, 0.16);
+  --shadow-glow: 0 0 0 1px rgba(212, 158, 32, 0.22), 0 4px 14px rgba(212, 158, 32, 0.12);
+
+  --avatar-1: #d49e20;
+  --avatar-2: #2c70d0;
+  --avatar-3: #d8702c;
+  --avatar-4: #6e3eb8;
+  --avatar-5: #c8425a;
+  --avatar-6: #b88e30;
+  --avatar-7: #2a8a7c;
+}
+
+/* ── Prism — four-color refraction (blue / red / yellow / green) ─────── */
+
+html[data-theme='prism'][data-variant='dark'] {
+  --bg: #131316;
+  --bg-2: #1c1c20;
+  --surface: rgb(40, 40, 46);
+  --surface-2: rgb(54, 54, 60);
+  --stroke: rgba(255, 255, 255, 0.07);
+  --stroke-2: rgba(255, 255, 255, 0.18);
+  --fg: #f1f3f4;
+  --fg-dim: #9aa0a6;
+  --fg-mute: #5f6368;
+  --hl: rgba(66, 133, 244, 0.10);
+
+  --accent: #4285f4;
+  --accent-2: #34a853;
+  --accent-3: #fbbc04;
+  --danger: #ea4335;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.40);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.50);
+  --shadow-glow: 0 0 0 1px rgba(66, 133, 244, 0.26), 0 6px 22px rgba(66, 133, 244, 0.14);
+
+  --avatar-1: #4285f4;
+  --avatar-2: #ea4335;
+  --avatar-3: #fbbc04;
+  --avatar-4: #34a853;
+  --avatar-5: #ab47bc;
+  --avatar-6: #00acc1;
+  --avatar-7: #ff7043;
+}
+
+html[data-theme='prism'][data-variant='bright'] {
+  --bg: #ffffff;
+  --bg-2: #f8f9fa;
+  --surface: rgb(255, 255, 255);
+  --surface-2: #ffffff;
+  --stroke: rgba(60, 64, 67, 0.10);
+  --stroke-2: rgba(60, 64, 67, 0.22);
+  --fg: #202124;
+  --fg-dim: #5f6368;
+  --fg-mute: #80868b;
+  --hl: rgba(26, 115, 232, 0.08);
+
+  --accent: #1a73e8;
+  --accent-2: #188038;
+  --accent-3: #f29900;
+  --danger: #d93025;
+
+  --shadow-1: 0 1px 3px rgba(60, 64, 67, 0.12);
+  --shadow-2: 0 8px 24px rgba(60, 64, 67, 0.16);
+  --shadow-glow: 0 0 0 1px rgba(26, 115, 232, 0.20), 0 4px 14px rgba(26, 115, 232, 0.10);
+
+  --avatar-1: #1a73e8;
+  --avatar-2: #d93025;
+  --avatar-3: #f29900;
+  --avatar-4: #188038;
+  --avatar-5: #8430ce;
+  --avatar-6: #007b83;
+  --avatar-7: #d84315;
+}
+
+/* ── Void — near-pure black, flat, zero depth, inverted buttons ─────── */
+
+html[data-theme='void'][data-variant='dark'] {
+  --bg: #050507;
+  --bg-2: #0c0c0f;
+  --surface: rgb(18, 18, 22);
+  --surface-2: rgb(26, 26, 30);
+  --stroke: rgba(255, 255, 255, 0.05);
+  --stroke-2: rgba(255, 255, 255, 0.10);
+  --fg: #f2f2f4;
+  --fg-dim: #848488;
+  --fg-mute: #484850;
+  --hl: rgba(255, 255, 255, 0.04);
+
+  --accent: #e2e2e6;
+  --accent-2: #a8a8b0;
+  --accent-3: #606068;
+  --danger: #ff4444;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.65);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.80);
+  --shadow-glow: 0 0 0 1px rgba(226, 226, 230, 0.14), 0 6px 20px rgba(226, 226, 230, 0.05);
+
+  --avatar-1: #c8c8cc;
+  --avatar-2: #a4a4a8;
+  --avatar-3: #848488;
+  --avatar-4: #646468;
+  --avatar-5: #9898a0;
+  --avatar-6: #b4b4b8;
+  --avatar-7: #b8bcc4;
+}
+
+html[data-theme='void'][data-variant='bright'] {
+  --bg: #f6f6f8;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-2: rgb(255, 255, 255);
+  --stroke: rgba(0, 0, 0, 0.06);
+  --stroke-2: rgba(0, 0, 0, 0.12);
+  --fg: #0c0c10;
+  --fg-dim: #585860;
+  --fg-mute: #8c8c94;
+  --hl: rgba(0, 0, 0, 0.05);
+
+  --accent: #101014;
+  --accent-2: #3a3a40;
+  --accent-3: #686870;
+  --danger: #cc2020;
+
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 0 1px rgba(0, 0, 0, 0.10), 0 4px 14px rgba(0, 0, 0, 0.05);
+
+  --avatar-1: #1a1a1e;
+  --avatar-2: #3a3a3e;
+  --avatar-3: #5a5a5e;
+  --avatar-4: #787880;
+  --avatar-5: #2c2c30;
+  --avatar-6: #4c4c50;
+  --avatar-7: #14141c;
+}
+
+/* ── Smoke — dark with real depth via lightness-step layering ───────── */
+
+html[data-theme='smoke'][data-variant='dark'] {
+  --bg: #0a0a0c;
+  --bg-2: #161618;
+  --surface: rgb(26, 26, 30);
+  --surface-2: rgb(38, 38, 44);
+  --stroke: rgba(255, 255, 255, 0.08);
+  --stroke-2: rgba(255, 255, 255, 0.18);
+  --fg: #f0f0f4;
+  --fg-dim: #909098;
+  --fg-mute: #525258;
+  --hl: rgba(255, 255, 255, 0.07);
+
+  --accent: #dcdce6;
+  --accent-2: #9898a4;
+  --accent-3: #585860;
+  --danger: #ff3f50;
+
+  --shadow-1: 0 2px 6px rgba(0, 0, 0, 0.50);
+  --shadow-2: 0 10px 30px rgba(0, 0, 0, 0.65);
+  --shadow-glow: 0 0 0 1px rgba(220, 220, 230, 0.16), 0 6px 20px rgba(220, 220, 230, 0.07);
+
+  --avatar-1: #c4c4cc;
+  --avatar-2: #a0a0ac;
+  --avatar-3: #828290;
+  --avatar-4: #646474;
+  --avatar-5: #9898a4;
+  --avatar-6: #b8b8c4;
+  --avatar-7: #8890a4;
+}
+
+html[data-theme='smoke'][data-variant='bright'] {
+  --bg: #f8f8f8;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-2: rgb(255, 255, 255);
+  --stroke: rgba(0, 0, 0, 0.07);
+  --stroke-2: rgba(0, 0, 0, 0.15);
+  --fg: #0a0a0c;
+  --fg-dim: #545460;
+  --fg-mute: #8a8a94;
+  --hl: rgba(0, 0, 0, 0.06);
+
+  --accent: #141416;
+  --accent-2: #3c3c44;
+  --accent-3: #686874;
+  --danger: #c42030;
+
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.09);
+  --shadow-glow: 0 0 0 1px rgba(0, 0, 0, 0.11), 0 4px 14px rgba(0, 0, 0, 0.05);
+
+  --avatar-1: #1c1c22;
+  --avatar-2: #3c3c44;
+  --avatar-3: #5c5c64;
+  --avatar-4: #7a7a84;
+  --avatar-5: #2e2e36;
+  --avatar-6: #4e4e58;
+  --avatar-7: #16182c;
+}
+
+/* ── Shade — cool blue-black, depth through color temperature ───────── */
+
+html[data-theme='shade'][data-variant='dark'] {
+  --bg: #070810;
+  --bg-2: #0e101e;
+  --surface: rgb(20, 22, 36);
+  --surface-2: rgb(28, 32, 50);
+  --stroke: rgba(180, 190, 230, 0.07);
+  --stroke-2: rgba(180, 190, 230, 0.16);
+  --fg: #edf0f8;
+  --fg-dim: #7880a0;
+  --fg-mute: #444c68;
+  --hl: rgba(160, 172, 224, 0.08);
+
+  --accent: #ccd4f0;
+  --accent-2: #8898c0;
+  --accent-3: #4a5878;
+  --danger: #ff4466;
+
+  --shadow-1: 0 2px 6px rgba(0, 2, 12, 0.55);
+  --shadow-2: 0 10px 30px rgba(0, 2, 12, 0.72);
+  --shadow-glow: 0 0 0 1px rgba(180, 192, 240, 0.18), 0 6px 20px rgba(180, 192, 240, 0.08);
+
+  --avatar-1: #b8c0dc;
+  --avatar-2: #9098b8;
+  --avatar-3: #7880a0;
+  --avatar-4: #606880;
+  --avatar-5: #a0a8c8;
+  --avatar-6: #bcc0d8;
+  --avatar-7: #6878a8;
+}
+
+html[data-theme='shade'][data-variant='bright'] {
+  --bg: #f0f2f8;
+  --bg-2: #ffffff;
+  --surface: rgb(255, 255, 255);
+  --surface-2: rgb(255, 255, 255);
+  --stroke: rgba(8, 12, 40, 0.07);
+  --stroke-2: rgba(8, 12, 40, 0.17);
+  --fg: #080c20;
+  --fg-dim: #3c4468;
+  --fg-mute: #6c7098;
+  --hl: rgba(8, 12, 48, 0.07);
+
+  --accent: #0c1028;
+  --accent-2: #2c3258;
+  --accent-3: #525890;
+  --danger: #b82040;
+
+  --shadow-1: 0 1px 3px rgba(8, 12, 40, 0.07);
+  --shadow-2: 0 8px 24px rgba(8, 12, 40, 0.13);
+  --shadow-glow: 0 0 0 1px rgba(8, 12, 48, 0.12), 0 4px 14px rgba(8, 12, 48, 0.07);
+
+  --avatar-1: #181c3c;
+  --avatar-2: #363c68;
+  --avatar-3: #566098;
+  --avatar-4: #6870a8;
+  --avatar-5: #28305c;
+  --avatar-6: #484e80;
+  --avatar-7: #10182e;
+}
+
+/* Bright-mode button text fix: inverted button (near-black accent) needs
+   white text — the universal #001a10 fallback is invisible on dark fills. */
+html[data-theme='void'][data-variant='bright'] .modal-card > footer button,
+html[data-theme='smoke'][data-variant='bright'] .modal-card > footer button,
+html[data-theme='shade'][data-variant='bright'] .modal-card > footer button {
+  color: #f4f4f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ── Global scrollbar styling ──────────────────────────────────────────
+ * Applies app-wide so every scrollable container (modals, panels, future
+ * components) automatically picks up theme-aware thin scrollbars without
+ * each scope having to opt in. Specific containers can still override —
+ * e.g. .chat-scroll keeps its custom 8px width. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+}
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--fg-mute); }
+*::-webkit-scrollbar-corner { background: transparent; }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow: hidden;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+}
+::selection {
+  background: var(--accent);
+  color: #000;
+}
+
+/* universal pill */
+.pill {
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  transition:
+    background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.pill:hover {
+  background: var(--surface-2);
+  border-color: var(--stroke-2);
+}
+.pill:active {
+  transform: scale(0.97);
+}
+
+.popover {
+  position: fixed;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  z-index: 1000;
+  min-width: 240px;
+  padding: var(--space-2);
+}
+/* Popover host divs (#model-overlay, #session-overlay, etc.) are hidden via
+   the [hidden] HTML attribute. ID-level rules elsewhere (e.g. #session-overlay
+   in chat.css, #model-overlay in layout.css) set `display: flex` and have
+   higher specificity (0,1,0,0) than this class+attr selector (0,0,2,0), so
+   without !important they win and reveal the empty 1px-bordered host as a
+   thin strip at viewport origin (position: fixed without top/left). Lock
+   display:none here so [hidden] always wins regardless of theme or future
+   ID-targeted overrides. */
+.popover[hidden] {
+  display: none !important;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 1100;
+}
+.modal[hidden] {
+  display: none;
+}
+.modal-card {
+  width: min(680px, 92vw);
+  max-height: 80vh;
+  background: var(--surface-2);
+  backdrop-filter: blur(22px);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-card > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--stroke);
+}
+.modal-card > header button {
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  font-size: 18px;
+}
+.modal-body {
+  padding: var(--space-4);
+  overflow: auto;
+  flex: 1;
+}
+.modal-body textarea {
+  width: 100%;
+  height: 40vh;
+  background: var(--bg-2);
+  color: var(--fg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  resize: vertical;
+}
+.modal-card > footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--stroke);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+.modal-card > footer button {
+  background: var(--accent);
+  color: #001a10;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+.dim {
+  color: var(--fg-dim);
+}
+
+/* ── Contrast theme — opinionated override layer ───────────────────────────
+ *
+ * The contrast tokens already collapse fg/bg/surface/stroke to pure black
+ * + white, but a lot of layout.css and chat.css bypasses tokens with
+ * hardcoded `rgba(255,255,255,0.05)` overlays, named hex colours, and
+ * `color-mix()` blends. Those produce illegible grey-on-grey,
+ * white-on-white, or black-on-black regions that defeat the whole point
+ * of the high-contrast variant.
+ *
+ * This layer forces every descendant of the contrast theme onto the
+ * canonical 2-colour palette: --bg as the single shared background,
+ * --fg as the single shared foreground. Surfaces lose their bg overlays
+ * and get a 1px outline in --fg so they stay visible. Hover/active
+ * inverts fg/bg for unambiguous tactile feedback. Avatars and the primary
+ * modal action button render as filled-fg shapes so they read as the
+ * strongest UI elements.
+ *
+ * The `:not(#_c_)` trick on the universal rule pushes its specificity to
+ * (1,2,1) so it wins against existing class-targeted + !important rules
+ * (e.g. shiki-syntax spans in layout.css) without an arms race. It is a
+ * deliberate, opinionated hack — contrast mode is an a11y variant, not a
+ * styled look, and is allowed to be heavy-handed. */
+
+html[data-theme='contrast']:root *:not(#_c_),
+html[data-theme='contrast']:root *:not(#_c_)::before,
+html[data-theme='contrast']:root *:not(#_c_)::after {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--fg) !important;
+  border-color: var(--fg) !important;
+  outline-color: var(--fg) !important;
+  text-decoration-color: var(--fg) !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
+  filter: none !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* Body is the only element that paints --bg; everything else is
+   transparent so the canonical bg shows through. */
+html[data-theme='contrast'] body {
+  background-color: var(--bg) !important;
+}
+
+/* Visible 1px edge for interactive elements + cards, since their original
+   tokenized/hardcoded backgrounds got stripped above. */
+html[data-theme='contrast']:root
+  :is(button, input, textarea, select, .pill, .popover, .modal-card, .card, [role='button']):not(#_c_) {
+  border: 1px solid var(--fg) !important;
+}
+
+html[data-theme='contrast'] a {
+  text-decoration: underline !important;
+}
+
+/* Hover / active inverts fg/bg on the element AND its descendants so
+   icons, badges, and labels nested inside a button flip with it. */
+html[data-theme='contrast']:root
+  :is(button, .pill, [role='button']):is(:hover, :active):not(#_c_),
+html[data-theme='contrast']:root
+  :is(button, .pill, [role='button']):is(:hover, :active):not(#_c_) * {
+  background-color: var(--fg) !important;
+  color: var(--bg) !important;
+  border-color: var(--bg) !important;
+  outline-color: var(--bg) !important;
+  fill: var(--bg) !important;
+  stroke: var(--bg) !important;
+}
+
+html[data-theme='contrast'] :focus-visible:not(#_c_) {
+  outline: 2px solid var(--fg) !important;
+  outline-offset: 2px !important;
+}
+
+/* Avatars + the primary modal action button render as filled fg shapes
+   with bg-coloured glyphs/text so they pop against the body. */
+html[data-theme='contrast']:root .msg-avatar:not(#_c_),
+html[data-theme='contrast']:root .modal-card > footer button:not(#_c_) {
+  background-color: var(--fg) !important;
+  color: var(--bg) !important;
+  border-color: var(--fg) !important;
+}
+
+/* Inputs/textareas: readable bg-coloured field inside an fg-coloured
+   outline, so the editable region is visually distinct from the body. */
+html[data-theme='contrast']:root :is(input, textarea, select):not(#_c_) {
+  background-color: var(--bg) !important;
+  color: var(--fg) !important;
+}
+
+/* Text selection: invert. */
+html[data-theme='contrast'] ::selection {
+  background-color: var(--fg) !important;
+  color: var(--bg) !important;
+}
+
+/* The fullscreen #bg-canvas is torn down in contrast mode by bg.ts so it
+   doesn't bleed through transparent panels and read as fullscreen behind
+   chat *and* graph. The chat-scoped .chat-empty-bg keeps running normally
+   — it's clipped to #view-chat so it never reaches the graph editor. */
+
+/* The view-overlay nav has `opacity: 0.4` baseline (only 1.0 on hover),
+   and `.vo-pos-arrow` has `opacity: 0.35` baseline (only 1.0 on
+   `.current`). On a colour theme those dim states read as muted accents;
+   on the strict 2-colour palette they collapse to mid-grey on black
+   (or grey on white) — the "grey on grey" the user reported. Force full
+   opacity here so the strokes render at canonical --fg. */
+html[data-theme='contrast'] .view-overlay,
+html[data-theme='contrast'] .vo-pos-arrow {
+  opacity: 1 !important;
+}
+
+/* With opacity flattened, the previously-faded inactive arrows become
+   indistinguishable from the active one. Same for `.vo-btn.active`,
+   whose accent-coloured fill got stripped by the override layer. Render
+   both as filled-fg shapes with bg-coloured glyphs — same inverted
+   treatment as avatars + hover. */
+html[data-theme='contrast']:root .vo-btn.active:not(#_c_),
+html[data-theme='contrast']:root .vo-btn.active:not(#_c_) *,
+html[data-theme='contrast']:root .vo-pos-arrow.current:not(#_c_),
+html[data-theme='contrast']:root .vo-pos-arrow.current:not(#_c_) * {
+  background-color: var(--fg) !important;
+  color: var(--bg) !important;
+  fill: var(--bg) !important;
+  stroke: var(--bg) !important;
+}
+
+/* Tool-call hover popover (.pill-full) overlays chat text. The universal
+   override above strips its --surface background to transparent, so the
+   floating panel becomes "text on text". Restore an opaque --bg fill (the
+   --fg 1px border is already in place from `border: 1px solid var(--stroke-2)`
+   + universal border-color override). Also restore the inner-triangle bg on
+   ::before so the arrow tip's outline-look survives. */
+html[data-theme='contrast']:root .pill-full:not(#_c_) {
+  background-color: var(--bg) !important;
+}
+html[data-theme='contrast']:root .pill-full:not(#_c_)::before {
+  border-top-color: var(--bg) !important;
+}
+
+/* Closed horizontal-bar dropdowns (.hs-body:not(.hs-open)) collapse to
+   max-height: 0 and rely on `border-color: transparent` (layout.css ~L900)
+   to stay invisible. The universal contrast layer reinstates
+   `border-color: var(--fg) !important` on every element, which turns the
+   0-height box into a 1px FG stripe 6px below each toggle button. Also
+   strip the box-shadow which the base rule leaves untouched in contrast
+   (universal rule already does, but keep here for clarity). */
+html[data-theme='contrast'] #header[data-orient='h'] .hs-body:not(.hs-open) {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Popover host hide-fix is now in the base layer (.popover[hidden] uses
+   !important globally) so this contrast-only override is no longer needed.
+   See the comment above .popover[hidden] earlier in this file. */
+
+/* Modal card containers — Preferences, Permission, Generic, Debug, Shortcuts,
+   Todos, GitHub, FTP. All rely on `background: var(--surface-2)` which the
+   universal override at L941 strips to transparent, leaving an outlined-only
+   box that you can see straight through. Headers inside use a subtle
+   `linear-gradient` background — also stripped — so a modal whose body did
+   manage to keep some bg painted ends up with a transparent header strip
+   ("only header transparent" the user reported). Restore an opaque --bg fill
+   on every modal container so the surface reads as solid; transparent inner
+   chrome (header gradient, etc.) then just shows the container --bg through,
+   which is the correct contrast-mode look. */
+html[data-theme='contrast']:root :is(
+  .modal-card,
+  .prefs-modal-card,
+  .perm-modal-card,
+  .debug-modal-card,
+  .sc-modal-card,
+  .todos-modal-card
+):not(#_c_),
+html[data-theme='contrast']:root #github-panel.github-panel-open:not(#_c_),
+html[data-theme='contrast']:root #ftp-panel.ftp-panel-open:not(#_c_) {
+  background-color: var(--bg) !important;
+}

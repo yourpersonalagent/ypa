@@ -1,0 +1,14 @@
+{
+  "name": "chat-minimap",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Right-edge minimap of the chat scroll. Each user/agent message becomes a clickable tick scaled to its rendered height. Click jumps the chat to that message. Disabling the module removes the ticks; chat-scroll still works (plan §8 done criterion 13).",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": ["panels"]
+  },
+  "lifecycle": {
+    "hot": true,
+    "drainTimeoutMs": 0
+  }
+}

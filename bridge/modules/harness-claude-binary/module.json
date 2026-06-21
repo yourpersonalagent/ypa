@@ -1,0 +1,15 @@
+{
+  "name": "harness-claude-binary",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Claude binary harness — spawns the `claude` CLI as a subprocess (legacy --print path). Registers `claude-binary` into the harnesses register; the binary path resolution + sysprompt assembly logic stays in bridge/providers/claude-{run,stream}.ts because those files use private helpers shared with provider/core.ts. Disabling this module removes the binary harness from /v1/stream/'s dispatch lookup; the dispatcher then falls back to whatever else is in the register (claude-sdk is core-pinned so it always remains).",
+  "provides": {
+    "bridgeRegisters": [
+      "harnesses"
+    ]
+  },
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "harness"
+}

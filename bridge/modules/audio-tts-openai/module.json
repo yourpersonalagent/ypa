@@ -1,0 +1,16 @@
+{
+  "name": "audio-tts-openai",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "OpenAI Text-to-Speech proxy. Exposes POST /v1/tts/openai which forwards { text, voice?, model?, format? } to https://api.openai.com/v1/audio/speech using the OpenAI provider's api_key from bridge config. Streams the audio response back unchanged. Disabling this module removes the OpenAI option from VoiceMode's TTS picker — the frontend falls back to BrowserTTS.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/tts/openai"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "voice"
+}

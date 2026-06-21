@@ -1,0 +1,14 @@
+{
+  "name": "pet",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "YHA pet — frontend half. Owns the FloatingPet overlay (sprite, patrol, idle behaviors, playground), the PetConsoleBubble toast, the PetHeaderButton (registered into the secondary headerIconButtons row at order 20), the hatch wizard UI (HatchModal + FrameNudgeModal + PetGalleryModal + the hatch engine under hatch/), the petStore + hatchStore + petConsoleStore Zustand stores, and the /pet local slash command. Disabling this module hides the secondary-row pet icon, removes the floating sprite, and 404-handles /pet slash commands silently. The bridge half (POST /v1/pet-console/ask, /v1/pets/*) is the `pet` bridge module — both should usually be toggled together.",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": ["headerIconButtons"]
+  },
+  "lifecycle": {
+    "hot": true,
+    "drainTimeoutMs": 0
+  }
+}

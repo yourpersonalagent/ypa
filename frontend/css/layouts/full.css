@@ -1,0 +1,29 @@
+/* css/layouts/full.css
+ * Scoped under [data-layout="full"]. Today's chrome already paints the
+ * full layout via the legacy stylesheets in css/layout/, css/chat/, etc.
+ * Those rules are unscoped and apply globally — so for backward compatibility
+ * the full layout adds no new rules of its own. This file exists as the
+ * declared seam for any future full-specific overrides.
+ *
+ * See `frontend/css/LAYOUTS.md` for the scoping contract.
+ */
+
+[data-layout="full"] {
+  /* Marker selector — keeps the contract testable even when empty. */
+}
+
+/* ── Wider reading column — full layout only ──────────────────────────────
+   Messages, the streaming status line, and the composer all share the
+   same 920px cap in chat/messages.css so message bubbles and the input
+   stay vertically aligned. Full layout has more horizontal real estate
+   than messenger/zen (which deliberately stay narrow), so bump the cap
+   to 1400px here. Scoped to [data-layout='full'] so messenger and zen
+   keep their tighter reading column. ──────────────────────────────────── */
+[data-layout="full"] .msg,
+[data-layout="full"] .chat-response-animation,
+[data-layout="full"] .chat-input-container {
+  max-width: 1400px;
+}
+[data-layout="full"] .msg.system {
+  max-width: min(max(1400px, 70%), 100%);
+}

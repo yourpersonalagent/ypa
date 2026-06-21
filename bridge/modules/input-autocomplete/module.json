@@ -1,0 +1,19 @@
+{
+  "name": "input-autocomplete",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Inline autocomplete for the chat input. Mirrors the auto-title pattern: single-shot OpenAI-compatible /chat/completions call, cheap model, returns a 1-line continuation. Routes (/v1/input-autocomplete/suggest, /v1/input-autocomplete/config) mount on ctx.app. Disabled by default; user opts in via the Autocomplete prefs tab.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/input-autocomplete/*"
+    ],
+    "configKeys": [
+      "defaults.inputAutocomplete"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "chat"
+}

@@ -1,0 +1,625 @@
+/* Modern chat view: full-height column, integrated controls, floating input at bottom */
+
+/* Force text-style glyphs for dual-purpose Unicode symbols (arrows, math, dingbats,
+   geometric shapes, misc symbols). Without this, the browser may pick Noto Color
+   Emoji for these ranges, and color-emoji glyphs are not painted by
+   background-clip:text — so they vanish inside gradient-clipped headings. */
+@font-face {
+  font-family: 'TextSymbolFallback';
+  src: local('DejaVu Sans'), local('Symbola'), local('Segoe UI Symbol'),
+       local('Cambria Math'), local('Arial Unicode MS');
+  unicode-range:
+    U+2190-21FF,  /* Arrows */
+    U+2200-22FF,  /* Mathematical Operators */
+    U+2300-23FF,  /* Misc Technical */
+    U+25A0-25FF,  /* Geometric Shapes */
+    U+2600-26FF,  /* Misc Symbols */
+    U+2700-27BF,  /* Dingbats */
+    U+2B00-2BFF;  /* Misc Symbols and Arrows */
+}
+
+.view-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* size container so cqh/cqi inside reference the pane, not the viewport */
+  container-type: size;
+}
+
+.chat-scroll-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-scroll-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 20px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--stroke);
+  background: var(--bg-2);
+  color: var(--fg);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.15s;
+}
+.chat-scroll-btn:hover {
+  opacity: 1;
+  background: var(--bg-3);
+}
+
+.chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0px 10px;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+  container-type: inline-size;
+  overflow-anchor: none;
+}
+.chat-scroll * { overflow-anchor: none; }
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--stroke);
+}
+
+.msg {
+  max-width: 920px;
+  margin: 10px auto;
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+  animation: msg-in var(--dur-med) var(--ease);
+  font-size: clamp(0.9rem, calc(11.7px + 0.35cqi), 1.08rem);
+}
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.msg-avatar {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+.msg.user .msg-avatar {
+  background: var(--accent-2);
+  color: #1a0a00;
+}
+.msg.agent .msg-avatar {
+  background: var(--accent);
+  color: #001a10;
+}
+.msg.system .msg-avatar {
+  background: var(--fg-mute);
+  color: var(--bg);
+}
+.msg.error .msg-avatar {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* Note messages: internal annotations — shown in chat but sent as [Note: ...] context, not a prompt */
+.msg.note {
+  opacity: 0.8;
+
+  padding-left: clamp(14px, 20%, 120px);
+  padding-right: 14px;
+}
+.msg.note .msg-avatar,
+.msg.note .msg-role-label {
+  display: none;
+}
+.msg.note .msg-bubble {
+  background: color-mix(in srgb, #e8b800 7%, var(--bg-2));
+  border: 1px solid color-mix(in srgb, #e8b800 20%, transparent);
+  border-left: 3px solid color-mix(in srgb, #e8b800 48%, transparent);
+  color: color-mix(in srgb, #e8c840 70%, var(--fg));
+  font-size: 13px;
+  font-style: italic;
+  padding: 6px 12px 6px 11px;
+  border-radius: var(--radius-sm);
+}
+.msg.note .msg-bubble::before {
+  content: '✎ ';
+  font-style: normal;
+  opacity: 0.6;
+  font-size: 11px;
+}
+/* Pet reflow float — activated by chatReflow.ts setting CSS vars + data-pet-float.
+   Using CSS vars on .msg (not a DOM sentinel inside .msg-bubble) so the float
+   survives dangerouslySetInnerHTML replacements during streaming. The ::before
+   pseudo-element re-reads the vars every layout pass regardless of whether
+   .msg-bubble's children were just recreated by React. */
+.msg[data-pet-float] .msg-bubble::before {
+  content: '';
+  display: block;
+  float: var(--pet-float-dir, left);
+  width: var(--pet-float-w, 0px);
+  height: var(--pet-float-h, 0px);
+  margin-top: var(--pet-float-mt, 0px);
+  pointer-events: none;
+  clear: none;
+  shape-outside: circle(25px at 50% 50%) border-box;
+}
+/* BFC-conflict fix: <pre> elements have overflow-x: auto which creates a
+   Block Formatting Context (BFC). A BFC element can't overlap an outer float —
+   it shifts sideways as a WHOLE UNIT instead of having its line boxes narrowed
+   individually. This causes the "whole code block shifts right/left" bug when
+   the pet float is active.
+   Fix: override to overflow-x: clip when the float is active. `clip` produces
+   the same visual clipping as `hidden` but does NOT create a new BFC (per CSS
+   Overflow Level 4 — Chrome 90+, Firefox 81+, Safari 16+). Without a BFC, the
+   float can narrow the pre's line boxes just like it does for <p> elements, so
+   code content flows beside the pet instead of jumping as a block.
+   Trade-off: wide code lines are clipped (not scrollable) while the pet overlaps.
+   The pet covers that area anyway, and scroll returns when the pet moves. */
+.msg[data-pet-float] .msg-bubble pre {
+  overflow-x: clip;
+}
+/* h1/h2 use display:inline-block for gradient text clipping. An inline-block
+   wider than the float-shortened line box gets placed BELOW the float instead
+   of flowing beside it — creating a visible gap. Switch to display:block so
+   the heading's own line boxes are narrowed by the float (text wraps beside
+   the pet) instead of the heading jumping to a separate line below the pet. */
+.msg[data-pet-float] .msg-bubble h1,
+.msg[data-pet-float] .msg-bubble h2 {
+  display: block;
+}
+html[data-variant='bright'] .msg.note .msg-bubble {
+  background: color-mix(in srgb, #a07000 8%, var(--bg-2));
+  border: 1px solid color-mix(in srgb, #a07000 18%, transparent);
+  border-left: 3px solid color-mix(in srgb, #a07000 42%, transparent);
+  color: color-mix(in srgb, #6b4a00 90%, transparent);
+}
+
+/* System messages: subtle centered status line */
+.msg.system {
+  justify-content: center;
+  max-width: min(max(920px, 70%), 100%);
+  margin: 2px auto;
+  gap: 0;
+}
+.msg.system .msg-avatar {
+  display: none;
+}
+.msg.system .msg-bubble {
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  color: var(--fg-dim);
+  padding: 1px 10px;
+  text-align: center;
+  opacity: 0.55;
+  line-height: 1.4;
+}
+
+.msg-bubble {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  padding: 18px 14px 10px;
+  border-radius: var(--radius-md);
+  line-height: 1.55;
+  word-wrap: break-word;
+  /* Style containment: each bubble is an isolated style scope.
+     Not using `layout` containment — on hundreds of bubbles it multiplies
+     Chrome's Layerize traversal cost without a meaningful layout-isolation
+     benefit (floats in chatReflow.ts still scope correctly to each bubble's
+     own BFC). Not using `paint` because .msg-role-label bleeds 5px outside. */
+  contain: style;
+  /* Append TextSymbolFallback so arrows/math/dingbats inside markdown get
+     painted via a text-style font (DejaVu Sans) instead of Noto Color Emoji.
+     unicode-range on the @font-face limits it to symbol blocks only — body
+     text continues to use the design's body font (Geist, etc.). Without this,
+     gradient-clipped headings drop the color-emoji glyphs entirely (↔ etc.). */
+  font-family: var(--design-body-font, var(--font, sans-serif)), 'TextSymbolFallback';
+}
+
+/* Markdown horizontal rule: a soft transparent → token → transparent gradient
+   instead of a hard edge-to-edge line. */
+.msg-bubble hr {
+  border: none;
+  height: 1px;
+  margin: 14px 0;
+  background: linear-gradient(to right, transparent, var(--stroke-2), transparent);
+}
+
+/* Role label straddling the top border of the bubble */
+.msg-role-label {
+  position: absolute;
+  top: 8px;
+  left: -5px;
+  transform: translateY(-50%);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0 7px;
+  line-height: 28px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  pointer-events: none;
+  user-select: none;
+}
+.msg.user .msg-role-label {
+  color: var(--accent-2);
+  left: auto;
+  right: -5px;
+}
+.msg.agent .msg-role-label {
+  color: var(--accent);
+}
+.msg.error .msg-role-label {
+  color: var(--danger);
+}
+.msg-role-label.is-emp {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  letter-spacing: 0;
+  padding: 0;
+  top: 6px;
+}
+/* Higher specificity than .msg.agent .msg-role-label so dark text wins over inherited green */
+.msg .msg-role-label.is-emp {
+  color: #001a10;
+}
+
+/* ─── USER MESSAGES: bubble element stays right-aligned with left padding ───
+     but internal text is now mostly left-aligned (as requested) */
+.msg.user .msg-bubble {
+  font-size: 2em;
+  padding-left: clamp(14px, 20%, 120px);
+  padding-right: 14px;
+  text-align: left; /* changed from right → text now flows naturally left */
+}
+
+/* First element + all headings in USER messages stay right-aligned */
+.msg.user .msg-bubble > :first-child,
+.msg.user .msg-bubble h1,
+.msg.user .msg-bubble h2,
+.msg.user .msg-bubble h3,
+.msg.user .msg-bubble h4 {
+  text-align: right;
+}
+
+/* Normal text (after the first paragraph) + lists, blockquotes, etc. → left-aligned */
+.msg.user .msg-bubble p:not(:first-of-type),
+.msg.user .msg-bubble ul,
+.msg.user .msg-bubble ol,
+.msg.user .msg-bubble li,
+.msg.user .msg-bubble blockquote,
+.msg.user .msg-bubble pre {
+  text-align: left;
+}
+
+.msg-bubble pre {
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  padding: 0;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  position: relative;
+}
+.msg-bubble pre code {
+  display: block;
+  padding: 12px 14px;
+  background: transparent !important;
+}
+/* Copy-to-clipboard button on code blocks (mirrors .msg-act-btn styling).
+   Hidden by default, fades in on pre hover. Pre already has position:relative. */
+.code-copy-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: var(--bg-2);
+  border: none;
+  color: var(--fg-mute);
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 4px;
+  opacity: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: opacity 0.12s, background 0.12s, color 0.12s;
+}
+.code-copy-btn svg { display: block; pointer-events: none; }
+.msg-bubble pre:hover .code-copy-btn { opacity: 0.55; }
+.code-copy-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--fg);
+}
+html[data-variant='bright'] .code-copy-btn:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+.code-copy-btn.copied {
+  opacity: 1;
+  color: var(--accent);
+}
+.msg-bubble code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+/* Inline code (not inside pre).
+   Explicit color + accent-tinted bg so it stays visible when wrapped in
+   <strong> (which inherits fg) inside bubbles that themselves paint with
+   --bg-2/--bg-3 — otherwise the swatch can collapse to text-on-same-text.
+   -webkit-text-fill-color is reset because headings (h1/h2) use
+   `-webkit-text-fill-color: transparent` for the gradient text effect and
+   that property inherits, which would otherwise make inline code invisible
+   when it sits inside a header. */
+.msg-bubble :not(pre) > code {
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-3, var(--bg-2)));
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--stroke));
+  color: var(--accent);
+  -webkit-text-fill-color: currentColor;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 11.5px;
+}
+.msg-bubble p:first-child {
+  margin-top: 0;
+}
+.msg-bubble p:last-child {
+  margin-bottom: 0;
+}
+/* Blockquote */
+.msg-bubble blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 8px 0;
+  padding: 4px 12px;
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--fg-dim);
+}
+/* GFM tables. markdown-it emits standard <table>/<thead>/<tbody> markup; without
+   explicit styles the browser default has no borders or padding and cells look
+   cramped — especially for grid-style todo layouts (Mon | Tue | Wed columns). */
+.msg-bubble table {
+  border-collapse: collapse;
+  margin: 10px 0;
+  /* display:block + overflow-x:auto lets wide tables scroll inside the bubble
+     instead of forcing the whole message wider than .chat-scroll. */
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  font-size: 0.95em;
+}
+.msg-bubble table th,
+.msg-bubble table td {
+  border: 1px solid var(--stroke);
+  padding: 6px 10px;
+  vertical-align: top;
+  text-align: left;
+}
+.msg-bubble table th {
+  background: var(--bg-2);
+  font-weight: 600;
+  color: var(--fg);
+}
+.msg-bubble table tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--bg-2) 35%, transparent);
+}
+
+/* Task lists (markdown-it-task-lists) */
+.msg-bubble .task-list-item {
+  list-style: none;
+  margin-left: -1.2em;
+}
+.msg-bubble .task-list-item-checkbox {
+  margin-right: 6px;
+  accent-color: var(--accent);
+  width: 13px;
+  height: 13px;
+  cursor: default;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+/* Headings inside chat bubbles. We previously used `background-clip: text` +
+   `-webkit-text-fill-color: transparent` for a subtle fg-mute → fg gradient,
+   but any glyph that Chromium rendered from a substituted font (e.g. ↔ from
+   Noto Color Emoji) wouldn't get clipped and would paint as transparent —
+   invisible to the eye but selectable with the mouse. There's no per-glyph
+   way to opt out of the clip in CSS, so we use a solid `color: var(--fg)`
+   here. Headings still stand out via size, weight, and letter-spacing. */
+.msg-bubble h1,
+.msg-bubble h2 {
+  color: var(--fg);
+  display: block;
+  width: 100%;
+}
+.msg-bubble h1 {
+  font-size: 3em;
+  font-weight: 700;
+  margin: 0.9em 0 0.32em;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.msg-bubble h2 {
+  font-size: 2em;
+  font-weight: 650;
+  margin: 0.75em 0 0.24em;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+/* Chat controls */
+.chat-controls-area {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
+.chat-ta-wrap {
+  position: relative;
+}
+/* Streaming status indicator — rendered at the end of #chat-scroll so it
+   scrolls with the conversation and sits beneath the last message while the
+   assistant is composing a reply. Left-aligned inline block, no overlay. */
+.chat-response-animation {
+  display: block;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 8px 14px 16px;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--fg-dim);
+  opacity: 0.55;
+  white-space: pre;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  user-select: none;
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--bg) 40%, transparent),
+    0 -1px 0 color-mix(in srgb, var(--fg) 5%, transparent);
+}
+
+/* No CSS animation on shimmer-fade: any infinite CSS animation keeps the
+   GPU compositor at 60fps, which then composites every will-change layer
+   on the page (e.g. the pet overlay) every frame — recreating the original
+   GPU cost. The typing-out text effect is driven by the rAF loop in
+   runStatusAnim; no separate CSS shimmer is needed. */
+.shimmer-fade {
+  display: inline;
+}
+
+.status-cursor {
+  display: inline-block;
+  margin-left: 3px;
+  font-weight: 400;
+  color: var(--accent);
+  /* No CSS animation — any infinite CSS animation keeps the GPU compositor at
+     60fps unconditionally. Blink is driven by the existing rAF loop in
+     runStatusAnim via cursorSpan.style.opacity, so there is zero extra cost. */
+  opacity: 0.6;
+}
+
+/* Input container: centered, full-width at ≤920px, capped at 920px above */
+.chat-input-container {
+  max-width: 920px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Unified input wrapper: textarea on top, bar below */
+.chat-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  padding: 10px 10px 4px;
+  margin: 0;
+}
+/* Fading chrome: full bg+border at top, fades to transparent at bottom */
+.chat-input-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--surface-2);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  pointer-events: none;
+  /* -2 (vs the response animation's -1) keeps stacking unambiguous: surface
+     fade behind, animation chars in front of the surface, textarea on top. */
+  z-index: -2;
+}
+
+#chat-ta-react-root {
+  display: contents;
+}
+
+#chat-ta {
+  width: 100%;
+  min-height: 44px;
+  max-height: 300px;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: var(--fg);
+  padding: 8px 12px 8px;
+  font-size: 16px; /* ≥16px prevents iOS Safari from auto-zooming on focus */
+  line-height: 1.45;
+  touch-action: manipulation;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+  font-family: inherit;
+}
+#chat-ta::-webkit-scrollbar {
+  width: 6px;
+}
+#chat-ta::-webkit-scrollbar-track {
+  background: transparent;
+}
+#chat-ta::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+#chat-ta::-webkit-scrollbar-thumb:hover {
+  background: var(--stroke);
+}
+
+/* Bottom button bar.
+   Wide (≥480px, no data-narrow): both halves share the same row — left grows,
+   right is pushed to the right edge by margin-left:auto.
+   Narrow (<480px, data-narrow set by ResizeObserver in ChatView.tsx): left takes
+   its own full-width row so all its buttons fit without wrapping; right wraps
+   below it, right-aligned. DO NOT try flex:1 1 100% without the ResizeObserver
+   guard — that stacks unconditionally and always produces 3-4 rows. */
+.chat-input-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 2px 8px 16px;
+  flex-wrap: nowrap;
+  row-gap: 6px;
+}
+

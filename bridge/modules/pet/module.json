@@ -1,0 +1,23 @@
+{
+  "name": "pet",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "YHA pet — bridge half. Owns the quick-chat console (POST /v1/pet-console/ask, GET /v1/pet-console/status — backed by the cheap NVIDIA llama-3.1-8b-instruct lane that doubles as a health probe for the auto-titler / categorizer pipeline) plus the hatch wizard upload endpoints (POST /v1/pets/:id/files, PUT /v1/pets/:id/manifest, GET /v1/pets, DELETE /v1/pets/:id). The hatch wizard persists frame PNGs + manifests under frontend/public/pets/<id>/. Frontend half (FloatingPet, PetConsoleBubble, PetHeaderButton, hatch wizard UI, pet store) is NOT moved in this batch — that's a 40-import-site refactor punted to a follow-up. Disabling this module 404s every /v1/pet-console/* and /v1/pets/* route; the FE will surface 'pet console offline' and the hatch wizard's upload step fails with a 404.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/pet-console/ask",
+      "/v1/pet-console/status",
+      "/v1/pets",
+      "/v1/pets/:id",
+      "/v1/pets/:id/files",
+      "/v1/pets/:id/manifest",
+      "/v1/pet-vision/snapshot",
+      "/proxy/pet-vision/snapshot"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "productivity"
+}

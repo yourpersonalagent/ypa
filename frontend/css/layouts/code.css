@@ -1,0 +1,512 @@
+/* CodeView — scoped to the code sub-view of the Full layout.
+ * Activated when [data-layout="full"] AND #main-views[data-mode="code"].
+ * The shell is a 2-column grid: centre (editor + bottom) and right stack.
+ * ChatView is rendered by FullLayout outside this component and slots in
+ * via the left column of #main-views.
+ *
+ * The chat ↔ code seam is a flex sibling rendered by FullLayout using the
+ * shared `.splitter` component (same chrome as the chat ↔ workflow divider
+ * in Split mode). Its width is owned by the `--cv-chat-width` custom prop
+ * on #main-views, written by ChatResizeHandle.tsx.
+ *
+ * See frontend/css/LAYOUTS.md for the scoping contract. */
+
+[data-layout="full"] #main-views[data-mode="code"] {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 0;
+}
+
+[data-layout="full"] #main-views[data-mode="code"] > #view-chat {
+  flex: 0 0 var(--cv-chat-width, 33%);
+  min-width: 280px;
+  order: 0;
+}
+
+/* Chat ↔ code splitter is always a vertical divider regardless of the
+ * Full layout's data-orientation (which only controls chat ↔ workflow). */
+[data-layout="full"] #main-views[data-mode="code"] > #cv-chat-splitter {
+  order: 1;
+  cursor: col-resize;
+}
+[data-layout="full"] #main-views[data-mode="code"] > #cv-chat-splitter::after {
+  inset: 40% 2px;
+}
+
+[data-layout="full"] #main-views[data-mode="code"] > .code-view {
+  flex: 1 1 0;
+  min-width: 0;
+  order: 2;
+
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  grid-template-rows: 1fr;
+  height: 100%;
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-center {
+  display: grid;
+  grid-template-rows: 1fr 220px;
+  min-height: 0;
+  min-width: 0;
+  border-right: 1px solid var(--stroke-2);
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-editor-region {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg-2);
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-bottom-stack {
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--stroke-2);
+  background: var(--surface);
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-right-stack {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-placeholder {
+  padding: 16px;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-placeholder h3 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-placeholder p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* EditorRegion: tab strip on top, CodeMirror host fills below. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-editor {
+  display: grid;
+  grid-template-rows: 32px 1fr;
+  height: 100%;
+  min-height: 0;
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-tabbar {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--stroke-2);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tabbar .ed-toolbar {
+  height: 100%;
+  border-right: 1px solid var(--stroke-2);
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-tabstrip {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: transparent;
+  scrollbar-width: thin;
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px 0 10px;
+  font-size: 12px;
+  height: 100%;
+  color: var(--fg-dim);
+  border-right: 1px solid var(--stroke-2);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  background: transparent;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab:hover {
+  color: var(--fg);
+  background: var(--hl);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab.is-active {
+  color: var(--fg);
+  background: var(--bg-2);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab-icon {
+  font-size: 12px;
+  opacity: 0.9;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab-name {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab-dot {
+  font-size: 8px;
+  color: var(--accent);
+  margin-left: -2px;
+}
+/* Subtle underline on the tab when the file changed on disk under us. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab.is-ext-changed {
+  box-shadow: inset 0 -2px 0 var(--accent-2, var(--accent));
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab.is-ext-changed.is-active {
+  box-shadow: inset 0 -2px 0 var(--accent), inset 0 -4px 0 var(--accent-2, var(--accent));
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab-close {
+  background: transparent;
+  border: 0;
+  color: var(--fg-mute);
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 13px;
+  line-height: 1;
+  border-radius: 3px;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab-close:hover {
+  color: var(--fg);
+  background: var(--hl);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab-add {
+  background: transparent;
+  border: 0;
+  color: var(--fg-mute);
+  cursor: pointer;
+  padding: 0 10px;
+  font-size: 14px;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-tab-add:hover {
+  color: var(--fg);
+  background: var(--hl);
+}
+
+[data-layout="full"] #main-views[data-mode="code"] .cv-editor-body {
+  position: relative;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-editor-stage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-cm-host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-cm-host[data-active="true"] {
+  visibility: visible;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-cm-host .cm-editor {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-cm-host .cm-scroller {
+  overflow: auto;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-editor-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--fg-mute);
+  pointer-events: none;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-editor-status {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  padding: 4px 8px;
+  background: var(--surface);
+  border: 1px solid var(--stroke-2);
+  border-radius: 4px;
+  pointer-events: none;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-editor-status--error {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* CodeMinimap styling lives in css/code-editor.css so the modal FileEditor
+   gets the strip too. */
+
+/* Tabbed stacks (right + bottom share the same chrome). */
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack {
+  display: grid;
+  grid-template-rows: 28px 1fr;
+  height: 100%;
+  min-height: 0;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--stroke-2);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack-tab {
+  background: transparent;
+  border: 0;
+  color: var(--fg-dim);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 0 12px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack-tab:hover {
+  color: var(--fg);
+  background: var(--hl);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack-tab.is-active {
+  color: var(--fg);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack-tab.is-drop-target {
+  box-shadow: inset 2px 0 0 var(--accent);
+  background: var(--hl);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack-empty {
+  color: var(--fg-mute);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0 12px;
+  align-self: center;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-stack-body {
+  min-height: 0;
+  overflow: auto;
+  background: var(--bg-2);
+  color: var(--fg);
+}
+
+/* Generic pane bits used by all RightStack tabs. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-pane-status {
+  padding: 12px;
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-pane-status--error {
+  color: var(--danger);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-pane-blurb {
+  padding: 12px 12px 6px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--fg-dim);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-pane-note {
+  padding: 8px 12px 12px;
+  margin: 0;
+  font-size: 10.5px;
+  color: var(--fg-mute);
+  line-height: 1.4;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-pane-action {
+  margin: 0 12px 8px;
+  align-self: flex-start;
+}
+
+/* Files / GitHub tabs embed the full FileManager / GithubModal components
+ * via their `embedded` modes. The components manage their own internal
+ * chrome — we just give them a height-bounded scrollable container.
+ *
+ * `.cv-files-up` is reused by Rewind's refresh button below. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-files-pane {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-files-pane .fm-embedded {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+/* GitHub PanelContent emits a header + repo cards as siblings. Let the
+ * pane itself scroll the whole thing (header included), same behaviour as
+ * the modal's max-height:80vh + overflow-y:auto. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-github-pane {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  background: var(--bg-2);
+  color: var(--fg);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-github-pane .github-panel-embedded {
+  display: contents;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-files-up {
+  background: transparent;
+  border: 0;
+  color: var(--fg-dim);
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 12px;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-files-up:hover { color: var(--fg); }
+
+/* Rewind tab — toolbar + scrollable list of recent agent edits. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-pane {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-2);
+  color: var(--fg);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--stroke-2);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-title {
+  flex: 1 1 auto;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-row {
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--fg);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-trigger {
+  color: var(--fg-mute);
+  font-size: 10.5px;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-meta {
+  color: var(--fg-mute);
+  font-size: 11px;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-rewind-restore {
+  align-self: flex-start;
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+/* Terminal tab — bash-console body+footer without modal chrome. The .bc-*
+ * class names are reused from frontend/css/bash-console.css. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-terminal-pane {
+  display: grid;
+  grid-template-rows: 1fr 32px;
+  background: var(--bg-2);
+  color: var(--fg);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-terminal-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 6px 10px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  scrollbar-width: thin;
+  color: var(--fg);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-terminal-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border-top: 1px solid var(--stroke-2);
+  background: var(--surface);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-terminal-footer .bc-input {
+  flex: 1 1 auto;
+}
+
+/* Debug tab — grid of cards that open the existing DebugModal. */
+[data-layout="full"] #main-views[data-mode="code"] .cv-debug-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 6px;
+  padding: 6px 12px 12px;
+  background: var(--bg-2);
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-debug-card {
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: 6px;
+  color: var(--fg);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  padding: 8px 10px;
+  text-align: left;
+}
+[data-layout="full"] #main-views[data-mode="code"] .cv-debug-card:hover {
+  background: var(--hl);
+  border-color: var(--accent);
+}

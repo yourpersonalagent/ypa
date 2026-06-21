@@ -1,0 +1,11 @@
+{
+  "name": "chat-minimap",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Right-edge scrollbar minimap that visualises the chat history at a glance. Each user/agent message becomes a thin coloured tick; clicking a tick scrolls to that message. Tiny ticks grow wider so they stay clickable. No bridge endpoints — pure frontend overlay rendered into the chat-scroll container. Disabling hides the minimap; the chat scrollbar continues to work normally.",
+  "needs": [],
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "chat"
+}

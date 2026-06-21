@@ -1,0 +1,18 @@
+{
+  "name": "todos",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Per-WD TODO persistence + HTTP routes (/v1/todos, /v1/todos/cwds, /v1/todos/:cwd). Storage is one JSON file per working directory under /tmp/yha-todos-<sanitized-cwd>.json. Library half (readTodos/writeTodos/rememberLabel/listAllCwds) is consumed by bridge/tools/exec.ts for the TodoWrite/TodoRead tool calls and by the MCP-Tools aggregator for cwd-scoped task lists. Disabling the module 404s the routes and surfaces an error in the bridge tool path; the frontend half (todos store + modal) keeps its slot but stays empty.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/todos",
+      "/v1/todos/cwds",
+      "/v1/todos/:cwd"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "productivity"
+}

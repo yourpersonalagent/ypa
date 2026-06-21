@@ -1,0 +1,11 @@
+{
+  "name": "shared-api",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Public-API key management — generate, list, revoke long-lived tokens that external clients (Hermes, OpenClaw, other yha instances) use to call this bridge. Adds the 'API' tab to the Preferences modal showing per-key labels, last-used timestamps, and per-model usage / cost totals. Bridge endpoints (/v1/api-keys/*) currently live in bridge/config/api-keys.ts (core); disabling this module only hides the prefs tab — existing tokens still validate until that handler moves into a bridge half.",
+  "needs": [],
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "system"
+}

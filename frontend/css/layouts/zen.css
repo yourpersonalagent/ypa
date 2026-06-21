@@ -1,0 +1,149 @@
+/* css/layouts/zen.css
+ * Scoped under [data-layout="zen"]. Phase 5b of LayoutPlan.md — single
+ * centered column of chat, no chrome, no buttons in view, palette-only
+ * controls.
+ *
+ * Composer is borderless and sticks to the bottom. The tip footer
+ * teaches palette features and self-hides as soon as the user sends a
+ * message in the current session (handled in ZenLayout.tsx).
+ */
+
+[data-layout="zen"] body {
+  margin: 0;
+  background: var(--bg, #0a0a0a);
+  color: var(--fg, #f0f0f0);
+}
+
+[data-layout="zen"] #header {
+  display: none !important;
+}
+
+/* Anchored to the viewport via inset:0 rather than 100vw/100vh so the small-
+ * screen `html { zoom: 0.9 }` rule doesn't shrink the layout to 90% of the
+ * visible area (leaving empty gutters at the right + bottom). */
+[data-layout="zen"] .layout-zen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+[data-layout="zen"] .zen-column {
+  width: min(720px, 92vw);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 auto;
+}
+
+/* Hide the in-bar action buttons — palette-only contract.
+   The composer textarea + the send/stop pair stay; everything else collapses.
+   The stop button's visibility is driven by chat-streaming.updateStreamingUI()
+   toggling inline `display` — `!important` here would mask it during streams.
+   #chat-attachments + #chat-participants intentionally stay visible: pasted
+   files and invitee chips are content the user just produced, not chrome. */
+[data-layout="zen"] .chat-bar-left,
+[data-layout="zen"] .chat-bar-right .cb-right-rest,
+[data-layout="zen"] #chat-minimap {
+  display: none !important;
+}
+
+/* Stop button keeps the standard .chat-bar-btn.stop-btn styling from
+   input-bar.css — same red glyph and dimensions in zen as in full/messenger.
+   The #chat-btw-insert overlay anchors off this size, so a zen-specific
+   resize would push the overlay into a different place than in other
+   layouts and break the visual pairing of the feature. */
+
+/* Borderless composer */
+[data-layout="zen"] .chat-controls-area {
+  padding: 4px 4px 18px;
+  background: transparent;
+}
+[data-layout="zen"] .chat-input-wrapper {
+  background: var(--bg-2, rgba(255,255,255,0.03));
+  border-radius: 14px;
+  padding: 8px 12px;
+  border: 1px solid var(--stroke, rgba(255,255,255,0.06));
+  transition: border-color 160ms ease;
+}
+[data-layout="zen"] .chat-input-wrapper:focus-within {
+  border-color: var(--accent, rgba(255,255,255,0.25));
+}
+[data-layout="zen"] #chat-ta {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font-size: 15px;
+  padding: 6px 4px;
+  resize: none;
+}
+[data-layout="zen"] .chat-bar-right .cb-right-send .send-btn {
+  background: transparent;
+  border: none;
+  color: var(--fg-mute, rgba(255,255,255,0.55));
+  font-size: 18px;
+  padding: 0 4px;
+  cursor: pointer;
+}
+[data-layout="zen"] .chat-bar-right .cb-right-send .send-btn:hover {
+  color: var(--accent, var(--fg));
+}
+
+/* The big YHA hero — keep it, but tone it down */
+[data-layout="zen"] .chat-empty-hero {
+  opacity: 0.55;
+  margin: 24vh 0 12px;
+}
+[data-layout="zen"] .brand-hero-logo {
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+}
+
+/* Tip footer — rotates LayoutPlan tips while the session is empty */
+[data-layout="zen"] .zen-tip {
+  width: min(720px, 92vw);
+  margin: 0 auto;
+  padding: 6px 12px 14px;
+  text-align: center;
+  color: var(--fg-mute, rgba(255,255,255,0.4));
+  font-size: 11.5px;
+  font-family: var(--font-mono, monospace);
+  user-select: none;
+}
+[data-layout="zen"] .zen-tip-text::before {
+  content: '· ';
+}
+[data-layout="zen"] .zen-tip-text::after {
+  content: ' ·';
+}
+
+/* ── Mobile (≤600px): edge-to-edge column ─────────────────────────────────
+ * Drop the 92vw column cap and the composer's bottom padding so the chat
+ * and input area stretch fully to the screen edges. The composer is the
+ * primary touch target on phones; padding wastes thumb-reach space. */
+@media (max-width: 600px) {
+  [data-layout="zen"] .zen-column {
+    width: 100%;
+    margin: 0;
+  }
+  [data-layout="zen"] .chat-controls-area {
+    padding: 4px 0 0;
+  }
+  /* Hard bottom edges: input area sits flush against the viewport bottom,
+   * so the rounded corners would look like a floating pill. Keep the top
+   * corners rounded so the wrapper still reads as a discrete control. */
+  [data-layout="zen"] .chat-input-wrapper {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+  [data-layout="zen"] .zen-tip {
+    width: 100%;
+    padding: 6px 4px 6px;
+  }
+}

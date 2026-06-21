@@ -1,0 +1,20 @@
+{
+  "name": "files-github",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Git/GitHub integration routes — detects repos, shows status, stages/unstages, commits, pushes. Uses local git CLI; HTTPS auth via stored GitHub PAT, SSH native. Owns /v1/git/* and the /v1/github/* PAT-storage endpoints.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/git/status",
+      "/v1/git/stage",
+      "/v1/git/commit",
+      "/v1/git/push",
+      "/v1/github/pat"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "files"
+}

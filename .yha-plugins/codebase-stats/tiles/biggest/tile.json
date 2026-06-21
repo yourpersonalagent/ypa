@@ -1,0 +1,23 @@
+{
+  "id": "biggest",
+  "label": "Biggest files",
+  "template": "table",
+  "data": "data.ts",
+  "refresh": "manual",
+  "size": { "w": 380, "h": 320 },
+  "props": {
+    "dataPath": "files",
+    "columns": [
+      { "header": "Path", "valuePath": "path" },
+      {
+        "header": "Size",
+        "valuePath": "human",
+        "align": "right",
+        "bar": { "valuePath": "size" }
+      }
+    ],
+    "emptyText": "No files found"
+  },
+  "headline": { "label": "biggest", "from": "files.0.human" },
+  "command": { "keywords": ["size", "biggest", "files", "disk"] }
+}

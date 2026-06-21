@@ -1,0 +1,55 @@
+# Bridge-specific ignores
+uploads/
+telemetry/
+monitoring-log/
+config-history/
+rewind/
+sessions/
+mcp/exchange/*
+config.json  # User config with API keys
+
+# Node modules (already in root .gitignore, but here for clarity)
+node_modules/
+
+# Logs
+*.log
+/state/terminals/
+/state/mcps/
+
+# Temporary files  
+tmp/
+temp/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Session backups
+*.bak
+
+# Per-user / per-install secrets + credentials. The root .gitignore already
+# covers these (as bridge/<path>), but mirror them here — anchored to this
+# dir with a leading slash — so they stay ignored even if this nested file is
+# the one git consults. Defense-in-depth: these must never be tracked.
+/api-keys.json
+/secrets/
+/certs/
+/tokens.json
+/ftp-connections.json
+/partners.json
+/partners/
+/users/*/
+/data/sessions.db
+/data/sessions.db-shm
+/data/sessions.db-wal

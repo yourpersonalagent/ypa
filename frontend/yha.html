@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en" data-theme="default" data-variant="dark" data-layout="full">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Defence-in-depth CSP. script-src still omits 'unsafe-eval' (no JS
+         eval/new Function), so an injected <script src> from a foreign origin
+         is blocked; 'wasm-unsafe-eval' narrowly permits WebAssembly compilation
+         (shiki's oniguruma syntax highlighter needs it) without re-enabling JS
+         eval. 'unsafe-inline' is required by the inline bootstrap scripts below.
+         object-src/base-uri are locked down to kill plugin and <base> hijack
+         vectors. Must precede the first resource-loading element. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' http: https: ws: wss:; frame-src 'self' https: data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YHA — Boutique AI</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#00b4c8" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="YHA" />
+    <link rel="apple-touch-icon" href="favicon.svg" />
+
+    <!--
+      Inline color-theme + layout detection — must run before any CSS arrives
+      so the page paints with the correct background/colors and layout shell
+      immediately. Cannot live in React because React mounts after the bundle
+      has loaded. Reads `yha.colorTheme` (new key) first; falls back to legacy
+      `yha.theme` for users who haven't yet hit the migration path in store.ts.
+    -->
+    <script>(function(){try{var r=document.documentElement;var t=localStorage.getItem('yha.colorTheme')||localStorage.getItem('yha.theme')||'';var fam='default',v='dark';if(t==='bright'){fam='default';v='bright';}else if(t==='dark'){fam='default';v='dark';}else if(t==='minimal'){fam='minimal';v='bright';}else if(t==='ocean'){fam='ocean';v='dark';}else if(t==='sunset'){fam='sunset';v='dark';}else if(t.indexOf('-')>0){var p=t.split('-');fam=p[0]||'default';v=p[1]==='bright'?'bright':'dark';}r.setAttribute('data-theme',fam);r.setAttribute('data-variant',v);var lm=localStorage.getItem('yha.layoutMode');if(lm==='classic')lm='full';else if(lm==='whatsapp')lm='messenger';if(lm==='full'||lm==='messenger'||lm==='zen')r.setAttribute('data-layout',lm);var dRaw=localStorage.getItem('yha.designTheme');var d=dRaw||'atelier';if(d!=='console'&&d!=='atelier'&&d!=='patchbay')d='atelier';r.setAttribute('data-design',d);/* First-ever visit (no design AND no colour theme stored): force dark variant so the atelier default lands as dark — overriding any earlier v='dark' would be a no-op, but if a future change reorders the colour-theme parse this still wins. */ if(!dRaw&&!localStorage.getItem('yha.theme')&&!localStorage.getItem('yha.colorTheme')){r.setAttribute('data-variant','dark');}}catch(_){}})();</script>
+    <style>
+      /* Paint a matching base background before external CSS arrives so the
+         cross-document navigation from / → /yha never flashes white. The exact
+         per-family bg arrives ~1 frame later from tokens.css; this just kills
+         the white. */
+      html { background: #06090e; }
+      html[data-variant='bright'] { background: #f6f5f1; }
+      html[data-theme='contrast'][data-variant='dark'] { background: #000; }
+      html[data-theme='contrast'][data-variant='bright'] { background: #fff; }
+
+      /* Native cross-document fade between / and /yha (Chromium 126+, Safari 18.2+).
+         Older browsers ignore this and fall back to a normal navigation. */
+      @view-transition { navigation: auto; }
+      ::view-transition-old(root),
+      ::view-transition-new(root) { animation-duration: 220ms; }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/tokens.css?v=5" />
+
+    <!-- Design themes (data-design axis — see css/designs/DESIGNS.md).
+         Order matters: linked AFTER tokens.css so design-theme rules can
+         remap colour vars defined there, but BEFORE the layout shells so
+         design fonts/borders propagate as inherited defaults. -->
+    <link rel="stylesheet" href="css/designs/console.css?v=3" />
+    <link rel="stylesheet" href="css/designs/atelier.css?v=5" />
+    <link rel="stylesheet" href="css/designs/patchbay.css?v=7" />
+
+    <!-- Optional naming/slogan rebrand — bridge emits window.__YHA_BRAND from
+         INTERNAL_APP_NAMING / INTERNAL_APP_SLOGAN env vars. If neither is
+         set or the script 404s, the page falls back to "YHA"/"Your Home
+         Agent · Home is where your agent lives." Safe to load synchronously
+         because the endpoint short-circuits to an empty body when unset. -->
+    <script src="/brand.js"></script>
+
+    <!-- Layout shells (scoped under [data-layout="…"] — see css/LAYOUTS.md). -->
+    <link rel="stylesheet" href="css/layouts/full.css?v=1" />
+    <link rel="stylesheet" href="css/layouts/messenger.css?v=6" />
+    <link rel="stylesheet" href="css/layouts/zen.css?v=4" />
+    <link rel="stylesheet" href="css/layouts/code.css?v=2" />
+
+    <!-- layout.css submodules — order must match original source order (cascade-sensitive) -->
+    <link rel="stylesheet" href="css/layout/core.css?v=2" />
+    <link rel="stylesheet" href="css/layout/panels-drawer.css?v=1" />
+    <link rel="stylesheet" href="css/layout/pet-panel.css?v=2" />
+    <link rel="stylesheet" href="css/layout/header-bar.css?v=3" />
+    <link rel="stylesheet" href="css/layout/editor-hud.css?v=1" />
+    <link rel="stylesheet" href="css/layout/trigger-modal.css?v=2" />
+    <link rel="stylesheet" href="css/layout/prefs-mcp.css?v=2" />
+    <link rel="stylesheet" href="css/layout/file-picker.css?v=1" />
+    <link rel="stylesheet" href="css/layout/toast.css?v=1" />
+    <link rel="stylesheet" href="css/layout/confirm-modal.css?v=1" />
+    <link rel="stylesheet" href="css/layout/prefs-modal.css?v=1" />
+    <link rel="stylesheet" href="css/layout/history-debug.css?v=1" />
+    <link rel="stylesheet" href="css/layout/chat-controls.css?v=1" />
+    <link rel="stylesheet" href="css/layout/bash-console.css?v=1" />
+    <link rel="stylesheet" href="css/layout/partners-api-todos.css?v=1" />
+    <link rel="stylesheet" href="css/layout/global-context-user-serve.css?v=2" />
+    <link rel="stylesheet" href="css/layout/cwd.css?v=2" />
+    <link rel="stylesheet" href="css/layout/plugins.css?v=1" />
+    <link rel="stylesheet" href="css/layout/tutorial.css?v=1" />
+    <link rel="stylesheet" href="css/nodes.css?v=3" />
+    <!-- chat.css submodules — order must match original source order (cascade-sensitive) -->
+    <link rel="stylesheet" href="css/chat/messages.css?v=1" />
+    <link rel="stylesheet" href="css/chat/input-bar.css?v=1" />
+    <link rel="stylesheet" href="css/chat/voice-tools.css?v=1" />
+    <link rel="stylesheet" href="css/chat/pickers.css?v=1" />
+    <link rel="stylesheet" href="css/chat/minimap.css?v=1" />
+    <link rel="stylesheet" href="css/chat/meta-shortcuts.css?v=2" />
+    <link rel="stylesheet" href="css/chat/edit-skills.css?v=1" />
+    <link rel="stylesheet" href="css/chat/empty-state.css?v=1" />
+    <link rel="stylesheet" href="css/chat/multichat-grid.css?v=1" />
+    <link rel="stylesheet" href="css/shutdown.css?v=5" />
+    <link rel="stylesheet" href="css/globe.css?v=1" />
+    <link rel="stylesheet" href="css/github.css?v=2" />
+    <link rel="stylesheet" href="css/ftp.css?v=1" />
+    <link rel="stylesheet" href="css/rclone.css?v=1" />
+    <link rel="stylesheet" href="css/moveable-window.css?v=2" />
+    <link rel="stylesheet" href="css/markdown-editor.css?v=3" />
+    <link rel="stylesheet" href="css/code-editor.css?v=1" />
+    <link rel="stylesheet" href="css/browser-window.css?v=2" />
+    <link rel="stylesheet" href="css/file-manager.css?v=1" />
+    <link rel="stylesheet" href="css/pet.css?v=1" />
+    <link rel="stylesheet" href="css/hatch.css?v=1" />
+  </head>
+  <body>
+    <!-- React mounts the entire app shell (header, main, modals, popovers) here. -->
+    <div id="root"></div>
+
+    <!-- Pre-React: collapse the body so the first paint is the analog-TV
+         "off" frame. main.ts flips connectionStore from 'booting' → 'booted'
+         once boot completes, which removes this class and plays the reverse
+         scanline. See ShutdownOverlay + shutdown.css. -->
+    <script>document.body.classList.add('tv-off');</script>
+
+    <!-- Rewind watchdog: if React's render loop never bumps the heartbeat
+         within 30s of page load, the bundle is presumed broken and we
+         inject a self-contained overlay that talks to the standalone
+         yha-rewind service via /__rewind/ (bridge proxy) or the recovery
+         port directly. Pure vanilla — no bundle dependency. -->
+    <script>
+    (function () {
+      if (window.__YPA_WATCHDOG_INSTALLED) return;
+      window.__YPA_WATCHDOG_INSTALLED = true;
+      window.__YPA_HEARTBEAT = window.__YPA_HEARTBEAT || 0;
+      var TIMEOUT_MS = 30000;
+      function escHtml(s) {
+        return String(s).replace(/[&<>]/g, function (c) {
+          return c === '&' ? '&amp;' : c === '<' ? '&lt;' : '&gt;';
+        });
+      }
+      // mode: 'watchdog' = bundle never rendered (show failure banner);
+      //       'manual'   = user opened via command palette (neutral header).
+      function injectOverlay(opts) {
+        if (document.getElementById('__ypa_watchdog_overlay')) return;
+        var mode = (opts && opts.mode) || 'watchdog';
+        var detail = (opts && opts.detail) || '';
+        var ov = document.createElement('div');
+        ov.id = '__ypa_watchdog_overlay';
+        ov.setAttribute('role', 'dialog');
+        ov.setAttribute('aria-label', mode === 'watchdog' ? 'YPA recovery' : 'Rewind recovery');
+        ov.style.cssText = [
+          'position:fixed','inset:0','z-index:2147483647',
+          'background:#0d0f12','color:#e8eaed',
+          'font:14px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif',
+          'display:flex','flex-direction:column'
+        ].join(';');
+        var bar = document.createElement('div');
+        bar.style.cssText = 'padding:10px 14px;background:#161a20;border-bottom:1px solid #2a2f37;display:flex;align-items:center;gap:10px;flex-wrap:wrap';
+        var title = mode === 'watchdog'
+          ? '<strong style="color:#ffb454">YPA failed to render.</strong>'
+          : '<strong style="color:#cde">Rewind — Recovery</strong>';
+        var subtitle = detail
+          ? '<span style="color:#9aa0a6;flex:1;min-width:200px">' + escHtml(detail) + '</span>'
+          : '';
+        bar.innerHTML =
+          title + subtitle +
+          '<button id="__ypa_wd_reload" style="background:#1f2937;color:#e8eaed;border:1px solid #374151;padding:6px 12px;border-radius:4px;cursor:pointer">Reload</button>' +
+          '<button id="__ypa_wd_hard" style="background:#1f2937;color:#e8eaed;border:1px solid #374151;padding:6px 12px;border-radius:4px;cursor:pointer">Hard reload</button>' +
+          '<button id="__ypa_wd_close" style="background:transparent;color:#9aa0a6;border:1px solid #374151;padding:6px 10px;border-radius:4px;cursor:pointer">Dismiss</button>';
+        var frame = document.createElement('iframe');
+        // Same-origin proxy: bridge forwards /__rewind/* to :8445.
+        // If the bridge is also down the user opens :8445 directly.
+        frame.src = '/__rewind/recover';
+        frame.style.cssText = 'flex:1;border:0;background:#0d0f12';
+        frame.title = 'Rewind recovery';
+        ov.appendChild(bar);
+        ov.appendChild(frame);
+        document.body.appendChild(ov);
+        document.getElementById('__ypa_wd_reload').onclick = function () { location.reload(); };
+        document.getElementById('__ypa_wd_hard').onclick = function () {
+          try {
+            if (window.caches && caches.keys) {
+              caches.keys().then(function (ks) {
+                return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+              }).then(function () { location.reload(); }, function () { location.reload(); });
+              return;
+            }
+          } catch (e) {}
+          location.reload();
+        };
+        document.getElementById('__ypa_wd_close').onclick = function () {
+          ov.parentNode && ov.parentNode.removeChild(ov);
+        };
+      }
+      // Expose for manual triggering (e.g. from the App Command Palette).
+      // Optional detail string (e.g. "foo-module failed to load") is shown
+      // in the neutral header — never the watchdog "failed to render" banner.
+      window.__ypa_showRewindOverlay = function (detail) {
+        injectOverlay({
+          mode: 'manual',
+          detail: detail || 'Opened from command palette.',
+        });
+      };
+      setTimeout(function () {
+        if (window.__YPA_HEARTBEAT > 0) return;
+        injectOverlay({
+          mode: 'watchdog',
+          detail: 'No render heartbeat within ' + (TIMEOUT_MS / 1000) + 's — the page bundle may be broken.',
+        });
+      }, TIMEOUT_MS);
+    })();
+    </script>
+
+    <!-- React entry — must run BEFORE main.ts so service modules find their
+         DOM targets after React's synchronous mount. -->
+    <script type="module" src="/src/main-react.tsx"></script>
+    <!-- Vanilla service modules (boot sequence + non-UI services) -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

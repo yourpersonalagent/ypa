@@ -1,0 +1,456 @@
+/* ─── Tool strip: compact pill row for tool calls/results ─── */
+.tool-strip {
+  max-width: min(780px, 100%);
+  margin: 2px auto 4px;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 5px;
+  align-items: flex-start;
+  overflow: visible;
+}
+
+.tool-pill {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 11px;
+  color: var(--fg-dim);
+  cursor: default;
+  max-width: min(240px, calc(50% - 3px));
+  transition:
+    background var(--dur-fast),
+    border-color var(--dur-fast);
+  user-select: text;
+  position: relative;
+  z-index: 1;
+}
+
+.pill-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 18px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+/* Dismiss × — hidden until the parent pill is hovered so the strip stays
+ * clean during normal display. Covers the "tool-call without matching
+ * result after stream abort" leak; the user can click × to clear any
+ * dangling pill manually. */
+.pill-dismiss {
+  margin-left: auto;
+  padding: 0 4px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity 80ms linear, background 80ms linear;
+}
+.tool-pill:hover .pill-dismiss,
+.tool-pill:focus-within .pill-dismiss {
+  opacity: 0.55;
+}
+.pill-dismiss:hover {
+  opacity: 1;
+  background: color-mix(in oklab, var(--danger) 18%, transparent);
+}
+
+.pill-icon {
+  font-size: 9px;
+  opacity: 0.55;
+  flex-shrink: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+.pill-icon svg { display: block; }
+.pill-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.tool-pill.tool-result .pill-name {
+  color: var(--accent);
+}
+
+.pill-snippet {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  opacity: 0.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+  min-width: 0;
+}
+
+/* Full detail — floats above as overlay, no layout shift */
+.pill-full {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 0;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  min-width: 220px;
+  max-width: min(400px, calc(100vw - 24px));
+  width: max-content;
+  max-height: min(320px, 45vh);
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--fg);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+/* downward arrow connecting tooltip to pill */
+.pill-full::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 14px;
+  border: 5px solid transparent;
+  border-top-color: var(--stroke-2);
+}
+.pill-full::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 15px;
+  border: 4px solid transparent;
+  border-top-color: var(--surface);
+  z-index: 1;
+}
+
+/* Flipped placement — set by JS (_positionPillFull) when the pill is so close
+   to the viewport top that the default upward popup would clip. Popup opens
+   below the pill and the arrow flips to point up. */
+.tool-pill.flip-down .pill-full {
+  bottom: auto;
+  top: calc(100% + 7px);
+}
+.tool-pill.flip-down .pill-full::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--stroke-2);
+}
+.tool-pill.flip-down .pill-full::before {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--surface);
+}
+
+/* Hover-based show — disabled on touch-only devices */
+@media (hover: hover) {
+  .tool-pill:hover,
+  .tool-pill:focus-within {
+    background: var(--surface);
+    border-color: var(--accent);
+    z-index: 10;
+  }
+  .tool-pill:hover .pill-full,
+  .tool-pill:focus-within .pill-full {
+    display: block;
+  }
+}
+
+/* Tap to expand — works on all devices, required on touch-only */
+.tool-pill.expanded {
+  background: var(--surface);
+  border-color: var(--accent);
+  z-index: 10;
+}
+.tool-pill.expanded .pill-full {
+  display: block;
+  pointer-events: auto;
+  overflow-y: auto;
+}
+
+/* ─── Link styling inside message bubbles ─── */
+.msg-bubble a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  border-bottom-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  padding-bottom: 1px;
+  cursor: pointer;
+  transition:
+    color var(--dur-fast),
+    border-bottom-color var(--dur-fast),
+    text-shadow var(--dur-fast);
+}
+.msg-bubble a:hover {
+  color: #fff;
+  border-bottom-color: var(--accent);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+html[data-variant='bright'] .msg-bubble a {
+  color: #007a4d;
+  border-bottom-color: rgba(0, 122, 77, 0.28);
+}
+html[data-variant='bright'] .msg-bubble a:hover {
+  color: #004d2e;
+  border-bottom-color: #007a4d;
+  text-shadow: none;
+}
+
+/* ─── Link context popup ─── */
+.link-popup {
+  position: fixed;
+  z-index: 9000;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  box-shadow:
+    var(--shadow-2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(22px);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 172px;
+  animation: link-popup-in var(--dur-fast) var(--ease);
+}
+@keyframes link-popup-in {
+  from {
+    opacity: 0;
+    transform: scale(0.93) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.link-popup-url {
+  padding: 4px 10px 5px;
+  font-size: 10.5px;
+  color: var(--fg-mute);
+  font-family: var(--font-mono);
+  border-bottom: 1px solid var(--stroke);
+  margin-bottom: 2px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.link-popup-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  color: var(--fg);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+  white-space: nowrap;
+  width: 100%;
+}
+.link-popup-btn:hover {
+  background: var(--hl);
+  color: var(--accent);
+}
+.link-popup-btn .lpb-icon {
+  font-size: 14px;
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+.link-popup .link-popup-btn.danger:hover {
+  background: rgba(255, 91, 110, 0.1);
+  color: var(--danger);
+}
+
+.typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: typing 1s var(--ease) infinite;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* ── AskUser inline question form ──────────────────────────────────────── */
+.ask-user-block {
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  background: color-mix(in srgb, var(--accent, #5b8dff) 6%, transparent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.ask-user-block.ask-user-answered {
+  background: color-mix(in srgb, var(--success, #4caf50) 8%, transparent);
+  border-color: color-mix(in srgb, var(--success, #4caf50) 35%, transparent);
+}
+.ask-user-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--accent, #5b8dff);
+}
+.ask-user-answered .ask-user-title {
+  color: var(--success, #4caf50);
+}
+.ask-user-icon {
+  display: inline-flex;
+  align-items: center;
+}
+.ask-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ask-user-question {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.ask-user-q-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  margin-bottom: 4px;
+}
+.ask-user-q-header {
+  background: var(--accent, #5b8dff);
+  color: white;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ask-user-q-multi {
+  font-size: 10px;
+  color: var(--text-dim, rgba(255,255,255,0.5));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ask-user-q-text {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.ask-user-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.ask-user-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ask-user-option:hover {
+  background: color-mix(in srgb, var(--accent, #5b8dff) 12%, transparent);
+}
+.ask-user-option input {
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+.ask-user-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+.ask-user-option-label {
+  font-weight: 500;
+}
+.ask-user-option-desc {
+  font-size: 12px;
+  color: var(--text-dim, rgba(255,255,255,0.6));
+}
+.ask-user-notes {
+  width: 100%;
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  background: var(--bg-elev, rgba(0,0,0,0.2));
+  color: inherit;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+  resize: vertical;
+}
+.ask-user-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.ask-user-submit {
+  background: var(--accent, #5b8dff);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ask-user-submit:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+.ask-user-summary {
+  background: var(--bg-elev, rgba(0,0,0,0.2));
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin: 0;
+  white-space: pre-wrap;
+  font: inherit;
+  font-size: 12px;
+}

@@ -1,0 +1,340 @@
+{
+  "name": "hunter",
+  "label": "Hunter",
+  "description": "A tiny, friendly black-and-tan German Shepherd with upright ears, expressive eyes, and a subtle tail wag.",
+  "homeSpot": {
+    "x": null,
+    "y": 420
+  },
+  "spriteFormat": "codex-imported",
+  "spriteSize": 192,
+  "poses": {
+    "idle": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/idle_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/idle_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/idle_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/idle_f04.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/idle_f05.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/idle_f06.png",
+          "duration": 140
+        }
+      ]
+    },
+    "running": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/running_f01.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/hunter/running_f02.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/hunter/running_f03.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/hunter/running_f04.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/hunter/running_f05.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/hunter/running_f06.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/hunter/running_f07.png",
+          "duration": 125
+        },
+        {
+          "src": "/pets/hunter/running_f08.png",
+          "duration": 125
+        }
+      ]
+    },
+    "streaming": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/streaming_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/streaming_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/streaming_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/streaming_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/streaming_f05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/streaming_f06.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/streaming_f07.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/streaming_f08.png",
+          "duration": 90
+        }
+      ]
+    },
+    "happy": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/happy_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/happy_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/happy_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/happy_f04.png",
+          "duration": 140
+        }
+      ]
+    },
+    "error": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/error_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/error_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/error_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/error_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/error_f05.png",
+          "duration": 90
+        }
+      ]
+    },
+    "thinking": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/thinking_f01.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/hunter/thinking_f02.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/hunter/thinking_f03.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/hunter/thinking_f04.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/hunter/thinking_f05.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/hunter/thinking_f06.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/hunter/thinking_f07.png",
+          "duration": 110
+        },
+        {
+          "src": "/pets/hunter/thinking_f08.png",
+          "duration": 110
+        }
+      ]
+    },
+    "jumping": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/jumping_f01.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/hunter/jumping_f02.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/hunter/jumping_f03.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/hunter/jumping_f04.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/hunter/jumping_f05.png",
+          "duration": 105
+        },
+        {
+          "src": "/pets/hunter/jumping_f06.png",
+          "duration": 105
+        }
+      ]
+    },
+    "powermove": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/powermove_f01.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/powermove_f02.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/powermove_f03.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/powermove_f04.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/powermove_f05.png",
+          "duration": 140
+        },
+        {
+          "src": "/pets/hunter/powermove_f06.png",
+          "duration": 140
+        }
+      ]
+    },
+    "xpeffect": {
+      "hotspotAnchor": "bottom-center",
+      "effectZone": {
+        "width": 300,
+        "height": 300,
+        "top": -80,
+        "left": -60
+      },
+      "frames": [
+        {
+          "src": "/pets/hunter/xpeffect_f01.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/xpeffect_f02.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/xpeffect_f03.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/xpeffect_f04.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/xpeffect_f05.png",
+          "duration": 90
+        },
+        {
+          "src": "/pets/hunter/xpeffect_f06.png",
+          "duration": 90
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "cwd-manager",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Per-working-directory heartbeat supervisor. Watches each opted-in CWD's TODO list (via getModuleApi('todos')) and CWD context, runs cheap programmatic ticks on an adaptive cadence (0.5/1/2 min active, 5 min idle), broadcasts status over the existing triggers SSE bus, and can optionally run explicit opt-in LLM agent checkups and autonomous worker chats. Agent ticks create/reuse one manager session per CWD and enrich the prompt with same-CWD chat-history snippets plus context-RAG hits; worker chats create focused task sessions and are separately opt-in when context-generator/context-rag is enabled. State persists to ctx.dataDir/state.json keyed by normalized cwd. Disabled by default per CWD (always explicit opt-in). Owns /v1/cwd-manager/* via ctx.routes. Soft-deps on todos / workflows-and-triggers / context-generator — all degrade gracefully.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/cwd-manager"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "productivity"
+}

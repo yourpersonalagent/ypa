@@ -1,0 +1,48 @@
+{
+  "name": "yha-bridge",
+  "version": "1.0.0",
+  "description": "YHA Bridge Server — routes to Claude Code binary or provider APIs",
+  "main": "server.ts",
+  "scripts": {
+    "start": "bun server.ts",
+    "dev": "bun --watch server.ts",
+    "typecheck": "tsc --noEmit",
+    "typecheck:mcp": "tsc -p tsconfig.mcp.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.ts\"",
+    "format:check": "prettier --check \"**/*.ts\""
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.119",
+    "@workos-inc/node": "^7.82.0",
+    "basic-ftp": "^5.3.1",
+    "better-sqlite3": "^11.10.0",
+    "compression": "^1.7.4",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.19.0",
+    "http-proxy-middleware": "^3.0.5",
+    "knex": "^3.2.9",
+    "mysql2": "^3.22.3",
+    "pg": "^8.20.0",
+    "sqlite-vec": "^0.1.9",
+    "ws": "^8.20.0"
+  },
+  "engines": {
+    "bun": ">=1.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "@types/ws": "^8.18.1",
+    "eslint": "^10.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.5.0",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0",
+    "vite": "^8.0.10"
+  }
+}

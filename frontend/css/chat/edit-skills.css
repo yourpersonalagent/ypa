@@ -1,0 +1,386 @@
+/* ─── Inline message edit area ──────────────────────────────────────────────── */
+.msg-edit-ta {
+  width: 100%;
+  min-height: 80px;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.92em;
+  padding: 6px 8px;
+  resize: vertical;
+  outline: none;
+  margin-top: 6px;
+  box-sizing: border-box;
+  line-height: 1.45;
+}
+.msg-edit-ta:focus {
+  border-color: var(--accent);
+}
+
+/* Per-block edit: one textarea per text block, with non-text blocks
+   (tool calls/results, reasoning, #btw) shown read-only between them so the
+   originally recorded order is visible but cannot be edited or reordered. */
+.msg-edit-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+.msg-edit-blocks .msg-edit-ta {
+  margin-top: 0;
+  min-height: 40px;
+}
+.msg-edit-ro {
+  opacity: 0.55;
+  pointer-events: none;
+  border-left: 2px solid var(--stroke-2);
+  padding-left: 10px;
+}
+
+.msg-edit-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  justify-content: flex-end;
+}
+.msg-edit-bar .chat-bar-btn {
+  opacity: 0.65;
+  padding: 3px 10px;
+  font-size: 12px;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+}
+.msg-edit-bar .chat-bar-btn:hover {
+  opacity: 1;
+}
+.msg-edit-bar .chat-bar-btn:hover {
+  opacity: 1;
+}
+
+/* ── Skills active bar ────────────────────────────────────────────────────── */
+.skills-active-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 4px 10px;
+  margin: 4px 0;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 11px;
+}
+.skills-bar-icon {
+  opacity: 0.7;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+}
+.skills-bar-icon svg { display: block; }
+.skills-bar-label {
+  color: var(--fg-dim);
+}
+.skills-bar-tag {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* ── Skills + Instance button active states ───────────────────────────────── */
+.chat-bar-btn.skills-btn.active,
+.chat-bar-btn.instance-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  opacity: 1;
+}
+
+/* ── Skill set checklist in preferences ─────────────────────────────────── */
+.sk-set-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.sk-set-check-lbl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.sk-set-check-lbl:hover {
+  background: var(--bg-3);
+}
+
+/* ── Workflow picker save row ───────────────────────────────────────────── */
+.wf-save-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.wf-name-inp {
+  flex: 1;
+  padding: 5px 8px;
+  background: var(--bg-2);
+  color: var(--fg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  outline: none;
+  font-family: inherit;
+}
+.wf-name-inp:focus {
+  border-color: var(--accent);
+}
+.wf-name-inp::placeholder {
+  color: var(--fg-mute);
+}
+.wf-name-inp.wf-name-err {
+  border-color: var(--danger, #ff5060);
+  animation: wf-shake 0.2s;
+}
+@keyframes wf-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+.wf-save-icon,
+.wf-new-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: var(--hl);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  transition: background var(--dur-fast);
+}
+.wf-save-icon:hover {
+  background: rgba(0, 224, 138, 0.18);
+}
+.wf-new-icon {
+  color: var(--fg-dim);
+}
+.wf-new-icon:hover {
+  background: var(--surface);
+  color: var(--fg);
+}
+
+/* ── Workflow picker footer ─────────────────────────────────────────────── */
+.wf-footer {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--stroke);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.wf-foot-btn {
+  flex: 1;
+  padding: 4px 6px;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  color: var(--fg-dim);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+.wf-foot-btn:hover {
+  background: var(--hl);
+  color: var(--fg);
+}
+.wf-foot-clear:hover {
+  color: var(--danger, #ff5060);
+}
+.wf-foot-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.wf-foot-btn.wf-foot-primary {
+  background: rgba(0, 224, 138, 0.18);
+  color: var(--accent, #00e08a);
+  border-color: rgba(0, 224, 138, 0.4);
+}
+.wf-foot-btn.wf-foot-primary:hover {
+  background: rgba(0, 224, 138, 0.28);
+  color: var(--accent, #00e08a);
+}
+
+/* ── Workflow picker — inline MD import panel ───────────────────────────── */
+.wf-import-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--stroke);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+.wf-import-ta {
+  width: 100%;
+  min-height: 110px;
+  max-height: 240px;
+  resize: vertical;
+  padding: 6px 8px;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.4;
+  outline: none;
+  box-sizing: border-box;
+}
+.wf-import-ta:focus {
+  border-color: var(--accent);
+}
+.wf-import-ta:disabled {
+  opacity: 0.6;
+}
+.wf-import-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.wf-import-or {
+  color: var(--fg-mute);
+}
+.wf-import-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--fg);
+  font-size: 11px;
+  transition: background var(--dur-fast);
+}
+.wf-import-file svg { display: block; }
+.wf-import-file:hover {
+  background: var(--hl);
+}
+.wf-import-file-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.wf-import-err {
+  color: var(--danger, #ff5060);
+  margin-left: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+}
+
+/* ─── Hermes inline prompt row (approval / clarify / sudo / secret) ─────────── */
+.hermes-prompt-row {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--stroke);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hpr-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85em;
+  color: var(--fg-dim);
+  font-weight: 500;
+}
+.hpr-icon { font-size: 1em; line-height: 1; display: inline-flex; align-items: center; }
+.hpr-icon svg { display: block; }
+.hpr-title { flex: 1; }
+.hpr-command {
+  display: block;
+  background: var(--bg-3);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  color: var(--fg);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.hpr-desc {
+  font-size: 0.78em;
+  color: var(--fg-mute);
+  line-height: 1.4;
+}
+.hpr-key-name {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--accent);
+}
+.hpr-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.hpr-btn {
+  border: 1px solid var(--stroke-2);
+  background: var(--bg-3);
+  color: var(--fg);
+  cursor: pointer;
+  padding: 4px 11px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82em;
+  font-family: inherit;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, opacity 0.15s;
+  white-space: nowrap;
+}
+.hpr-btn:hover { background: var(--bg-2); border-color: var(--stroke); }
+.hpr-btn-allow { color: color-mix(in srgb, var(--accent) 90%, var(--fg)); border-color: color-mix(in srgb, var(--accent) 35%, var(--stroke)); }
+.hpr-btn-allow:hover { background: color-mix(in srgb, var(--accent) 12%, var(--bg-3)); border-color: var(--accent); }
+.hpr-btn-always { opacity: 0.75; }
+.hpr-btn-deny { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, var(--stroke)); }
+.hpr-btn-deny:hover { background: color-mix(in srgb, var(--danger) 10%, var(--bg-3)); border-color: var(--danger); }
+.hpr-input {
+  flex: 1;
+  min-width: 160px;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.85em;
+  padding: 4px 9px;
+  outline: none;
+}
+.hpr-input:focus { border-color: var(--accent); }
+.hpr-resolving { opacity: 0.5; pointer-events: none; }
+

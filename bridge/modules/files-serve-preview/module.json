@@ -1,0 +1,27 @@
+{
+  "name": "files-serve-preview",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Per-CWD live-preview server (Vite/serve/python -m http.server) — REST handlers for start/stop/status/logs at /v1/serve/*. The runtime library bridge/files/serve.ts stays in core because its buildServeProxyMiddleware(), handleProxyUpgrade() and killAllSync() are wired directly into server.ts (proxy mount, WS-upgrade hook, shutdown drain) — moving it would break the /proxy/serve/:id reverse proxy.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/serve/runtimes",
+      "/v1/serve/status",
+      "/v1/serve/profiles",
+      "/v1/serve/start",
+      "/v1/serve/stop/:id",
+      "/v1/serve/touch/:id",
+      "/v1/serve/keep-alive/:id",
+      "/v1/serve/shares",
+      "/v1/serve/share/:id",
+      "/v1/serve/shares/:token/revoke",
+      "/v1/serve/active-session",
+      "/v1/serve/logs/:id"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "files"
+}

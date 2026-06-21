@@ -1,0 +1,743 @@
+/* Top-level layout: left sidebar (was top header), main split, view overlay */
+
+:root {
+  --sidebar-w: 320px;
+  /* --header-h is set in JS (layout.ts → applyHeaderOrient) to the
+     actual rendered bar height when the horizontal header is open. */
+  --header-h: 0px;
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 20;
+  pointer-events: none;
+  transform: translateX(-110%);
+  opacity: 0;
+  transition:
+    transform 0.45s var(--ease),
+    opacity 0.3s var(--ease);
+  padding: 0;
+  overflow: hidden;
+}
+#header[data-open='true'] {
+  transform: translateX(0);
+  opacity: 1;
+  padding: 22px 14px 14px;
+  /* Header chrome derives entirely from design tokens so it follows
+     Console / Atelier / Patchbay automatically. The radial highlight is
+     a soft accent-tinted bloom; the linear stripe fades the design's
+     surface from opaque on the left to transparent on the right. */
+  background:
+    radial-gradient(ellipse 120% 60% at 0% 8%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+    linear-gradient(to right,
+      color-mix(in srgb, var(--bg-2) 92%, transparent),
+      color-mix(in srgb, var(--bg-2) 60%, transparent) 70%,
+      color-mix(in srgb, var(--bg-2) 30%, transparent));
+  border-right: 0.5px solid var(--stroke);
+  pointer-events: auto;
+}
+#header > * {
+  pointer-events: auto;
+}
+
+/* Large globe background behind sidebar logo */
+.header-globe-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 220px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+}
+#header[data-open='true'] .header-globe-wrap {
+  opacity: 0.5;
+}
+.header-globe-wrap canvas {
+  position: absolute;
+  left: -30%;
+  top: -20%;
+  width: 320px;
+  height: 260px;
+  border-radius: 50%;
+}
+
+html[data-variant='bright'] #header[data-open='true'] .header-globe-wrap {
+  opacity: 0.9;
+}
+html[data-variant='bright'] #header[data-open='true'] .header-globe-wrap canvas {
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0 2px 14px;
+}
+.brand h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.brand h1 small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--fg-dim);
+  letter-spacing: 0.01em;
+}
+
+/* Header block character — JS spin in HeaderBrand.tsx handles all animation */
+.header-block {
+  display: inline-block;
+  color: var(--accent);
+  transition: color 0.3s ease;
+  font-family: var(--font-mono);
+}
+/* ── Y.O.L.O. cwd actions (rclone / github / knowledge graph) ── */
+.cwd-host {
+  color: var(--accent-2);
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 0.8em;
+}
+.cwd-action {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: var(--fg-mute);
+  background: none;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 3px;
+  padding: 1px 5px;
+  cursor: pointer;
+  line-height: 1.4;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    opacity 0.15s;
+  position: relative;
+}
+.cwd-action:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.cwd-action:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+/* Green dot before button text when output already exists */
+.cwd-action[data-built='true']::before {
+  content: '●';
+  font-size: 6px;
+  color: var(--accent);
+  margin-right: 4px;
+  vertical-align: middle;
+  opacity: 0.8;
+}
+/* Pulse animation while graph is building */
+@keyframes cwd-building-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.cwd-action[data-building='true'] {
+  animation: cwd-building-pulse 0.7s ease-in-out infinite;
+  border-color: var(--accent);
+  color: var(--accent);
+  cursor: wait;
+}
+/* ── GitHub panel modal (managed by GithubModal.tsx + github.ts) ── */
+#github-panel {
+  display: none;
+}
+#github-panel.github-panel-open {
+  display: block;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  width: min(520px, calc(100vw - 2rem));
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--surface-2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.18));
+  border-radius: var(--radius-md);
+  padding: 0;
+}
+.github-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.45);
+}
+.gh-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--fg-mute);
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 1;
+}
+.gh-close-btn:hover {
+  color: var(--fg);
+}
+
+/* ── Sidebar menu: vertical stack of items ── */
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-md);
+  overflow: hidden auto;
+  padding: 6px 4px;
+  flex: 0 1 auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+  margin-bottom: 14px;
+}
+/* Release the backdrop-filter GPU layer when the sidebar is hidden —
+   translateX(-110%) keeps the element in the compositor tree with an
+   active blur even when fully off-screen. */
+#header:not([data-open='true']) .header-actions {
+  backdrop-filter: none;
+}
+.header-actions::-webkit-scrollbar {
+  width: 5px;
+}
+.header-actions::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+
+/* flat item — full-width row in the sidebar */
+.hm-item {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-xs);
+  color: var(--fg-dim);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 9px 12px;
+  white-space: nowrap;
+  position: relative;
+  text-align: left;
+  transition:
+    color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+  cursor: pointer;
+}
+.hm-item:hover {
+  color: var(--fg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--fg) 10%, transparent) 0%, transparent 100%);
+}
+.hm-item:active {
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+  color: var(--fg);
+}
+
+/* accent variant — run button */
+.hm-item.hm-accent {
+  color: var(--accent);
+  font-weight: 600;
+}
+.hm-item.hm-accent:hover {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent) 0%, color-mix(in srgb, var(--accent) 8%, transparent) 100%);
+  color: var(--accent);
+}
+
+/* busy variant — flagged on header buttons whose feature is currently
+   calling the model. Used by ContextGenButton via the `useApiBusy` hook
+   so the user can see a "don't restart the server" signal at a glance.
+   The colour is `--danger` (theme-aware red); the icon also swaps to a
+   "broadcasting arcs" SVG in the JSX. Pulse animation disabled per user
+   request 2026-05-07 — coloring + icon switch is enough. */
+.hm-item.is-busy,
+.hm-item.is-busy:hover,
+.hm-item.is-busy:active {
+  color: var(--danger);
+}
+/* Pulse animation disabled — kept commented for easy restore.
+.hm-item.is-busy .hm-icon svg {
+  animation: hm-busy-pulse 1.4s ease-in-out infinite;
+}
+@keyframes hm-busy-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hm-item.is-busy .hm-icon svg {
+    animation: none;
+  }
+}
+*/
+
+/* icon wrapper inside hm-item buttons — centres SVG vertically in-line */
+.hm-icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* separator between items — thin horizontal line in the sidebar stack */
+.hm-sep {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    to right,
+    transparent 10%,
+    var(--stroke-2) 40%,
+    var(--stroke-2) 60%,
+    transparent 90%
+  );
+  flex-shrink: 0;
+  margin: 2px 0;
+  align-self: stretch;
+}
+
+/* select inside header — inherits from hm-item base look */
+.hm-select {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--fg-dim);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 7px 26px 7px 13px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  transition:
+    color var(--dur-fast),
+    background var(--dur-fast);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23506576'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  max-width: 160px;
+}
+.hm-select:hover {
+  color: var(--fg);
+  background-color: linear-gradient(180deg, rgba(0, 224, 138, 0.11) 0%, transparent 100%);
+}
+.hm-select option {
+  background: var(--bg-2);
+  color: var(--fg);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Workflow dropdown panel ───────────────────────────────────────────────── */
+.wf-panel {
+  width: 248px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+}
+/* Align first block element in user/note chat message bubbles to the right */
+.msg.user .msg-bubble > :first-child,
+.msg.note .msg-bubble > :first-child {
+  text-align: right;
+}
+.wf-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-mute);
+  padding: 0 2px 2px;
+}
+.wf-select {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  font-size: 12px;
+  padding: 6px 28px 6px 10px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23506576'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  transition: border-color var(--dur-fast);
+}
+.wf-select:hover {
+  border-color: var(--stroke);
+}
+.wf-select option {
+  background: var(--bg-2);
+  color: var(--fg);
+}
+.wf-sep {
+  height: 1px;
+  background: var(--stroke);
+  margin: 2px 0;
+}
+.wf-row {
+  display: flex;
+  gap: 4px;
+}
+.wf-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  color: var(--fg-dim);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 6px;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast),
+    border-color var(--dur-fast);
+}
+.wf-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--fg);
+}
+.wf-btn.wf-run {
+  color: var(--accent);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.wf-btn.wf-run:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.wf-btn.wf-del:hover {
+  color: var(--danger, #ff5060);
+  border-color: rgba(255, 80, 96, 0.3);
+}
+.wf-seg {
+  display: flex;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--stroke-2);
+}
+.wf-seg-btn {
+  flex: 1;
+  background: var(--surface);
+  border: none;
+  border-right: 1px solid var(--stroke-2);
+  color: var(--fg-mute);
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 7px 4px;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+.wf-seg-btn:last-child {
+  border-right: none;
+}
+.wf-seg-btn:hover {
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  color: var(--fg);
+}
+.wf-seg-btn.wf-seg-active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+#main {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transition: padding var(--dur-med) var(--ease);
+}
+#header[data-open='true'] ~ #main {
+  padding-left: var(--sidebar-w);
+}
+
+/* Views row — holds chat + splitter + workflow */
+#main-views {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+#main-views[data-orientation='v'] {
+  flex-direction: column;
+}
+
+.view {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-2);
+  margin: 4px;
+  border-radius: var(--radius-lg);
+  transition:
+    flex var(--dur-med) var(--ease),
+    margin var(--dur-med) var(--ease),
+    border-color var(--dur-med);
+  flex: 1 1 50%;
+  min-width: 0;
+  min-height: 0;
+}
+.splitter {
+  flex: 0 0 6px;
+  order: 1;
+  background: transparent;
+  position: relative;
+  cursor: col-resize;
+}
+#main-views[data-orientation='v'] .splitter {
+  cursor: row-resize;
+}
+.splitter::after {
+  content: '';
+  position: absolute;
+  inset: 40% 2px;
+  background: var(--stroke-2);
+  border-radius: 2px;
+  opacity: 0;
+  transition:
+    background var(--dur-fast),
+    opacity var(--dur-fast);
+}
+#main-views[data-orientation='v'] .splitter::after {
+  inset: 2px 40%;
+}
+.splitter:hover::after {
+  background: var(--accent);
+  opacity: 1;
+}
+
+/* Full-view modes: truly hide the other view, stretch active to fill */
+#main-views[data-mode='chat'] #view-workflow,
+#main-views[data-mode='chat'] .splitter,
+#main-views[data-mode='workflow'] #view-chat,
+#main-views[data-mode='workflow'] .splitter {
+  display: none !important;
+}
+
+#main-views[data-mode='chat'] #view-chat,
+#main-views[data-mode='workflow'] #view-workflow {
+  flex: 1 1 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.vo-gap {
+  width: 12px;
+  display: inline-block;
+}
+
+/* view overlay — minimal, grows on hover. Position cycles: bottom/left/top/right.
+   ViewOverlay.tsx adds invisible .vo-spacer elements before and/or after the
+   .vo-pill so the cycle (chat/layout) button always sits at the structural
+   centre of the overlay regardless of how many real buttons each side has.
+   .view-overlay is a transparent positioning shell that holds the spacers +
+   the .vo-pill; .vo-pill carries the visible chrome (background, border,
+   padding, shadow) so the pill hugs only the real buttons — spacers extend
+   the layout but stay outside the visible design. */
+.view-overlay {
+  position: fixed;
+  bottom: 14px;
+  top: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+  opacity: 0.25;
+  transition: opacity var(--dur-med) var(--ease);
+  z-index: 30;
+  scale: 0.75;
+}
+.vo-pill {
+  display: flex;
+  /* flex-direction:inherit works in modern engines but some older iOS
+     WebKit builds drop it for this specific property, so the explicit
+     data-pos rules below pin row/column directly. The `inherit` here is
+     the desktop fast path. */
+  flex-direction: inherit;
+  gap: 2px;
+  padding: 5px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  /* backdrop-filter removed — forces 60fps GPU compositing on every vsync
+     whenever anything animates below it (pet patrol, transitions, etc.) */
+  /* Outline is rendered by the box-shadow below.
+     A 0.5px border here was making pill width = 38N + 9 (always odd), which
+     pushed translate(-50%) onto a half-pixel and produced a parity-dependent
+     ~0.5px drift between even/odd button counts. */
+  border-radius: var(--radius-pill);
+  transition: background var(--dur-med);
+  box-shadow:
+    0 0 0 1px var(--stroke-2),
+    0 8px 24px rgba(0, 0, 0, 0.22);
+}
+.view-overlay:hover,
+.view-overlay:focus-within {
+  opacity: 1;
+  transform: translateX(-50%) scale(1.33);
+}
+.view-overlay:hover .vo-pill,
+.view-overlay:focus-within .vo-pill {
+  background: var(--surface-2);
+}
+.view-overlay[data-pos='top'] {
+  top: 14px;
+  bottom: auto;
+}
+#header[data-open='true'] ~ .view-overlay[data-pos='top'] {
+  top: 14px;
+}
+#header[data-open='true'] ~ .view-overlay[data-pos='left'] {
+  left: calc(var(--sidebar-w) + 14px);
+}
+.view-overlay[data-pos='top']:hover,
+.view-overlay[data-pos='top']:focus-within {
+  transform: translateX(-50%) scale(1.33);
+}
+.view-overlay[data-pos='right'] {
+  right: 14px;
+  left: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  flex-direction: column;
+}
+.view-overlay[data-pos='right'] .vo-pill,
+.view-overlay[data-pos='left'] .vo-pill {
+  flex-direction: column;
+}
+.view-overlay[data-pos='top'] .vo-pill,
+.view-overlay[data-pos='bottom'] .vo-pill {
+  flex-direction: row;
+}
+.view-overlay[data-pos='right']:hover,
+.view-overlay[data-pos='right']:focus-within {
+  transform: translateY(-50%) scale(1.33);
+}
+.view-overlay[data-pos='left'] {
+  left: 14px;
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  flex-direction: column;
+}
+.view-overlay[data-pos='left']:hover,
+.view-overlay[data-pos='left']:focus-within {
+  transform: translateY(-50%) scale(1.33);
+}
+.vo-btn {
+  background: transparent;
+  border: none;
+  padding: 3px;
+  color: var(--fg-dim);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition:
+    color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    transform var(--dur-fast);
+}
+.vo-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.vo-btn:hover {
+  background: var(--hl);
+  color: var(--accent);
+}
+.vo-btn:active {
+  transform: scale(0.92);
+}
+.vo-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+}
+/* Invisible reserved slot — rendered by ViewOverlay.tsx so the cycle button
+   stays at the structural centre of the overlay regardless of how many real
+   buttons are visible. Sits *outside* the .vo-pill, so the visible pill hugs
+   only the real buttons; the spacer occupies the slot the missing button
+   would take.
+
+   The spacer is +19px along the overlay's main flex axis (55 vs 36) to
+   counteract a small residual visual drift toward the spacer side observed
+   when switching between layouts with different spacer counts. The cross
+   axis stays at 36 so the spacer doesn't push the pill sideways. */
+.vo-spacer {
+  width: 36px;
+  height: 36px;
+  pointer-events: none;
+}
+.view-overlay[data-pos='top'] .vo-spacer,
+.view-overlay[data-pos='bottom'] .vo-spacer {
+  width: 55px;
+}
+.view-overlay[data-pos='left'] .vo-spacer,
+.view-overlay[data-pos='right'] .vo-spacer {
+  height: 55px;
+}
+

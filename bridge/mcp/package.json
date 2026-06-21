@@ -1,0 +1,11 @@
+{
+  "name": "claudeyha-mcp-servers",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "rebrowser-playwright": "^1.52.0"
+  }
+}

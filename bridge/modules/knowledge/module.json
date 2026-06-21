@@ -1,0 +1,14 @@
+{
+  "name": "knowledge",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Knowledge vault — placeholder module. The data lives under bridge/core/paths.ts:knowledgeRoot (legacy bridge/knowledge/ or per-user bridge/users/<email>/knowledge/) and is read by the `knowledge-memory` MCP child (bridge/mcp/knowledge-server.js), which now imports the same paths getter so the data root is a single source of truth. There are no /v1/knowledge/* HTTP routes — the MCP server is the only consumer. The module exists to (a) reserve the slot in modules.json so a future Phase 2 cut can move both the data AND the MCP server here, and (b) prove the register-side structure works for behavior-less modules.",
+  "needs": [],
+  "provides": {
+    "routes": []
+  },
+  "lifecycle": {
+    "reload": "safe"
+  },
+  "category": "context"
+}

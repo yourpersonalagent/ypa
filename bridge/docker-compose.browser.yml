@@ -1,0 +1,40 @@
+# YHA desktop-browser — managed by bridge/mcp/desktop-browser-server.js.
+# Lifecycle: brought up by the MCP on startup, brought down on shutdown.
+# Both ports bind to 127.0.0.1 only — never expose to the LAN.
+#
+# Surfaces:
+#   :3001  KasmVNC web UI (slow, framebuffer)  — secondary, for the user window
+#   :9333  Chromium CDP        (fast, JSON-RPC) — primary, for the model
+# Note: 9222 is reserved by the host Chrome that the existing `web` MCP uses
+# for real-mode CDP. We pick 9333 to avoid the collision.
+
+services:
+  yha-chromium:
+    image: lscr.io/linuxserver/chromium:latest
+    container_name: yha-chromium
+    # Bridge networking (default). Chromium 113+ refuses to bind CDP to
+    # 0.0.0.0 unless --remote-allow-origins=* is also set; with both, the
+    # bind succeeds and Docker's port map forwards 127.0.0.1:9333 (host)
+    # to 0.0.0.0:9333 (container). The host's 127.0.0.1 binding keeps CDP
+    # off the LAN.
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      # Chromium 113+ refuses to bind CDP to non-loopback even with
+      # --remote-debugging-address=0.0.0.0. So Chromium binds 127.0.0.1:9334
+      # inside the container, and the cdp-proxy sidecar (mounted into
+      # /custom-services.d/) re-exposes it on 0.0.0.0:9333 so the Docker
+      # port map can reach it.
+      - CHROME_CLI=--remote-debugging-port=9334 --remote-allow-origins=*
+    volumes:
+      - ./browser-config:/config
+      - ./browser-init/cdp-proxy:/custom-services.d/cdp-proxy:ro
+    ports:
+      - "127.0.0.1:3011:3000"
+      - "127.0.0.1:9333:9333"
+    shm_size: "1gb"
+    mem_limit: "2g"
+    restart: "no"

@@ -1,0 +1,302 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docs — entire folder is now per-user (Q16: moved to bridge/users/<email>/docs/).
+# Project-root docs/ is no longer used; ignore the whole path so an accidental
+# `git reset --hard` or `git checkout` can't resurrect tracked legacy copies.
+docs/
+
+# desktop-browser MCP — Chromium profile data (cookies, history, cache)
+# Persisted across container restarts but local-only; do not sync.
+bridge/browser-config/
+
+# IDE files
+.vscode/
+.idea/
+# VSCode multi-root workspace file — personal/machine-specific (folder layout +
+# local settings). Keep it on disk for opening the project, but don't publish.
+*.code-workspace
+*.swp
+*.swo
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+logs/
+# Local terminal session captures. Runtime-owned logs should live under
+# bridge/state/terminals/; keep the old repo-root path ignored too so accidental
+# captures cannot be committed.
+/terminals/
+bridge/state/terminals/
+# Generated MCP tool-schema snapshots. Some harnesses dump these into the
+# working directory; YHA-owned runtime copies should stay under bridge/state.
+/mcps/
+bridge/state/mcps/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+tmp_*
+# Dev-scratch with literal Windows paths as filenames (PowerShell escaping
+# bugs). NOTE: the "colon" in these names is the homoglyph U+F03A, NOT an ASCII
+# ':' — the old `C:Users*` pattern used a real colon and so never matched the
+# tracked file. Match the collapsed AppData\Local\Temp fragment these mangled
+# names carry instead; that is robust regardless of the exact garbled prefix.
+*AppDataLocalTemp*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Session data (contains chat history)
+bridge/sessions/
+bridge/uploads/
+
+# SQLite session DB (large, written live by bridge + go-core)
+bridge/data/sessions.db
+bridge/data/sessions.db-shm
+bridge/data/sessions.db-wal
+bridge/data/image-jobs.db
+bridge/data/image-jobs.db-shm
+bridge/data/image-jobs.db-wal
+
+# SQLite session backups (VACUUM INTO snapshots by yha-rewind)
+bridge/data/backups/
+
+# Bridge runtime state (rewritten live — caused "unstable object source" in git add)
+bridge/context-graph.json
+bridge/data/mcp-pids.json
+bridge/data/mcp-pids.json.tmp.*
+# YHA Net local identity/trust state (contains private node keys + invite secrets)
+bridge/data/net/
+bridge/input-history.json
+bridge/last-exit.json
+bridge/prefs.json
+bridge/tokens.json
+bridge/harness-history.json
+bridge/important-memory.json
+bridge/cwd-context-memory.json
+bridge/link-state.json
+bridge/search-usage.json
+bridge/costs.json
+bridge/openai-proxy-prefs.json
+bridge/mcp-state.json
+bridge/mcp-state.json.tmp.*
+bridge/mcp-external-sources.json
+bridge/mcp-external-sources.json.tmp.*
+bridge/mcp-audit.jsonl
+# UI composer autosave scratch — rewritten live by the editor; never source.
+bridge/draft.json
+
+# Per-install telemetry (model-usage events, session rewind snapshots, UI state)
+bridge/model-tracker-events/
+bridge/rewind/
+bridge/state/code-view/
+
+# Per-user / per-install secrets and credentials (A.6 — never publish, even private)
+bridge/api-keys.json
+bridge/secrets/
+# Local TLS material (default path when TLS_CERT_PATH/TLS_KEY_PATH unset)
+bridge/certs/
+bridge/ftp-connections.json
+bridge/partners.json
+bridge/partners/
+bridge/config-history/
+
+# Per-user folder (Q16) — bridge/users/<email>/ holds all per-user state:
+# live secrets (link/secrets.json), tokens, prefs, docs vault, RAG DBs, skills,
+# generated synthesis, etc. Fresh installs grow this from first sign-in via
+# bridge/users/resolver.ts (the resolver source itself stays tracked — pattern
+# matches only per-email subdirs, not files at bridge/users/ root).
+bridge/users/*/
+
+# Q16 migrator artifacts — markers + .bak siblings dropped at legacy paths
+# after move into bridge/users/<email>/. Per-host runtime, not source.
+*.migrated-to-*
+bridge/*.bak
+
+# Skills migrated out of the module dir (Q16). The skills-editor module now
+# resolves storage through bridge/users/<email>/skills/ — nothing should land
+# back at the legacy in-module path, but ignore it explicitly so a stray
+# `meta.writeSkill()` against the fallback (no ALLOWED_EMAILS) doesn't get
+# re-tracked. _state.json is the live mount list; audit.log already covered
+# above.
+bridge/modules/skills-editor/skills/
+bridge/modules/skills-editor/_state.json
+
+# Skill-import provenance stamps (any depth). Dropped into each imported skill
+# folder at import time; inert at runtime and carry stale per-host source paths.
+# New imports regenerate their own, so never source — ignore everywhere.
+.yha-import.json
+
+# Per-user employees — real-people personas (A.6: drop from repo, keep locally)
+bridge/employees/
+
+# Personal/working notes at repo root (kept locally, not for public surface)
+/*ideas*.md
+/*review*.md
+/*handoff*.md
+/*Rebuild-Plan.md
+/DEPENDENCIES.md
+/GO-Ownership-Plan.md
+# Harness probe scratch dropped at repo root — inert
+# smoke-test junk, never source.
+/_*probe*.txt
+
+# .trash/ at any depth — local junk from delete/move/paste tools; not source code
+.trash/
+
+# Activity / audit logs (per-user attribution, not for public surface)
+bridge/auth-logins.log
+bridge/meta/audit.log
+bridge/modules/skills-editor/audit.log
+bridge/api-inout-log/
+bridge/monitoring-log/
+bridge/telemetry/
+bridge/server.log
+restart.log
+
+# MCP runtime exchange dump (process I/O traces)
+bridge/mcp/exchange/
+
+# TUI daemon runtime state (pid, unix socket, job logs — recreated on TUI start)
+bridge/state/yha-tui/daemon.pid
+bridge/state/yha-tui/daemon.sock
+bridge/state/yha-tui/jobs/
+bridge/state/yha-tui/yha-windows.pids.json
+bridge/state/yha-tui/config.toml
+bridge/state/tui-tokens.json
+
+# Python bytecode caches (nested too — skills + tools can ship Python helpers)
+bridge/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Claude harness local state (per-machine, not portable)
+.claude/
+
+# Context-RAG runtime data (registry + SQLite DBs written live by ingest)
+bridge/modules/context-generator/context-rag/dbs.json
+bridge/modules/context-generator/context-rag/data/*.db
+bridge/modules/context-generator/context-rag/data/*.db-shm
+bridge/modules/context-generator/context-rag/data/*.db-wal
+bridge/modules/context-generator/context-rag/data/*.json
+
+# User configuration (contains API keys)
+bridge/config.json
+
+# Generated knowledge graph + synthesis output (rebuilt via "build" button).
+# Knowledge root is routed through bridge/core/paths.ts:knowledgeRoot — legacy
+# bridge/knowledge/ (pre-Q16) or bridge/users/<email>/knowledge/ (per-user,
+# already covered by `bridge/users/*/` above). The whole legacy folder is
+# generated content; ignore it entirely so a stray runtime write doesn't get
+# committed.
+bridge/knowledge/
+
+# Backups
+*.bak
+*.bak-*
+bridge/data/sessions.db.bak*
+
+# Compiled binaries — compile-on-install (locked: no binary releases).
+# /bin/ is fully ignored except the placeholder. Covers every platform/extension
+# (Linux ELF, Windows .exe, .exe~ backups, local shell helpers, third-party
+# binaries dropped into /bin/ by installers, etc.).
+/bin/*
+!/bin/.gitkeep
+
+# Grok Build CLI home/session data. Grok writes its config (.claude.json),
+# sessions/, and projects/ into its HOME dir. The live HOME is ~/.grok
+# (external — see bridge/config.json grokInstances). A stale copy was once
+# committed at repo-root grok/; it now lives under the ignored bin/. Ignore
+# the repo-root path so a stray run with HOME=<repo> can't re-track it.
+/grok/
+# Orphaned materialized MCP-config dir (settings.json/.claude.json/mcp-bridge.json)
+# left by a removed harness instance — nothing reads it now (materialize.ts only
+# materializes claude/codex instances, never grok). Ignored so it can't re-track.
+bridge/grok/
+bridge/bin/
+go-core/bin/
+go-core/cmd/yha-core/yha-core
+
+# Python virtualenvs — recreated by `pip install` on first run.
+.venv/
+bridge/mcp/.graphify-venv/
+
+# Frontend build output — `cd frontend && bun run build` regenerates it.
+# Lives at frontend/demo/ today (the demo page IS the built dist).
+frontend/demo/
+frontend/.tsc-slice.json
+# Trace dumps — capture absolute source paths from the dev machine; generated on
+# demand, never source. Only trace.json was ever tracked here.
+frontend/trace/
+
+# Runtime data
+*.pid
+*.seed
+
+# Coverage directory
+coverage/
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Bun
+.bun-cache
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# parcel-bundler cache
+.cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build output
+.nuxt
+
+# Gatsby files
+.cache/
+public
+!frontend/public/
+!frontend/public/pets/
+!frontend/public/pets/**
+
+# VuePress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# YHA demo build artifacts (regenerated by tools/build-demo.mjs)
+frontend/demo.zip

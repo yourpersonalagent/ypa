@@ -1,0 +1,1037 @@
+/* ── Overlay-position cluster: 4 arrow buttons in compass layout ─────────── */
+.vo-pos-cluster {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 10px);
+  grid-template-rows: repeat(3, 10px);
+  place-content: center;
+  gap: 0;
+  overflow: visible;
+}
+.vo-pos-cluster:hover {
+  /* override .vo-btn:hover background so the cluster doesn't fill on hover */
+  background: transparent;
+  color: var(--fg-dim);
+}
+.vo-pos-arrow {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.35;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+.vo-pos-arrow svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  stroke: none;
+  overflow: visible;
+}
+.vo-pos-arrow:hover {
+  opacity: 0.9;
+  background: var(--hl);
+  color: var(--accent);
+}
+.vo-pos-arrow.current {
+  opacity: 1;
+  color: var(--accent);
+}
+.vo-pos-arrow[data-pos='top'] {
+  grid-area: 1 / 2 / 2 / 3;
+}
+.vo-pos-arrow[data-pos='right'] {
+  grid-area: 2 / 3 / 3 / 4;
+}
+.vo-pos-arrow[data-pos='bottom'] {
+  grid-area: 3 / 2 / 4 / 3;
+}
+.vo-pos-arrow[data-pos='left'] {
+  grid-area: 2 / 1 / 3 / 2;
+}
+
+/* ── Collapsible sidebar sections (personnel, triggers) ──────────────────── */
+.hs-section {
+  display: flex;
+  flex-direction: column;
+}
+.hs-toggle {
+  position: relative;
+  padding-right: 28px;
+}
+.hs-toggle .hm-icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  opacity: 0.8;
+}
+/* Add a small gap between the leading icon and label text on toggles that
+   don't already use flex (cwd-toggle uses gap: 6px on its own). */
+.hs-toggle:not(.cwd-toggle) .hm-icon {
+  margin-right: 6px;
+}
+.hs-toggle.hs-open .hm-icon {
+  opacity: 1;
+  color: var(--accent);
+}
+.hs-toggle::after {
+  content: '\25BE';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 26px;
+  line-height: 1;
+  opacity: 0.65;
+  transition: transform 0.2s;
+}
+.hs-toggle.hs-open::after {
+  transform: translateY(-50%) rotate(180deg);
+  opacity: 1;
+}
+.hs-toggle.hs-open {
+  color: var(--fg);
+}
+.hs-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.28s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+}
+.hs-body.hs-open {
+  overflow: hidden auto;
+  max-height: 100vh;
+}
+.hs-loading {
+  padding: 8px 12px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+/* The two .hm-row-pair wrappers (.hm-row-pair-primary and
+   .hm-row-pair-secondary) are semantic groupings only — `display: contents`
+   collapses their box so every button participates directly in the parent
+   .hm-row-pair-group flex layout. That lets the buttons wrap intelligently:
+
+   - vertical sidebar mode: the group is a wrapping row with a 25% basis
+     per item, so up to 4 buttons fit per line. Extra buttons spill onto
+     subsequent lines, where flex-grow makes the partial last row fill
+     evenly (e.g. 7 buttons → 4 + 3, the 3 each sized at ~33%).
+   - horizontal bar mode (overrides further down): same flex-wrap, but
+     items don't grow and the group right-aligns its content via
+     justify-content:flex-end so individual buttons that don't fit wrap
+     onto additional lines staying flush against the right edge — the
+     same behaviour the left-side header action buttons already have. */
+.hm-row-pair {
+  display: contents;
+}
+.hm-row-pair-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  /* Buttons within a row touch (column-gap:0) like the old paired layout;
+     wrapped rows get 4px of vertical breathing room (row-gap:4px). */
+  column-gap: 0;
+  row-gap: 4px;
+  margin-top: auto; /* push to bottom in vertical sidebar (carries
+                              every child button along as one block) */
+}
+/* The buttons / hs-section / pet-header-menu are DOM-children of
+   .hm-row-pair (not of .hm-row-pair-group) — `display: contents` only
+   flattens layout, CSS combinators still walk the real DOM tree. So the
+   selector targets `.hm-row-pair > X`, not `.hm-row-pair-group > X`,
+   otherwise the rule wouldn't match and items would fall back to
+   `flex: 0 1 auto` (content-width, ~no width for icon-only buttons).
+   Default to a 25% basis so vertical sidebar fits exactly 4 per row;
+   flex-grow:1 fills any leftover space on a partial wrapped row (e.g.
+   the 3 secondary items expand to ~33% each on their own line). */
+.hm-row-pair > .hm-item,
+.hm-row-pair > .hs-section,
+.hm-row-pair > .pet-header-menu {
+  flex: 1 1 25%;
+  min-width: 0;
+}
+.hm-row-pair .hm-item {
+  text-align: center;
+  padding: 9px 4px;
+}
+.hm-row-pair .hs-section .hm-item {
+  width: 100%;
+}
+.pet-header-menu {
+  position: relative;
+}
+.pet-header-menu .pet-hm-btn {
+  width: 100%;
+}
+.pet-hm-btn.is-on {
+  color: var(--accent);
+}
+.pet-menu-popover {
+  position: absolute;
+  left: calc(100% + 8px);
+  bottom: 0;
+  z-index: 45;
+  display: grid;
+  min-width: 236px;
+  max-width: min(340px, 86vw);
+  padding: 6px;
+  gap: 2px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 0.5px solid var(--stroke);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(20px);
+}
+/* Portal-rendered floating variant — JS computes top/left/maxHeight at
+   open time so the popover is always within the viewport. Same visual
+   chrome as the inline `.pet-menu-popover` above, but `position: fixed`
+   coords from React inline style win over the absolute positioning
+   inherited from the base rule (anchor + bottom go to auto). z-index
+   bumped above the standard 45 so it floats over modals + bg canvases
+   that grew their own stacking context. */
+.pet-menu-popover.pet-menu-popover-floating {
+  position: fixed;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  top: auto;
+  z-index: 1200;
+  /* maxHeight is also set inline by React; this just provides a fallback
+     for when the script computation gives 0 (race on first paint). */
+  max-height: min(80vh, 720px);
+  overflow-y: auto;
+}
+/* Trigger-button level badge — small accent-ringed pill in the top-right
+   corner of the pet menu button, showing the current pet level. Hidden
+   when the pet is at level 1 (no need to advertise the starting state). */
+.pet-hm-btn {
+  position: relative;
+}
+.pet-hm-level-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+  color: var(--bg, #0a0a0a);
+  background: var(--accent, #00e08a);
+  border: 1px solid var(--surface, #161616);
+  border-radius: 999px;
+  pointer-events: none;
+}
+/* Level + XP row inside the popover head — clickable so the user can
+   preview the level-up animation without grinding XP. Mimics the bar
+   pattern used elsewhere in the app (chat per-tier progress). */
+.pet-menu-popover .pet-menu-level-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 4px 6px;
+  background: color-mix(in oklab, var(--accent, #00e08a) 6%, var(--surface-1, #1a1a1a));
+  border: 1px solid color-mix(in oklab, var(--accent, #00e08a) 30%, var(--stroke, #2a2a2a));
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
+  /* Override the popover's blanket `button { width: 100% }` rule with
+     no further changes — this row is already 100 % wide via grid. */
+  min-height: 0;
+}
+.pet-menu-popover .pet-menu-level-row:hover {
+  border-color: color-mix(in oklab, var(--accent, #00e08a) 55%, var(--stroke, #2a2a2a));
+}
+.pet-menu-level-num {
+  font-weight: 600;
+  color: var(--accent, #00e08a);
+  white-space: nowrap;
+}
+.pet-menu-level-bar {
+  position: relative;
+  height: 5px;
+  background: var(--stroke-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.pet-menu-level-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--accent, #00e08a), var(--accent-2, #ffaa48));
+  transition: width 320ms ease-out;
+}
+.pet-menu-level-xp {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.78;
+  white-space: nowrap;
+}
+.pet-menu-head {
+  display: grid;
+  gap: 2px;
+  padding: 7px 8px 6px;
+  border-bottom: 0.5px solid var(--stroke);
+  margin-bottom: 3px;
+}
+.pet-menu-head strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+.pet-menu-head span {
+  font-size: 10px;
+  opacity: 0.6;
+}
+.pet-menu-popover button {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  width: 100%;
+  padding: 6px 8px;
+  color: var(--fg);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.pet-menu-popover button:hover:not(:disabled),
+.pet-menu-popover button:focus-visible:not(:disabled) {
+  background: var(--surface-2);
+  outline: none;
+}
+.pet-menu-popover button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.pet-menu-sep {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--stroke);
+}
+
+/* ── Sprite-toggle 2 × 2 grid (Mirror / Run dir / Tint / Layer) ──────────
+   Four small on/off flips paired into two columns. Buttons inside still
+   inherit the `.pet-menu-popover button` styling above (hover bg, padding,
+   28 px min-height) — we just override the implicit `width: 100 %` rule by
+   letting grid track sizing pick the column width. Slightly tighter
+   font-size + horizontal padding so the longer "Run dir: flipped" /
+   "Theme tint: on" labels don't wrap on the narrowest popover (236 px). */
+.pet-menu-popover .pet-menu-toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+.pet-menu-popover .pet-menu-toggle-grid button {
+  width: 100%;
+  min-width: 0; /* allow grid track to shrink the button below content */
+  padding: 6px 6px;
+  font-size: 10.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Action button grid (Hatch / Manage / Play | Export / Import / Codex) ─── */
+.pet-menu-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+}
+/* Action grid buttons are more compact than the full-width menuitem style. */
+.pet-menu-action-grid button {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  padding: 5px 4px;
+  font-size: 10.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 26px;
+}
+
+/* ── Codex pet import inline panel ────────────────────────────────────────── */
+.pet-codex-import-panel {
+  padding: 7px;
+  border-radius: 7px;
+  background: color-mix(in oklab, var(--accent, #00e08a) 5%, var(--surface-1, #1a1a1a));
+  border: 1px solid color-mix(in oklab, var(--accent, #00e08a) 22%, var(--stroke, #2a2a2a));
+  display: grid;
+  gap: 6px;
+}
+.pet-codex-import-hint {
+  font-size: 10px;
+  opacity: 0.65;
+  margin: 0;
+}
+.pet-codex-import-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 7px;
+  font-size: 10px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  background: var(--surface, #161616);
+  border: 1px solid var(--stroke, #2a2a2a);
+  border-radius: 5px;
+  color: var(--fg);
+  resize: vertical;
+  min-height: 52px;
+  line-height: 1.45;
+}
+.pet-codex-import-input::placeholder {
+  opacity: 0.38;
+}
+.pet-codex-import-input:focus {
+  outline: none;
+  border-color: color-mix(in oklab, var(--accent, #00e08a) 50%, var(--stroke, #2a2a2a));
+}
+.pet-codex-import-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+/* Override the popover-wide `button { width: 100% }` for panel buttons */
+.pet-menu-popover .pet-codex-import-panel button {
+  width: auto;
+  min-height: 22px;
+  padding: 2px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid var(--stroke, #2a2a2a);
+  background: var(--surface-2, #222);
+  cursor: pointer;
+  color: var(--fg);
+}
+.pet-menu-popover .pet-codex-import-panel button:hover:not(:disabled) {
+  background: var(--surface-2);
+  outline: none;
+}
+.pet-menu-popover .pet-codex-import-panel .pet-codex-import-btn {
+  background: var(--accent, #00e08a);
+  color: var(--bg, #0a0a0a);
+  border-color: transparent;
+  font-weight: 600;
+}
+.pet-menu-popover .pet-codex-import-panel .pet-codex-import-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  background: var(--accent, #00e08a);
+}
+.pet-menu-popover .pet-codex-import-panel .pet-codex-import-btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+.pet-codex-import-progress {
+  font-size: 11px;
+  margin: 0;
+  opacity: 0.8;
+}
+.pet-codex-import-success {
+  font-size: 11px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pet-codex-import-err {
+  font-size: 10px;
+  color: var(--color-danger, #ff5555);
+  margin: 0;
+}
+
+/* Inline slider row — used by the shadow-distance control. Sits flush with
+   the surrounding menuitem buttons but exposes a range input + reset +
+   live readout instead. Doesn't dismiss the popover on click so the user
+   can drag the slider freely. */
+.pet-menu-slider-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--fg);
+}
+.pet-menu-slider-row label {
+  cursor: help;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.pet-menu-slider-row input[type='range'] {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent, #00e08a);
+}
+.pet-menu-slider-reset {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 22px !important;
+  height: 22px;
+  min-height: 22px !important;
+  padding: 0 !important;
+  border-radius: 4px;
+  border: 1px solid var(--stroke) !important;
+  background: var(--surface-1) !important;
+  color: var(--fg-mute) !important;
+  font-size: 13px;
+  cursor: pointer;
+}
+.pet-menu-slider-val {
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-mute);
+  font-size: 11px;
+}
+
+/* Preview-animation chip grid in the pet menu. Lets the user scrub through
+   every mood the pet defines without needing to wait for the right
+   chat-streaming state to occur naturally. Lives between the manual
+   triggers (Power move / Fight / XP) and the appearance toggles. */
+.pet-menu-preview-grid {
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pet-menu-preview-label {
+  font-size: 11px;
+  color: var(--fg-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Coverage row sits above the chip grid showing "N/M animations" with an
+   ↻ Upgrade button when missing rows exist. Codex-full (all 9 codex moods
+   present) reads green; codex-partial reads amber. The Upgrade button
+   opens the hatch wizard so missing rows can be generated. */
+.pet-menu-preview-coverage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pet-menu-preview-coverage-count {
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+.pet-menu-preview-coverage-count.is-codex-full {
+  background: color-mix(in oklab, var(--accent, #00e08a) 14%, transparent);
+  color: var(--accent, #00e08a);
+  border-color: color-mix(in oklab, var(--accent, #00e08a) 28%, transparent);
+}
+.pet-menu-preview-coverage-count.is-codex-partial {
+  background: color-mix(in oklab, var(--accent-2, #ffaa48) 14%, transparent);
+  color: var(--accent-2, #ffaa48);
+  border-color: color-mix(in oklab, var(--accent-2, #ffaa48) 28%, transparent);
+}
+.pet-menu-popover .pet-menu-preview-upgrade {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  min-height: 0;
+  margin-left: auto;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: 1px solid color-mix(in oklab, var(--accent-2, #ffaa48) 40%, transparent);
+  background: transparent;
+  color: var(--accent-2, #ffaa48);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.pet-menu-popover .pet-menu-preview-upgrade:hover,
+.pet-menu-popover .pet-menu-preview-upgrade:focus-visible {
+  background: color-mix(in oklab, var(--accent-2, #ffaa48) 14%, transparent);
+  border-color: var(--accent-2, #ffaa48);
+  outline: none;
+}
+
+/* YHA-extra chip variant — subtle accent border so the extras (fighting,
+   reconnecting) are visually distinguishable from the Codex 9 in the chip
+   grid without screaming for attention. */
+.pet-menu-popover .pet-menu-preview-chip.is-yha-extra {
+  border-color: color-mix(in oklab, var(--accent-2, #ffaa48) 30%, var(--stroke));
+}
+.pet-menu-preview-chips {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+/* `.pet-menu-popover button` (above) sets width:100% + min-height:28px on
+   every button in the popover — that would stretch each preview chip to a
+   full row, breaking the grid. Increase specificity here by qualifying
+   with the popover class so we override those, AND reset width/min-height
+   explicitly. `display: flex` (block-level) fills the 2-column grid cell;
+   `width: 100%` makes every chip the same width so the grid stays tidy. */
+.pet-menu-popover .pet-menu-preview-chip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  width: 100%;
+  min-height: 24px;
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid var(--stroke);
+  background: var(--surface-1);
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+.pet-menu-popover .pet-menu-preview-chip:hover:not(:disabled),
+.pet-menu-popover .pet-menu-preview-chip:focus-visible:not(:disabled) {
+  border-color: var(--accent, #00e08a);
+  background: color-mix(in oklab, var(--accent, #00e08a) 12%, var(--surface-1));
+}
+.pet-menu-popover .pet-menu-preview-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+/* Inline "+XP" badge for the XP burst chip — pushed to the right end of
+   the chip via margin-left: auto so the glyph + label stay left-aligned. */
+.pet-chip-badge {
+  margin-left: auto;
+  padding: 1px 4px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.4;
+  border-radius: 3px;
+  background: var(--accent-2, #ffaa48);
+  color: var(--bg, #0a0a0a);
+  white-space: nowrap;
+}
+
+/* ── Profile detail card ──────────────────────────────────────────────────
+   Visualises the active PetProfile's tagline, behaviour list, and pet/profile
+   fit hint. Used by the in-overlay pet menu (PetHeaderButton) AND the Prefs
+   tab (PetPrefsSection) so the picker UI is consistent.
+
+   The behaviour list is a "definition list" — each item has a bold label and
+   a lighter summary, stacked tightly so 6-8 behaviours fit without scrolling.
+*/
+.pet-profile-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 0 0;
+  border-top: 1px solid color-mix(in oklab, var(--stroke) 60%, transparent);
+  margin-top: 4px;
+}
+.pet-profile-detail-tagline {
+  font-size: 11px;
+  line-height: 1.4;
+  margin: 0;
+  color: var(--fg-dim);
+  font-style: italic;
+}
+.pet-profile-detail-preferred-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pet-profile-detail-preferred {
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--accent, #00e08a) 18%, transparent);
+  color: var(--accent, #00e08a);
+  border: 1px solid color-mix(in oklab, var(--accent, #00e08a) 30%, transparent);
+}
+.pet-profile-detail-reset {
+  font-size: 10px;
+  line-height: 1.2;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fg-dim);
+  border: 1px solid var(--stroke);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.pet-profile-detail-reset:hover,
+.pet-profile-detail-reset:focus-visible {
+  background: color-mix(in oklab, var(--accent, #00e08a) 10%, transparent);
+  color: var(--fg);
+  border-color: var(--accent, #00e08a);
+  outline: none;
+}
+.pet-profile-detail-behaviors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pet-profile-behavior {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--surface-1) 70%, transparent);
+  border: 1px solid color-mix(in oklab, var(--stroke) 70%, transparent);
+}
+.pet-profile-behavior-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.2;
+}
+.pet-profile-behavior-summary {
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--fg-dim);
+}
+.pet-profile-detail-fit {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+  line-height: 1.3;
+}
+.pet-profile-detail-fit.is-full {
+  background: color-mix(in oklab, var(--accent, #00e08a) 12%, transparent);
+  color: var(--accent, #00e08a);
+}
+.pet-profile-detail-fit.is-partial {
+  background: color-mix(in oklab, var(--accent-2, #ffaa48) 14%, transparent);
+  color: var(--accent-2, #ffaa48);
+}
+.pet-profile-detail-fit-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 9px;
+  opacity: 0.85;
+}
+.pet-profile-detail-fit-count {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.pet-profile-detail-fit-missing {
+  font-size: 9.5px;
+  opacity: 0.85;
+}
+
+/* ── Quick-swap pet grid ─────────────────────────────────────────────────────
+   3-column grid at the bottom of the pet popover for fast pet switching.
+   max-height shows ~2 rows; extra pets scroll vertically.
+   Two-class selector (.pet-quick-swap-grid .pet-quick-swap-item) beats the
+   generic .pet-menu-popover button rule (0,1,1) so flex/padding overrides
+   land without !important. */
+.pet-quick-swap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  max-height: 230px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2px 0 4px;
+}
+
+.pet-quick-swap-grid .pet-quick-swap-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 3px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition:
+    background 120ms,
+    border-color 120ms;
+  min-height: unset;
+  width: 100%;
+}
+
+.pet-quick-swap-grid .pet-quick-swap-item:hover:not(:disabled) {
+  background: var(--surface-2, rgba(255, 255, 255, 0.07));
+}
+
+.pet-quick-swap-grid .pet-quick-swap-item.is-active {
+  border-color: var(--accent, #7eb8ff);
+  background: color-mix(in srgb, var(--accent, #7eb8ff) 10%, transparent);
+  cursor: default;
+}
+
+.pet-quick-swap-grid .pet-quick-swap-item:disabled:not(.is-active) {
+  opacity: 0.5;
+}
+
+.pet-quick-swap-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 3px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.pet-quick-swap-label {
+  font-size: 9px;
+  line-height: 1.2;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg-dim, rgba(255, 255, 255, 0.5));
+}
+
+.pet-quick-swap-grid .pet-quick-swap-item.is-active .pet-quick-swap-label {
+  color: var(--accent, #7eb8ff);
+  font-weight: 600;
+}
+
+/* ── Pet QuickChat section ──────────────────────────────────────────────────
+   A compact block inside the pet menu popover that lets the user assign an
+   independent background session, model, and capability settings for the pet.
+   Sits between the quick-swap gallery and the action button grid.
+   ─────────────────────────────────────────────────────────────────────────── */
+.pet-quickchat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px 4px;
+}
+
+/* Small section label above the controls */
+.pet-quickchat-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-mute, rgba(255, 255, 255, 0.38));
+  padding: 0 2px 1px;
+}
+
+/* Session picker button — full-width, left-aligned, with a trailing caret */
+.pet-menu-popover .pet-quickchat-section .pet-quickchat-session-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 26px;
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 6px;
+  border: 1px solid var(--stroke, #2a2a2a);
+  background: var(--surface-1, #1c1c1c);
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+}
+.pet-menu-popover .pet-quickchat-section .pet-quickchat-session-btn:hover:not(:disabled) {
+  border-color: var(--accent, #00e08a);
+  background: color-mix(in oklab, var(--accent, #00e08a) 9%, var(--surface-1, #1c1c1c));
+}
+.pet-qc-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pet-qc-icon {
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+}
+.pet-qc-caret {
+  flex-shrink: 0;
+  font-size: 9px;
+  opacity: 0.5;
+  margin-left: auto;
+}
+
+/* Model + cap badges row */
+.pet-quickchat-model-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Model picker button — grows to fill remaining space */
+.pet-menu-popover .pet-quickchat-section .pet-quickchat-model-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  min-height: 26px;
+  padding: 4px 7px;
+  font-size: 10.5px;
+  border-radius: 6px;
+  border: 1px solid var(--stroke, #2a2a2a);
+  background: var(--surface-1, #1c1c1c);
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease;
+  overflow: hidden;
+}
+.pet-menu-popover .pet-quickchat-section .pet-quickchat-model-btn:hover:not(:disabled) {
+  border-color: var(--accent, #00e08a);
+  background: color-mix(in oklab, var(--accent, #00e08a) 9%, var(--surface-1, #1c1c1c));
+}
+.pet-qc-provider-chip {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--accent, #00e08a) 20%, var(--surface-2, #222));
+  color: var(--fg);
+  line-height: 1.4;
+}
+
+/* Three capability badge buttons (Vision / Reasoning / Tools) */
+.pet-quickchat-caps {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.pet-menu-popover .pet-quickchat-section .pet-qc-cap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  min-height: 26px;
+  padding: 0;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid var(--stroke, #2a2a2a);
+  background: var(--surface-1, #1c1c1c);
+  color: var(--fg-mute, rgba(255, 255, 255, 0.38));
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    color 120ms ease;
+}
+.pet-menu-popover .pet-quickchat-section .pet-qc-cap:hover:not(:disabled) {
+  background: var(--surface-2, #222);
+  color: var(--fg);
+}
+.pet-menu-popover .pet-quickchat-section .pet-qc-cap.cap-active {
+  border-color: var(--accent, #00e08a);
+  background: color-mix(in oklab, var(--accent, #00e08a) 18%, var(--surface-1, #1c1c1c));
+  color: var(--accent, #00e08a);
+}
+.pet-menu-popover .pet-quickchat-section .pet-qc-cap.cap-filter {
+  border-color: var(--color-warning, #ffaa48);
+  background: color-mix(in oklab, var(--color-warning, #ffaa48) 12%, var(--surface-1, #1c1c1c));
+  color: var(--color-warning, #ffaa48);
+}
+
+/* Voice → Pet route opt-in toggle. Compact full-width row, mirrors the
+   session row but with an explicit on/off chip on the right. */
+.pet-quickchat-voice-route {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 4px 6px;
+  background: var(--surface-1, #1c1c1c);
+  border: 1px solid var(--stroke, #333);
+  border-radius: var(--radius-sm, 8px);
+  color: var(--fg);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.pet-quickchat-voice-route:hover {
+  background: var(--surface-2, #222);
+}
+.pet-quickchat-voice-route.is-on {
+  border-color: var(--accent, #00e08a);
+  background: color-mix(in oklab, var(--accent, #00e08a) 12%, var(--surface-1, #1c1c1c));
+}
+.pet-quickchat-voice-route .pet-qc-label {
+  flex: 1;
+  text-align: left;
+}
+.pet-quickchat-voice-route .pet-qc-voice-state {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--fg-mute, #506576);
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--surface-2, #222);
+}
+.pet-quickchat-voice-route.is-on .pet-qc-voice-state {
+  color: var(--accent, #00e08a);
+  background: color-mix(in oklab, var(--accent, #00e08a) 18%, var(--surface-2, #222));
+}
+
+/* ── Mini session picker sub-popover ──────────────────────────────────────── */
+.pet-session-mini-picker {
+  z-index: 9999;
+  min-width: 220px;
+}
+.pet-smp-head {
+  padding: 6px 8px 4px;
+}
+.pet-smp-create-btn {
+  width: 100%;
+}
+.pet-smp-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+/* Signed-in user info — avatar styles & dropdown body live further down with
+   #hs-user-info. Keep #user-info-name/email/id as bare ids in case other
+   code references them, but rely on the new dropdown section for layout. */
+

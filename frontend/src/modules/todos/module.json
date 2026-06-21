@@ -1,0 +1,14 @@
+{
+  "name": "todos",
+  "version": "0.1.0",
+  "kind": "frontend",
+  "description": "Per-WD task list — Zustand store + full-screen TodosModal. Hydrates from /v1/todos (served by the bridge half of this module). The session-picker inline rendering is still owned by panels/CwdPanel.tsx; this module only ships the modal + store today. The session-picker slot rewrite (belowSessions region + cwdDropdownEntries entry) is deferred to a follow-up batch — see the bridge half's index.ts for rationale.",
+  "needs": [],
+  "provides": {
+    "frontendRegisters": []
+  },
+  "lifecycle": {
+    "hot": true,
+    "drainTimeoutMs": 0
+  }
+}

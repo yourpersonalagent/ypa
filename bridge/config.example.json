@@ -1,0 +1,110 @@
+{
+  "defaults": {
+    "model": "claude-sonnet-4-6",
+    "notebooklm_bin": "/path/to/notebooklm/binary",
+    "preset": "neutral",
+    "useAgents": true,
+    "agent_max_iter": 25,
+    "tool_max_iter": 150,
+    "tool_result_limit": 5000,
+    "tool_preview_limit": 300,
+    "image_model": "gemini-2.5-flash-image",
+    "image_provider": "Google",
+    "audio_model": "gemini-2.5-pro-preview-tts",
+    "audio_provider": "Google",
+    "video_model": "veo-3.1-generate-preview",
+    "video_provider": "Google",
+    "anthropicApiMode": "api",
+    "apiLoggingEnabled": false,
+    "chat_history_max_turns": 8,
+    "chat_history_max_chars": 8000,
+    "chat_history_mode": "turns_chars",
+    "codexExecMode": "bypass",
+    "tool_command_overwrite_enabled": true,
+    "tool_command_overwrite_tools": [
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Bash",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "Task"
+    ],
+    "claudeInstances": [
+      {
+        "label": "Default",
+        "configDir": "~/.claude"
+      }
+    ]
+  },
+  "providers": [
+    {
+      "name": "Anthropic",
+      "api_key": "YOUR_ANTHROPIC_API_KEY_HERE",
+      "endpoint": "https://api.anthropic.com/v1",
+      "models": {
+        "claude-sonnet-4-6": {
+          "model_id": "claude-sonnet-4-6",
+          "type": "llm",
+          "price_input": 3,
+          "price_output": 15,
+          "context_window": 200000,
+          "max_tokens": 8192,
+          "supports_images": true,
+          "supports_audio": false,
+          "supports_video": false,
+          "supports_tools": true,
+          "supports_agents": true
+        }
+      }
+    },
+    {
+      "name": "OpenAI",
+      "api_key": "YOUR_OPENAI_API_KEY_HERE",
+      "endpoint": "https://api.openai.com/v1",
+      "models": {
+        "gpt-4o": {
+          "model_id": "gpt-4o",
+          "type": "llm",
+          "price_input": 2.5,
+          "price_output": 10,
+          "context_window": 128000,
+          "max_tokens": 4096,
+          "supports_images": true,
+          "supports_audio": false,
+          "supports_video": false,
+          "supports_tools": true,
+          "supports_agents": true
+        }
+      }
+    },
+    {
+      "name": "Google",
+      "api_key": "YOUR_GOOGLE_API_KEY_HERE",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta",
+      "models": {
+        "gemini-2.5-pro-preview": {
+          "model_id": "gemini-2.5-pro-preview",
+          "type": "llm",
+          "price_input": 0.125,
+          "price_output": 0.375,
+          "context_window": 2000000,
+          "max_tokens": 8192,
+          "supports_images": true,
+          "supports_audio": true,
+          "supports_video": true,
+          "supports_tools": true,
+          "supports_agents": true
+        }
+      }
+    },
+    {
+      "name": "OpenRouter",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE",
+      "endpoint": "https://openrouter.ai/api/v1",
+      "models": {}
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+/* ── Bash Console Window (MoveableWindow content) ───────────────────────────
+   Drawer-era styles (#bc-drawer, .bc-header, .bc-close, .bc-hm-btn) were
+   removed when the console was rewritten as a moveable window — the chrome
+   now comes from .mw-card / .mw-header / .mw-btn (see MoveableWindow.tsx).
+   The .bc-* rules below style the inner body (history list + footer input)
+   that lives INSIDE the moveable window's body slot.
+
+   .bash-window-body resets the default mw-body padding (the .bc-body has its
+   own scroll + padding) and turns the body into a column flex container so
+   .bc-body can take flex:1 and own the vertical scroll. */
+.bash-window-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  font-family: var(--font-mono, 'Fira Mono', monospace);
+}
+
+.bc-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  /* position:relative so the ::after ping ring is anchored here */
+  position: relative;
+}
+/* Ping ring — uses transform+opacity instead of box-shadow so the animation
+   is compositor-only (no CPU repaint on every frame). Same visual as before:
+   a ring expands outward and fades; only the implementation differs. */
+.bc-live-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 224, 138, 0.5);
+  animation: bc-pulse 2.2s ease-in-out infinite;
+}
+@keyframes bc-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.bc-subtitle {
+  font-size: 10px;
+  color: var(--fg-mute);
+  font-family: inherit;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.bc-running-badge {
+  font-size: 10px;
+  color: var(--accent-2);
+  letter-spacing: 0.03em;
+}
+
+.bc-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--stroke-2) transparent;
+}
+.bc-body::-webkit-scrollbar {
+  width: 5px;
+}
+.bc-body::-webkit-scrollbar-thumb {
+  background: var(--stroke-2);
+  border-radius: 3px;
+}
+
+.bc-empty {
+  color: var(--fg-mute);
+  font-size: 11.5px;
+  text-align: center;
+  padding: 28px 0;
+  font-family: inherit;
+}
+.bc-entry {
+  margin-bottom: 10px;
+}
+.bc-cmd-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.bc-cmd-line::before {
+  content: '$';
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.bc-cmd-text {
+  color: var(--fg);
+}
+.bc-exit-ok {
+  color: var(--fg-mute);
+  font-size: 10px;
+}
+.bc-exit-err {
+  color: var(--danger);
+  font-size: 10px;
+}
+.bc-ts {
+  color: var(--fg-mute);
+  font-size: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.bc-output {
+  margin: 2px 0 0 14px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 11.5px;
+  color: var(--fg-dim);
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+.bc-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--stroke-2);
+  flex-shrink: 0;
+}
+.bc-prompt {
+  color: var(--accent);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.bc-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 2px 0;
+}
+.bc-input::placeholder {
+  color: var(--fg-mute);
+}
+.bc-input:disabled {
+  opacity: 0.5;
+}
+.bc-run-btn {
+  background: none;
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-xs);
+  color: var(--fg-dim);
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color var(--dur-fast),
+    border-color var(--dur-fast);
+}
+.bc-run-btn:hover:not(:disabled) {
+  color: var(--fg);
+  border-color: var(--accent);
+}
+.bc-run-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+

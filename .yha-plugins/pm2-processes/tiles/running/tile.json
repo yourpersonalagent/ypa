@@ -1,0 +1,22 @@
+{
+  "id": "running",
+  "label": "PM2 processes",
+  "template": "table",
+  "data": "data.ts",
+  "refresh": "manual",
+  "size": { "w": 520, "h": 360 },
+  "headline": { "from": "top", "label": "pm2 top" },
+  "props": {
+    "dataPath": "rows",
+    "columns": [
+      { "header": "Name", "valuePath": "name" },
+      { "header": "Status", "valuePath": "status" },
+      { "header": "CPU%", "valuePath": "cpu", "align": "right" },
+      { "header": "MEM", "valuePath": "mem", "align": "right" },
+      { "header": "Uptime", "valuePath": "uptime", "align": "right" },
+      { "header": "↻", "valuePath": "restarts", "align": "right" },
+      { "header": "PID", "valuePath": "pid", "align": "right" }
+    ]
+  },
+  "command": { "keywords": ["pm2", "processes", "services", "daemons"] }
+}

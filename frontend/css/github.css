@@ -1,0 +1,605 @@
+/* ── GitHub / git source-control panel ──────────────────────────────────────
+   Mounted inside .hs-body#github-panel in the left sidebar.
+   Mimics VSCode's SCM panel: repo cards, file status list, commit textarea.
+
+   All colours route through themed CSS variables (--surface*, --fg*,
+   --stroke*, --accent*, --danger, --hl). Avoid raw rgba() and --text-*
+   tokens — those collapse to dark grey on coloured themes (kawaii, ocean,
+   sunset, …) because they're only set on the variant base.
+ ─────────────────────────────────────────────────────────────────────────── */
+
+/* Panel-level header (title + global refresh) */
+.gh-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 4px;
+  border-bottom: 1px solid var(--stroke);
+}
+.gh-panel-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+.gh-refresh-all-btn {
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  line-height: 1;
+  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.gh-refresh-all-btn:hover {
+  color: var(--fg);
+  background: var(--hl);
+}
+
+/* ── Repo card ───────────────────────────────────────────────────────────── */
+.gh-repo-card {
+  border-bottom: 1px solid var(--stroke);
+}
+.gh-repo-card:last-child {
+  border-bottom: none;
+}
+
+/* Card header row — click to expand/collapse */
+.gh-repo-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px 7px 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--dur-fast) var(--ease);
+}
+.gh-repo-header:hover {
+  background: var(--hl);
+}
+
+.gh-repo-chevron {
+  font-size: 10px;
+  color: var(--fg-mute);
+  flex-shrink: 0;
+  width: 10px;
+}
+.gh-repo-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gh-repo-remote-name {
+  font-weight: 400;
+  color: var(--fg-mute);
+  font-size: 11px;
+}
+.gh-repo-branch {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: var(--radius-xs);
+  padding: 1px 5px;
+  flex-shrink: 0;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ahead/behind sync badge */
+.gh-sync-badge {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  border-radius: var(--radius-xs);
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+.gh-sync-ahead {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.gh-sync-behind {
+  color: var(--accent-3);
+  background: color-mix(in srgb, var(--accent-3) 12%, transparent);
+}
+.gh-sync-diverged {
+  color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+}
+
+/* Changed-file count badge */
+.gh-count-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--fg-dim);
+  background: var(--stroke-2);
+  border-radius: 99px;
+  padding: 0 5px;
+  min-width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Per-repo refresh button */
+.gh-refresh-btn {
+  background: none;
+  border: none;
+  color: var(--fg-mute);
+  font-size: 13px;
+  padding: 1px 3px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--dur-fast), color var(--dur-fast);
+}
+.gh-repo-header:hover .gh-refresh-btn {
+  opacity: 1;
+}
+.gh-refresh-btn:hover {
+  color: var(--fg);
+}
+
+/* ── Repo body (expanded) ─────────────────────────────────────────────────── */
+.gh-repo-body {
+  padding: 0 0 6px;
+}
+
+/* Section labels: "Staged N  [Unstage All]" */
+.gh-section-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+.gh-section-count {
+  font-weight: 400;
+  color: var(--fg-dim);
+}
+
+/* Small inline link buttons (Stage All / Unstage All) */
+.gh-link-btn {
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: var(--radius-xs);
+  margin-left: auto;
+  transition: color var(--dur-fast);
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 400;
+}
+.gh-link-btn:hover {
+  color: var(--accent);
+}
+
+/* ── File rows ────────────────────────────────────────────────────────────── */
+.gh-file-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 12px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background var(--dur-fast);
+  min-height: 24px;
+}
+.gh-file-row:hover {
+  background: var(--hl);
+}
+
+/* Status character badge */
+.gh-file-status {
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+.gh-s-modified  { color: var(--accent-2); }
+.gh-s-added     { color: var(--accent); }
+.gh-s-deleted   { color: var(--danger); }
+.gh-s-renamed   { color: var(--accent-3); }
+.gh-s-copied    { color: var(--accent-3); }
+.gh-s-conflict  { color: var(--danger); }
+.gh-s-untracked { color: var(--fg-mute); }
+
+/* File path text */
+.gh-file-name {
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--fg-dim);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gh-file-row:hover .gh-file-name {
+  color: var(--fg);
+}
+
+/* Stage/unstage toggle hint */
+.gh-file-toggle {
+  font-size: 11px;
+  color: var(--fg-mute);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+}
+.gh-file-row:hover .gh-file-toggle {
+  opacity: 1;
+}
+
+/* ── Commit area ──────────────────────────────────────────────────────────── */
+.gh-commit-area {
+  padding: 8px 10px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gh-commit-msg {
+  width: 100%;
+  min-height: 56px;
+  max-height: 140px;
+  background: var(--bg-2);
+  color: var(--fg);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--dur-fast);
+  line-height: 1.4;
+}
+.gh-commit-msg:focus {
+  border-color: var(--accent);
+}
+.gh-commit-msg::placeholder {
+  color: var(--fg-mute);
+}
+
+/* Action buttons row */
+.gh-commit-actions {
+  display: flex;
+  gap: 6px;
+}
+.gh-btn {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease),
+    opacity var(--dur-fast),
+    transform var(--dur-fast);
+}
+.gh-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+}
+.gh-btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* Commit button — accent fill. Text uses --bg-2 which is the variant base
+   in every theme: dark on a light accent (dark mode) or light on a dark
+   accent (bright mode). */
+.gh-btn-commit {
+  background: var(--accent);
+  color: var(--bg-2);
+}
+.gh-btn-commit:not(:disabled):hover {
+  background: var(--accent);
+  filter: brightness(1.1);
+}
+
+/* Sync button — subtle outline */
+.gh-btn-sync {
+  background: var(--surface-2);
+  color: var(--fg-dim);
+  border: 1px solid var(--stroke-2);
+}
+.gh-btn-sync:not(:disabled):hover {
+  border-color: var(--accent-3);
+  color: var(--accent-3);
+}
+
+/* ── Token management ─────────────────────────────────────────────────────── */
+.gh-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.gh-token-btn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  line-height: 1;
+  transition: opacity var(--dur-fast), background var(--dur-fast);
+}
+.gh-token-btn:hover { background: var(--hl); }
+.gh-token-ok      { opacity: 0.75; }
+.gh-token-missing { opacity: 0.35; filter: grayscale(1); }
+.gh-token-missing:hover { opacity: 0.85; filter: none; }
+
+.gh-token-form {
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--stroke);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--hl);
+}
+
+.gh-token-input {
+  width: 100%;
+  background: var(--bg-2);
+  color: var(--fg);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-xs);
+  padding: 6px 8px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  outline: none;
+  transition: border-color var(--dur-fast);
+}
+.gh-token-input:focus { border-color: var(--accent); }
+
+.gh-token-row { display: flex; gap: 5px; }
+
+.gh-btn-token-save {
+  background: var(--accent);
+  color: var(--bg-2);
+  flex: 1;
+}
+.gh-btn-token-save:not(:disabled):hover {
+  background: var(--accent);
+  filter: brightness(1.1);
+}
+
+.gh-btn-token-clear {
+  background: var(--surface-2);
+  color: var(--fg-dim);
+  border: 1px solid var(--stroke-2);
+}
+.gh-btn-token-clear:not(:disabled):hover { border-color: var(--danger); color: var(--danger); }
+
+.gh-token-hint {
+  font-size: 10.5px;
+  color: var(--fg-mute);
+  line-height: 1.5;
+  margin: 0;
+}
+.gh-token-hint code {
+  font-family: var(--font-mono);
+  background: var(--hl);
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
+/* Status/result message line */
+.gh-status-msg {
+  font-size: 11px;
+  border-radius: var(--radius-xs);
+  padding: 4px 8px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.gh-status-ok  { color: var(--accent);  background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.gh-status-err { color: var(--danger);  background: color-mix(in srgb, var(--danger) 10%, transparent); }
+
+/* Loading / empty states */
+.gh-loading,
+.gh-empty {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--fg-mute);
+  line-height: 1.5;
+  text-align: center;
+}
+.gh-empty .gh-link-btn {
+  margin: 6px auto 0;
+  display: block;
+  color: var(--accent);
+  font-size: 12px;
+}
+
+/* ── Commits / jump-back ────────────────────────────────────────────────────
+   Expandable list of recent commits below the commit/sync area. "jump" runs a
+   safe detached-HEAD checkout server-side — never force/reset/clean — so
+   ignored files (databases, keys, chat history) survive a jump untouched. */
+.gh-history {
+  border-top: 1px solid var(--stroke);
+  margin-top: 4px;
+}
+.gh-history-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px 6px 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--dur-fast) var(--ease);
+}
+.gh-history-header:hover {
+  background: var(--hl);
+}
+.gh-history-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+  flex: 1;
+}
+.gh-detached-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent-2) 14%, transparent);
+  border-radius: var(--radius-xs);
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+.gh-history-body {
+  padding: 0 0 4px;
+}
+
+/* Detached-HEAD banner + Return-to-branch button */
+.gh-detached-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 10px 8px;
+  padding: 7px 9px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--fg-dim);
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 35%, transparent);
+  border-radius: var(--radius-sm);
+}
+.gh-btn-return {
+  flex: none;
+  align-self: flex-start;
+  background: var(--surface-2);
+  color: var(--fg-dim);
+  border: 1px solid var(--stroke-2);
+  padding: 5px 10px;
+}
+.gh-btn-return:not(:disabled):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Uncommitted-changes warning */
+.gh-history-warn {
+  margin: 4px 10px 8px;
+  padding: 5px 8px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
+  border-radius: var(--radius-xs);
+}
+
+/* Commit rows */
+.gh-commit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 12px;
+  min-height: 30px;
+  transition: background var(--dur-fast);
+}
+.gh-commit-row:hover {
+  background: var(--hl);
+}
+.gh-commit-current {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.gh-commit-remote {
+  background: color-mix(in srgb, var(--accent-3) 10%, transparent);
+  border-left: 2px solid var(--accent-3);
+  padding-left: 10px;
+}
+.gh-commit-remote:hover {
+  background: color-mix(in srgb, var(--accent-3) 14%, transparent);
+}
+.gh-commit-hash {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--accent-3);
+  flex-shrink: 0;
+  width: 52px;
+}
+.gh-commit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.gh-commit-subject {
+  font-size: 11.5px;
+  color: var(--fg-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gh-commit-row:hover .gh-commit-subject {
+  color: var(--fg);
+}
+.gh-commit-meta {
+  font-size: 9.5px;
+  color: var(--fg-mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gh-commit-remote-tag {
+  color: var(--accent-3);
+}
+.gh-commit-here {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.gh-commit-jump {
+  flex-shrink: 0;
+  background: var(--surface-2);
+  color: var(--fg-mute);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-xs);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+}
+.gh-commit-row:hover .gh-commit-jump {
+  opacity: 1;
+}
+.gh-commit-jump:not(:disabled):hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.gh-commit-jump:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

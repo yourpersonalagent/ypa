@@ -1,0 +1,22 @@
+[
+  {
+    "id": "example-partner",
+    "type": "hermes",
+    "name": "Example Partner",
+    "symbolColor": "#5cc8ff",
+    "enabled": false,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "example-openclaw",
+    "type": "openclaw",
+    "name": "Example OpenClaw",
+    "symbolColor": "var(--avatar-5)",
+    "enabled": false,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "host": "192.0.2.1",
+    "port": 18789,
+    "token": "",
+    "agentId": "main"
+  }
+]

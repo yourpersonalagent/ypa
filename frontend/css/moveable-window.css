@@ -1,0 +1,138 @@
+/* MoveableWindow — generic moveable, resizable, fullscreen-toggleable card.
+   Used as a wrapper around feature-specific content (BrowserWindow, FileEditor).
+   Lifted out of browser-window.css. */
+
+/* Anchored via position:absolute + inset:0 rather than position:fixed so the
+ * small-screen `html { zoom: 0.9 }` rule in prefs-modal.css doesn't render
+ * the card box 10% short on the right + bottom. Fixed-position descendants
+ * of a zoomed html still inherit the zoom and end up smaller than the
+ * visual viewport; absolute+inset:0 fills html's unzoomed content box,
+ * which the cascade then scales back to exactly the viewport. */
+.mw-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Modal variant: dim/blur the background and capture clicks for outside-close. */
+.mw-overlay-modal {
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.mw-card {
+  pointer-events: auto;
+  background: var(--surface-2);
+  border: 1px solid var(--stroke-2);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Floor comes from each window's minWidth/minHeight (the inline --mw-min-*
+     vars set by MoveableWindow) but is capped to the viewport via min(…,100%).
+     The card's containing block is .mw-overlay (inset:0 == the zoom-adjusted
+     layout viewport), so an uncapped floor wider/taller than the screen would
+     push the right/bottom edge — and the resize handle — off-screen on small
+     displays, leaving the window stuck oversized and un-resizable. */
+  min-width: min(var(--mw-min-w, 360px), 100%);
+  min-height: min(var(--mw-min-h, 260px), 100%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+.mw-card.dragging,
+.mw-card.resizing {
+  user-select: none;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.55);
+}
+.mw-card:fullscreen {
+  border: none;
+  border-radius: 0;
+  background: var(--surface-1, #0d0d0d);
+}
+
+.mw-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 14px;
+  border-bottom: 1px solid var(--stroke);
+  cursor: grab;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  user-select: none;
+  flex-shrink: 0;
+  touch-action: none;
+}
+.mw-card.dragging .mw-header { cursor: grabbing; }
+.mw-card:fullscreen .mw-header { cursor: default; }
+
+.mw-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-1, #eaeaea);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 50vw;
+}
+
+.mw-spacer { flex: 1; }
+
+.mw-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-2, #a8a8a8);
+  width: 28px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.mw-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--stroke);
+  color: var(--text-1, #eaeaea);
+}
+.mw-btn.active {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.mw-body {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.mw-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  /* On phones the 16-px hit target was unreachable with a fingertip. Bump
+     the grab area without changing the visual; the gradient still fills the
+     bottom-right 16 px corner. */
+  width: 28px;
+  height: 28px;
+  cursor: nwse-resize;
+  background:
+    linear-gradient(135deg, transparent 64%, var(--stroke-2) 64%, var(--stroke-2) 72%, transparent 72%),
+    linear-gradient(135deg, transparent 82%, var(--stroke-2) 82%, var(--stroke-2) 90%, transparent 90%);
+  z-index: 2;
+  touch-action: none;
+}

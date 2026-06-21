@@ -1,0 +1,30 @@
+{
+  "name": "yha-workspace",
+  "private": true,
+  "workspaces": ["bridge", "frontend"],
+  "scripts": {
+    "start": "bun run --filter yha-bridge start",
+    "dev": "bun run --filter yha-bridge dev",
+    "dev:watch": "bun run --filter yha-frontend dev:watch",
+    "typecheck": "bun run --filter '*' typecheck",
+    "lint": "bun run --filter '*' lint",
+    "lint:fix": "bun run --filter '*' lint:fix",
+    "format": "bun run --filter '*' format",
+    "format:check": "bun run --filter '*' format:check",
+    "verify": "bun run typecheck && bun run verify:go && bun run test",
+    "verify:go": "cd go-core && go build ./... && go vet ./...",
+    "test": "bun run test:go && bun run test:bridge && bun run test:streaming",
+    "test:go": "cd go-core && go test ./...",
+    "test:bridge": "bun tools/run-bridge-tests.mjs",
+    "build": "bun run --filter yha-frontend build",
+    "preview": "bun run --filter yha-frontend preview",
+    "clean": "rm -rf node_modules bridge/node_modules frontend/node_modules bridge/dist frontend/dist",
+    "fresh": "bun run clean && bun install",
+    "release": "bun tools/bump-version.mjs",
+    "version:show": "bun tools/bump-version.mjs show",
+    "test:streaming": "bun test frontend/src/chat/__tests__/reconnect-placeholder.test.ts"
+  },
+  "engines": {
+    "bun": ">=1.2"
+  }
+}

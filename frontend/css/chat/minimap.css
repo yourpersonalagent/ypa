@@ -1,0 +1,67 @@
+/* ─── Chat Minimap ─────────────────────────────────────────────────────────── */
+#chat-minimap {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  width: 30px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.cm-tick {
+  position: absolute;
+  right: 3px;
+  width: var(--cm-w, 4px);
+  border-radius: 2px;
+  cursor: pointer;
+  pointer-events: all;
+  opacity: 0.25;
+  transition:
+    opacity var(--dur-fast),
+    width var(--dur-fast),
+    box-shadow var(--dur-fast);
+}
+/* Invisible hit-area extender: keeps the visible tick small but ensures a
+   minimum click/touch reach. --cm-pad-y is set inline (max(0, (8 - height)/2))
+   so visually-tiny ticks still get an ~8px tall hit zone. The 3px lateral
+   padding gives a bit of finger-room without altering the visual. */
+.cm-tick::before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: calc(-1 * var(--cm-pad-y, 0px));
+  bottom: calc(-1 * var(--cm-pad-y, 0px));
+}
+.cm-tick.user {
+  background: var(--accent-2);
+}
+.cm-tick.agent {
+  background: var(--accent);
+}
+
+.cm-tick:hover {
+  opacity: 1;
+  /* +4px width on hover so every tick visibly grows — including ones already
+     wider than 8px from the small-height grow curve. Default 4px → 8px (same
+     as before); 20px → 24px; etc. */
+  width: calc(var(--cm-w, 4px) + 4px);
+}
+.cm-tick.user:hover {
+  box-shadow: -4px 0 10px color-mix(in srgb, var(--accent-2) 55%, transparent);
+}
+.cm-tick.agent:hover {
+  box-shadow: -4px 0 10px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+html[data-variant='bright'] .cm-tick {
+  opacity: 0.6;
+}
+html[data-variant='bright'] .cm-tick.user:hover {
+  box-shadow: -4px 0 8px color-mix(in srgb, var(--accent-2) 40%, transparent);
+}
+html[data-variant='bright'] .cm-tick.agent:hover {
+  box-shadow: -4px 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+

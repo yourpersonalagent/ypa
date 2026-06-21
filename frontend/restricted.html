@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YHA</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        background: #0d0f11;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 20px;
+        font-family: 'Courier New', Courier, monospace;
+      }
+      h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        color: #00b4c8;
+      }
+      a {
+        font-size: 0.65rem;
+        color: #2a2f36;
+        text-decoration: none;
+        letter-spacing: 1px;
+      }
+      a:hover {
+        color: #6b7784;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>█ YHA</h1>
+    <a href="/auth/logout">sign out</a>
+  </body>
+</html>

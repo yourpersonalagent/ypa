@@ -1,0 +1,16 @@
+{
+  "name": "search",
+  "version": "0.1.0",
+  "kind": "bridge",
+  "description": "Web-search providers + orchestrator + /v1/search/* routes. Walks tavily/exa/google_cse/bing/brave in priority order, then falls through to playwright_mcp / web_mcp / free DDG-Brave fallback. Reads bridge/search-config.json + bridge/search-usage.json (user state files kept outside the module during migration). Disabling the module 404s /v1/search/* but the bridge `WebSearch` tool path in tools/exec.ts also imports the orchestrator — disabling does NOT silence that tool today.",
+  "needs": [],
+  "provides": {
+    "routes": [
+      "/v1/search/*"
+    ]
+  },
+  "lifecycle": {
+    "reload": "idle-only"
+  },
+  "category": "integrations"
+}

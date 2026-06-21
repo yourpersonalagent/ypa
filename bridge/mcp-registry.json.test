@@ -1,0 +1,1 @@
+{"mcpServers":{"knowledge-memory":{"command":"node","args":["/abs/path/knowledge-server.js"]},"bash-console":{"command":"node","args":["/abs/path/bash-console-server.js"]}}}
